@@ -1,5 +1,6 @@
 # bot.py
 from telethon import TelegramClient
+from telethon.sessions import StringSession
 from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID
 import glob
 import importlib.util
