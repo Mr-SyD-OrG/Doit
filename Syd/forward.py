@@ -13,7 +13,7 @@ SOURCE_CHAT_ID = -1002295881345
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHAT_ID))
 async def forward_if_allowed(event):
-    if event.message.forwards and event.message.forward:  # ✅ Ensure message is truly forwardable  # Check if forwarding is allowed
+    if event.message.forwards and event.message.forward_from:  # ✅ Only forwardable messages# ✅ Ensure message is truly forwardable  # Check if forwarding is allowed
         async with semaphore:  # Limit concurrent forwards
             try:
                 DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
