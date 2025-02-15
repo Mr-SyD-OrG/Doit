@@ -6,8 +6,7 @@ import importlib.util
 import os
 
 # Create Telegram client
-client = TelegramClient("userbot_session", API_ID, API_HASH)
-
+mrsyd = TelegramClient(StringSession(PHONE_NUMBER), APP_ID, APP_HASH)
 # Function to dynamically load plugins from the 'Syd' directory
 def load_plugins():
     plugins_path = "Syd"  # Change from "plugins" to "Syd"
@@ -20,7 +19,7 @@ def load_plugins():
         print(f"Loaded plugin: {module_name}")
 
 async def start_bot():
-    await client.start(PHONE_NUMBER)  # Userbot requires phone number login
+    await mrsyd.start()  # Userbot requires phone number login
     print("Userbot is running...")
 
     # Load plugins manually from Syd/
