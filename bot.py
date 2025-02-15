@@ -8,9 +8,9 @@ client = TelegramClient(
     API_ID,
     API_HASH,
     bot_token=BOT_TOKEN,
-    workers=200,
-    plugins={"root": "plugins"},  # Load all plugins from "plugins" folder
-    sleep_threshold=15,
+   # workers=200,
+    plugins={"root": "Syd"},  # Load all plugins from "plugins" folder
+  #  sleep_threshold=15,
 )
 
 # Ensure we only forward messages from the source chat
