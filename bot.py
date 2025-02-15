@@ -1,6 +1,6 @@
 # bot.py
 from telethon import TelegramClient
-from info import API_ID, API_HASH, BOT_TOKEN, SOURCE_CHAT_ID
+from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID
 
 # Create Telegram client with plugin support
 client = TelegramClient(
@@ -17,6 +17,6 @@ client = TelegramClient(
 #client.add_event_handler(forward_message, events.NewMessage(chats=SOURCE_CHAT_ID))
 
 async def start_bot():
-    await client.start()
-    print("Userbot with forwarding is running...")
+    await client.start(PHONE_NUMBER)  # Userbot requires phone number login
+    print("Userbot with plugins is running...")
     await client.run_until_disconnected()
