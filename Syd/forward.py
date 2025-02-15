@@ -2,7 +2,7 @@
 import asyncio
 from asyncio import Semaphore
 from telethon import events
-from info import DESTINATION_CHAT_ID
+from info import DESTINATION_CHAT_ID, SOURCE_CHAT_ID
 
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
