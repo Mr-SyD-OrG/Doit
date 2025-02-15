@@ -3,6 +3,8 @@ from telethon import TelegramClient
 from telethon.sessions import StringSession
 from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID
 import glob
+from aiohttp import web
+from Syd.web_support import web_server
 import importlib.util
 import os
 
@@ -25,5 +27,9 @@ async def start_bot():
 
     # Load plugins manually from Syd/
     load_plugins()
+    app = web.AppRunner(await web_server())
+    await app.setup()
+    bind_address = "0.0.0.0"
+    await web.TCPSite(app, bind_address, 8080).start()
 
     await mrsyd.run_until_disconnected()
