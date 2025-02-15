@@ -1,6 +1,7 @@
 # plugins/forwarder.py
 import asyncio
 import random
+from bot import mrsyd
 from asyncio import Semaphore
 from telethon import events
 #from info import SOURCE_CHAT_ID
