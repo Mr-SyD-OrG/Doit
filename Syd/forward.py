@@ -10,7 +10,7 @@ semaphore = Semaphore(2)
 DESTINATION_CHAT = [-1002433450358, -1002464733363]
 SOURCE_CHAT_ID = -1002295881345
 
-@client.on(events.NewMessage(chats=SOURCE_CHAT_ID))
+@mrsyd.on(events.NewMessage(chats=SOURCE_CHAT_ID))
 async def forward_if_allowed(event):
     if event.message.forward:  # Check if forwarding is allowed
         async with semaphore:  # Limit concurrent forwards
@@ -26,7 +26,7 @@ async def forward_if_allowed(event):
 
 
 
-@events.register(events.NewMessage(from_users=1733124290))
+@mrsyd.register(events.NewMessage(from_users=1733124290))
 async def handle_new_source(event):
     """Handles input, sets source chat & forwards messages within range if allowed."""
     
