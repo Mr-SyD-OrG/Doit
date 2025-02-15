@@ -7,7 +7,7 @@ import importlib.util
 import os
 
 # Create Telegram client
-mrsyd = TelegramClient(StringSession(PHONE_NUMBER), APP_ID, APP_HASH)
+mrsyd = TelegramClient(StringSession(PHONE_NUMBER), API_ID, API_HASH)
 # Function to dynamically load plugins from the 'Syd' directory
 def load_plugins():
     plugins_path = "Syd"  # Change from "plugins" to "Syd"
