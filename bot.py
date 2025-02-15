@@ -14,7 +14,7 @@ client = TelegramClient(
 )
 
 # Ensure we only forward messages from the source chat
-client.add_event_handler(forward_message, events.NewMessage(chats=SOURCE_CHAT_ID))
+#client.add_event_handler(forward_message, events.NewMessage(chats=SOURCE_CHAT_ID))
 
 async def start_bot():
     await client.start()
