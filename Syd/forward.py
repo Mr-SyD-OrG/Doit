@@ -18,27 +18,16 @@ async def forward_if_allowed(event):
     message = event.message
 
     # ✅ Check if forwarding is allowed
-    is_forwardable = message.forwards and (message.forward_from or message.forward_sender_name)
+    
+    async with semaphore:
+        try:
+            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
+            await event.client.forward_messages(DESTINATION_CHAT_ID, message)
+            print(f"✅ Message {message.id} forwarded successfully.")
+            await asyncio.sleep(300)
 
-    if is_forwardable:
-        async with semaphore:
-            try:
-                DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
-                await event.client.forward_messages(DESTINATION_CHAT_ID, message)
-                print(f"✅ Message {message.id} forwarded successfully.")
-                await asyncio.sleep(2)
-
-            except Exception as e:
-                error_message = str(e).lower()
-
-                # ❌ Ignore errors only if due to forwarding restrictions
-                if "not forwardable" in error_message or "cannot forward" in error_message:
-                    print(f"❌ Message {message.id} is restricted. Skipping...")
-                else:
-                    print(f"⚠️ Error forwarding message {message.id}: {e}")
-
-    else:
-        print(f"❌ Message {message.id} is restricted. Skipping...")
+        except Exception as e:
+            print(f"❌ Message {message.id} {e} is restricted. Skipping...")
 
 
 
