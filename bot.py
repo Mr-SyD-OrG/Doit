@@ -1,76 +1,22 @@
-import logging
-import logging.config
-import warnings
-from pyrogram import Client, idle
-from pyrogram import Client, __version__
-from pyrogram.raw.all import layer
-from config import Config
-from aiohttp import web
-from plugins.web_support import web_server
-from pytz import timezone
-from datetime import datetime
-import asyncio
+# bot.py
+from telethon import TelegramClient
+from config import API_ID, API_HASH, BOT_TOKEN, SOURCE_CHAT_ID
 
-import pyromod
+# Create Telegram client with plugin support
+client = TelegramClient(
+    "userbot_session",
+    API_ID,
+    API_HASH,
+    bot_token=BOT_TOKEN,
+    workers=200,
+    plugins={"root": "plugins"},  # Load all plugins from "plugins" folder
+    sleep_threshold=15,
+)
 
-logging.config.fileConfig('logging.conf')
-logging.getLogger().setLevel(logging.INFO)
-logging.getLogger("pyrogram").setLevel(logging.ERROR)
-logging.getLogger("pymongo").setLevel(logging.ERROR)
+# Ensure we only forward messages from the source chat
+client.add_event_handler(forward_message, events.NewMessage(chats=SOURCE_CHAT_ID))
 
-
-class Bot(Client):
-
-    def __init__(self):
-        super().__init__(
-            name="SnowRenamer",
-            api_id=Config.API_ID,
-            api_hash=Config.API_HASH,
-            bot_token=Config.BOT_TOKEN,
-            workers=200,
-            plugins={"root": "plugins"},
-            sleep_threshold=15,
-        )
-
-    async def start(self):
-        await super().start()
-        me = await self.get_me()
-        self.mention = me.mention
-        self.username = me.username
-        self.force_channel = Config.FORCE_SUB
-        if Config.FORCE_SUB:
-            try:
-                link = await self.export_chat_invite_link(Config.FORCE_SUB)
-                self.invitelink = link
-            except Exception as e:
-                logging.warning(e)
-                logging.warning("Make Sure Bot admin in force sub channel")
-                self.force_channel = None
-        app = web.AppRunner(await web_server())
-        await app.setup()
-        bind_address = "0.0.0.0"
-        await web.TCPSite(app, bind_address, Config.PORT).start()
-        logging.info(f"{me.first_name} ✅✅ BOT started successfully ✅✅")
-
-        for id in Config.ADMIN:
-            try:
-                await self.send_message(id, f"**__{me.first_name}  Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️__**")
-            except:
-                pass
-
-        if Config.LOG_CHANNEL:
-            try:
-                curr = datetime.now(timezone("Asia/Kolkata"))
-                date = curr.strftime('%d %B, %Y')
-                time = curr.strftime('%I:%M:%S %p')
-                await self.send_message(Config.LOG_CHANNEL, f"**__{me.mention} Iꜱ Rᴇsᴛᴀʀᴛᴇᴅ !!**\n\n📅 Dᴀᴛᴇ : `{date}`\n⏰ Tɪᴍᴇ : `{time}`\n🌐 Tɪᴍᴇᴢᴏɴᴇ : `Asia/Kolkata`\n\n🉐 Vᴇʀsɪᴏɴ : `v{__version__} (Layer {layer})`</b>")
-            except:
-                print("Pʟᴇᴀꜱᴇ Mᴀᴋᴇ Tʜɪꜱ Iꜱ Aᴅᴍɪɴ Iɴ Yᴏᴜʀ Lᴏɢ Cʜᴀɴɴᴇʟ")
-
-    async def stop(self, *args):
-        await super().stop()
-        logging.info("Bot Stopped 🙄")
-
-
-bot = Bot()
-bot.run()
+async def start_bot():
+    await client.start()
+    print("Userbot with forwarding is running...")
+    await client.run_until_disconnected()
