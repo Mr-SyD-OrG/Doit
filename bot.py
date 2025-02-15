@@ -1,6 +1,6 @@
 # bot.py
 from telethon import TelegramClient
-from config import API_ID, API_HASH, BOT_TOKEN, SOURCE_CHAT_ID
+from info import API_ID, API_HASH, BOT_TOKEN, SOURCE_CHAT_ID
 
 # Create Telegram client with plugin support
 client = TelegramClient(
