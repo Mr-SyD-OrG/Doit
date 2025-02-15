@@ -26,4 +26,4 @@ async def start_bot():
     # Load plugins manually from Syd/
     load_plugins()
 
-    await client.run_until_disconnected()
+    await mrsyd.run_until_disconnected()
