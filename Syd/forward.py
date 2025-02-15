@@ -70,7 +70,7 @@ async def handle_new_source(event):
                             continue
 
                         print(f"📤 Forwarding message {msg_id} from {source_chat}...")
-                        await event.client.forward_message(DESTINATION_CHAT_ID, message)
+                        await event.client.send_message(DESTINATION_CHAT_ID, message)
                         print(f"✅ Message {msg_id} forwarded successfully!")
                         await asyncio.sleep(300)  # Small delay to avoid spam
                     else:
