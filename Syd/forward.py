@@ -7,7 +7,7 @@ from telethon import events
 #from info import SOURCE_CHAT_ID
 
 # Semaphore to limit concurrent forwards (adjust as needed)
-semaphore = Semaphore(2)
+semaphore = Semaphore(1)
 DESTINATION_CHAT = [-1002433450358, -1002464733363]
 SOURCE_CHAT_ID = -1002295881345
 
@@ -24,7 +24,7 @@ async def forward_if_allowed(event):
             DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
             await event.client.forward_messages(DESTINATION_CHAT_ID, message)
             print(f"✅ Message {message.id} forwarded successfully.")
-            await asyncio.sleep(300)
+            await asyncio.sleep(200)
 
         except Exception as e:
             print(f"❌ Message {message.id} {e} is restricted. Skipping...")
@@ -61,7 +61,7 @@ async def handle_new_source(event):
                         print(f"📤 Forwarding message {msg_id} from {source_chat}...")
                         await event.client.send_message(-1002398194127, message)
                         print(f"✅ Message {msg_id} forwarded successfully!")
-                        await asyncio.sleep(300)  # Small delay to avoid spam
+                        await asyncio.sleep(200)  # Small delay to avoid spam
                     else:
                         print(f"❌ Message {msg_id} does not exist. Skipping.")
 
