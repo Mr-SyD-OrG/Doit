@@ -2,12 +2,12 @@
 import asyncio
 from asyncio import Semaphore
 from telethon import events
-from config import DESTINATION_CHAT_ID
+from info import DESTINATION_CHAT_ID
 
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
 
-@events.register(events.NewMessage)
+@events.register(events.NewMessage(chats=SOURCE_CHAT_ID))
 async def forward_message(event):
     """Forwards messages from the source chat to the destination."""
     async with semaphore:
