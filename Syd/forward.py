@@ -7,29 +7,24 @@ from telethon import events
 #from info import SOURCE_CHAT_ID
 
 # Semaphore to limit concurrent forwards (adjust as needed)
-semaphore = Semaphore(1)
+semaphore = Semaphore(2)
 DESTINATION_CHAT = [-1002433450358, -1002464733363]
-SOURCE_CHAT_ID = -1002295881345
+SOURCE_CHATS = [-1002295881345]
 
 
-@mrsyd.on(events.NewMessage(chats=SOURCE_CHAT_ID))
+@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
 async def forward_if_allowed(event):
-    """ Forward only if Telegram allows it. Ignore only restriction errors. """
     message = event.message
+    if message.media and (message.document or message.file):
+        async with semaphore:
+            try:
+                DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
+                await event.client.forward_messages(DESTINATION_CHAT_ID, message)
+                print(f"✅ Message {message.id} forwarded successfully.")
+                await asyncio.sleep(200)
 
-    # ✅ Check if forwarding is allowed
-    
-    async with semaphore:
-        try:
-            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
-            await event.client.forward_messages(DESTINATION_CHAT_ID, message)
-            print(f"✅ Message {message.id} forwarded successfully.")
-            await asyncio.sleep(200)
-
-        except Exception as e:
-            print(f"❌ Message {message.id} {e} is restricted. Skipping...")
-
-
+            except Exception as e:
+                print(f"❌ Message {message.id} {e}")
 
 @mrsyd.on(events.NewMessage(from_users=1733124290))
 async def handle_new_source(event):
