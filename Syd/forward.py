@@ -9,7 +9,7 @@ from telethon import events
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
 DESTINATION_CHAT = [-1002433450358, -1002464733363]
-SOURCE_CHATS = [-1002295881345]
+SOURCE_CHATS = [-1002295881345, -1002281540615]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
