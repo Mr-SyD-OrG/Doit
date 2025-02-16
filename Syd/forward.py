@@ -8,7 +8,7 @@ from telethon import events
 
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
-DESTINATION_CHAT = [-1002433450358, -1002464733363]
+DESTINATION_CHATS = [-1002433450358, -1002464733363]
 SOURCE_CHATS = [-1002295881345, -1002281540615]
 
 
@@ -46,7 +46,7 @@ async def handle_new_source(event):
         async with semaphore:
             for msg_id in range(start_msg_id, end_msg_id + 1):
                 try:
-                    DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
+                    DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
                     message = await event.client.get_messages(source_chat, ids=msg_id)
                     if message:  # Ensure message exists
                         if not message.forwards:  # Check if forwarding is allowed
