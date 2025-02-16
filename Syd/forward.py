@@ -63,7 +63,7 @@ async def handle_new_source(event):
                         print(f"✅ Message {msg_id} forwarded successfully!")
                         await asyncio.sleep(200)  # Small delay to avoid spam
                     else:
-                        print(f"❌ Message {msg_id} does not exist. Skipping.")
+                        print(f"No ⚡ Message {msg_id} does not exist. Skipping.")
 
                 except Exception as e:
                     print(f"⚠️ Error forwarding message {msg_id}: {e}")
