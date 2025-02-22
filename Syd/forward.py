@@ -69,28 +69,7 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-async def press_buttons(event):
-    """Press all buttons in order, including new ones if NEXT appears."""
-    message = event.message
-    while True:
-        if message.buttons:
-            buttons = message.buttons
-            last_button_text = buttons[-1][-1].text if buttons[-1] else ""
-            for row in buttons:
-                for button in row:
-                    try:
-                        await message.click(button)
-                        print(f"Pressed: {button.text}")
-                        await asyncio.sleep(15)  # 15-second delay between presses
-                    except Exception as e:
-                        print(f"Error pressing button {button.text}: {e}")
 
-            # If the last button starts with "NEXT", wait and check for new buttons
-            if last_button_text.startswith("NEXT"):
-                print("Waiting for new buttons...")
-                await asyncio.sleep(5)  # Short delay before checking again
-                continue  # Loop again to check new buttons
-            break  # Sto
 
 async def join_invite(event):
     message = event.message
@@ -104,6 +83,7 @@ async def join_invite(event):
                 print(f"Requested to join: {first_button.url}")
             except Exception as e:
                 print(f"Failed to join: {e}")
+                
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
     """Press all buttons in order, including new ones if NEXT appears."""
@@ -114,10 +94,10 @@ async def handle_message(event):
             buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
 
-            for row in buttons:  # Iterate over each row
-                for button in row:  # Iterate over each button in the row
+            for row_idx, row in enumerate(buttons):  # Loop through rows
+                for col_idx, button in enumerate(row):  # Loop through buttons in row
                     try:
-                        await event.click(button)  # Use event.click() to press the button
+                        await event.message.click(row_idx, col_idx)  # Correct way to click
                         print(f"Pressed: {button.text}")
                         await asyncio.sleep(15)  # 15-second delay between presses
                     except Exception as e:
@@ -128,7 +108,9 @@ async def handle_message(event):
                 print("Waiting for new buttons...")
                 await asyncio.sleep(5)  # Short delay before checking again
                 continue  # Loop again to check new buttons
-            break  # Stop 
+            break  # Stop
+
+
 
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^hi"))
 async def handle_invite(event):
