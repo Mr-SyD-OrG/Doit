@@ -4,6 +4,8 @@ import random
 from bot import mrsyd
 from asyncio import Semaphore
 from telethon import events
+from pyrogram.types import Message
+
 #from info import SOURCE_CHAT_ID
 
 # Semaphore to limit concurrent forwards (adjust as needed)
@@ -67,11 +69,14 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-@mrsyd.on_message(filters.user(1983814301) & filters.regex(r"^🔍 Results for your Search"))
-async def press_buttons(client: Client, message: Message):
+@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
+async def handle_message(event):
+    """Press all buttons in order, including new ones if NEXT appears."""
+    message = event.message
+
     while True:
-        if message.reply_markup and message.reply_markup.inline_keyboard:
-            buttons = message.reply_markup.inline_keyboard
+        if message.buttons:
+            buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
 
             for row in buttons:
@@ -83,23 +88,26 @@ async def press_buttons(client: Client, message: Message):
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
 
-            # If the last button starts with "NEXT", wait for new buttons
+            # If the last button starts with "NEXT", wait and check for new buttons
             if last_button_text.startswith("NEXT"):
                 print("Waiting for new buttons...")
                 await asyncio.sleep(5)  # Short delay before checking again
-                continue  # Check for new buttons
-            break
+                continue  # Loop again to check new buttons
+            break  # Sto
 
+@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^hi"))
+async def handle_invite(event):
+    message = event.message
 
-@mrsyd.on_message(filters.user(1983814301) & filters.regex(r"^Hi"))
-async def handle_invite(client: Client, message: Message):
-    if message.reply_markup and message.reply_markup.inline_keyboard:
-        first_button = message.reply_markup.inline_keyboard[0][0]  # First button
+    if message.buttons:
+        first_button = message.buttons[0][0]  # First button in the inline keyboard
 
         # Check if it's an invite link
-        if "joinchat" in first_button.url or "t.me/" in first_button.url:
+        if first_button.url and ("joinchat" in first_button.url or "t.me/" in first_button.url):
             try:
-                await client.join_chat(first_button.url)
+                await client(JoinChannelRequest(first_button.url))
                 print(f"Requested to join: {first_button.url}")
             except Exception as e:
                 print(f"Failed to join: {e}")
+
+
