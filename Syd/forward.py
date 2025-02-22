@@ -69,16 +69,13 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
-async def handle_message(event):
+async def press_buttons(event):
     """Press all buttons in order, including new ones if NEXT appears."""
     message = event.message
-
     while True:
         if message.buttons:
             buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
-
             for row in buttons:
                 for button in row:
                     try:
@@ -95,10 +92,8 @@ async def handle_message(event):
                 continue  # Loop again to check new buttons
             break  # Sto
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^hi"))
-async def handle_invite(event):
+async def join_invite(event):
     message = event.message
-
     if message.buttons:
         first_button = message.buttons[0][0]  # First button in the inline keyboard
 
@@ -110,4 +105,14 @@ async def handle_invite(event):
             except Exception as e:
                 print(f"Failed to join: {e}")
 
+@client.on(events.NewMessage())
+async def handle_message(event):
+    sender = await event.get_sender()
+    if sender.bot or event.sender_id == 1983814301:  # Check if sender is a bot or specific user
+        message_text = event.message.text
+
+        if message_text.startswith("🔍 Results for your Search "):
+            await press_buttons(event)
+        elif message_text.startswith("Hi"):
+            await join_invite(event)
 
