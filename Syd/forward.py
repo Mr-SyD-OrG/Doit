@@ -71,20 +71,6 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-
-
-async def join_invite(event):
-    message = event.message
-    if message.buttons:
-        first_button = message.buttons[0][0]  # First button in the inline keyboard
-
-        # Check if it's an invite link
-        if first_button.url and ("joinchat" in first_button.url or "t.me/" in first_button.url):
-            try:
-                await client(JoinChannelRequest(first_button.url))
-                print(f"Requested to join: {first_button.url}")
-            except Exception as e:
-                print(f"Failed to join: {e}")
                 
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
@@ -96,7 +82,7 @@ async def handle_message(event):
             buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
 
-            for row_idx, row in enumerate(buttons):  # Loop through rows
+            for row_idx, row in enumerate(buttons):  # Lrows
                 for col_idx, button in enumerate(row):  # Loop through buttons in row
                     try:
                         await event.message.click(row_idx, col_idx)  # Correct way to click
@@ -114,7 +100,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^Hi Asi,❗️Join SearchBot users Channel to use this Bot!👇👇"))
+@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^Hi"))
 async def handle_invite(event):
     message = event.message
 
