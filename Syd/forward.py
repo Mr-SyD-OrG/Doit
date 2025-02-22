@@ -87,14 +87,14 @@ async def handle_message(event):
                     try:
                         await event.message.click(row_idx, col_idx)  # Correct way to click
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(65)  # 15-second delay between presses
+                        await asyncio.sleep(115)  # 15-second delay between presses
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
 
             # If the last button starts with "NEXT", wait and check for new buttons
             if last_button_text.startswith("NEXT"):
                 print("Waiting for new buttons...")
-                await asyncio.sleep(5)  # Short delay before checking again
+                await asyncio.sleep(100)  # Short delay before checking again
                 continue  # Loop again to check new buttons
             break  # Stop
 
