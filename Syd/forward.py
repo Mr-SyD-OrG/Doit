@@ -110,9 +110,10 @@ async def handle_invite(event):
         # Check if the button contains an invite link
         if first_button.url and ("joinchat" in first_button.url or "t.me/" in first_button.url):
             try:
-                # Extract username or invite hash from the link
                 invite_link = first_button.url
-                match = re.search(r"(?:t\.me/|joinchat/)([\w_-]+)", invite_link)
+
+                # Extract username or invite hash, handling http/https
+                match = re.search(r"(?:https?://)?t\.me/(?:joinchat/)?([\w_-]+)", invite_link)
 
                 if match:
                     chat_id = match.group(1)  # Extracted username or invite hash
