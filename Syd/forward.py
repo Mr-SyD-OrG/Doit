@@ -114,10 +114,10 @@ async def handle_message(event):
             buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
 
-            for row in buttons:
-                for button in row:
+            for row in buttons:  # Iterate over each row
+                for button in row:  # Iterate over each button in the row
                     try:
-                        await message.click(button)
+                        await event.click(button)  # Use event.click() to press the button
                         print(f"Pressed: {button.text}")
                         await asyncio.sleep(15)  # 15-second delay between presses
                     except Exception as e:
@@ -128,7 +128,7 @@ async def handle_message(event):
                 print("Waiting for new buttons...")
                 await asyncio.sleep(5)  # Short delay before checking again
                 continue  # Loop again to check new buttons
-            break  # Sto
+            break  # Stop 
 
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^hi"))
 async def handle_invite(event):
