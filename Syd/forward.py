@@ -1,5 +1,7 @@
 # plugins/forwarder.py
 import asyncio
+import re
+from telethon.tl.functions.channels import JoinChannelRequest
 import random
 from bot import mrsyd
 from asyncio import Semaphore
@@ -112,18 +114,27 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^hi"))
+@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^Hi Asi,❗️Join SearchBot users Channel to use this Bot!👇👇"))
 async def handle_invite(event):
     message = event.message
 
     if message.buttons:
         first_button = message.buttons[0][0]  # First button in the inline keyboard
 
-        # Check if it's an invite link
+        # Check if the button contains an invite link
         if first_button.url and ("joinchat" in first_button.url or "t.me/" in first_button.url):
             try:
-                await client(JoinChannelRequest(first_button.url))
-                print(f"Requested to join: {first_button.url}")
+                # Extract username or invite hash from the link
+                invite_link = first_button.url
+                match = re.search(r"(?:t\.me/|joinchat/)([\w_-]+)", invite_link)
+
+                if match:
+                    chat_id = match.group(1)  # Extracted username or invite hash
+                    await event.client(JoinChannelRequest(chat_id))
+                    print(f"Requested to join: {chat_id}")
+                else:
+                    print(f"Invalid invite link format: {invite_link}")
+
             except Exception as e:
                 print(f"Failed to join: {e}")
                 
