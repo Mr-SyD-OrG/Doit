@@ -9,7 +9,7 @@ from telethon import events
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
 DESTINATION_CHATS = [-1002433450358, -1002464733363]
-SOURCE_CHATS = [-1002295881345, -1002281540615]
+SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
@@ -21,7 +21,7 @@ async def forward_if_allowed(event):
                 DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
                 await event.client.forward_messages(DESTINATION_CHAT_ID, message)
                 print(f"✅ Message {message.id} forwarded successfully.")
-                await asyncio.sleep(300)
+                await asyncio.sleep(320)
 
             except Exception as e:
                 print(f"❌ Message {message.id} {e}")
@@ -65,3 +65,41 @@ async def handle_new_source(event):
 
     else:
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
+
+
+@mrsyd.on_message(filters.user(1983814301) & filters.regex(r"^🔍 Results for your Search"))
+async def press_buttons(client: Client, message: Message):
+    while True:
+        if message.reply_markup and message.reply_markup.inline_keyboard:
+            buttons = message.reply_markup.inline_keyboard
+            last_button_text = buttons[-1][-1].text if buttons[-1] else ""
+
+            for row in buttons:
+                for button in row:
+                    try:
+                        await message.click(button)
+                        print(f"Pressed: {button.text}")
+                        await asyncio.sleep(15)  # 15-second delay between presses
+                    except Exception as e:
+                        print(f"Error pressing button {button.text}: {e}")
+
+            # If the last button starts with "NEXT", wait for new buttons
+            if last_button_text.startswith("NEXT"):
+                print("Waiting for new buttons...")
+                await asyncio.sleep(5)  # Short delay before checking again
+                continue  # Check for new buttons
+            break
+
+
+@mrsyd.on_message(filters.user(1983814301) & filters.regex(r"^Hi"))
+async def handle_invite(client: Client, message: Message):
+    if message.reply_markup and message.reply_markup.inline_keyboard:
+        first_button = message.reply_markup.inline_keyboard[0][0]  # First button
+
+        # Check if it's an invite link
+        if "joinchat" in first_button.url or "t.me/" in first_button.url:
+            try:
+                await client.join_chat(first_button.url)
+                print(f"Requested to join: {first_button.url}")
+            except Exception as e:
+                print(f"Failed to join: {e}")
