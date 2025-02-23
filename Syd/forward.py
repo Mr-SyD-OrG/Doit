@@ -2,6 +2,7 @@
 import asyncio
 import re
 from telethon.tl.functions.channels import JoinChannelRequest
+from telethon.tl.functions.messages import ImportChatInviteRequest
 import random
 from bot import mrsyd
 from asyncio import Semaphore
@@ -112,6 +113,7 @@ async def handle_message(event):
 
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^Hi"))
 async def handle_invite(event):
+    """Click the first inline button if it's an invite link and request to join."""
     message = event.message
 
     if message.buttons:
@@ -122,15 +124,23 @@ async def handle_invite(event):
             try:
                 invite_link = first_button.url
 
-                # Extract username or invite hash, handling all Telegram link formats
+                # Check for different Telegram invite link formats
                 match = re.search(r"(?:https?://)?t\.me/(?:\+|joinchat/)?([\w_-]+)", invite_link)
 
                 if match:
-                    chat_id = match.group(1)  # Extracted username or invite hash
-                    await event.client(JoinChannelRequest(chat_id))
-                    print(f"Requested to join: {chat_id}")
+                    invite_code = match.group(1)  # Extract invite hash or username
+                    
+                    if "+" in first_button.url or "joinchat" in first_button.url:
+                        # It's an invite hash, use ImportChatInviteRequest
+                        await event.client(ImportChatInviteRequest(invite_code))
+                        print(f"Joined via invite link: {invite_code}")
+                    else:
+                        # It's a public username, use JoinChannelRequest
+                        await event.client(JoinChannelRequest(invite_code))
+                        print(f"Joined public channel: {invite_code}")
                 else:
                     print(f"Invalid invite link format: {invite_link}")
 
             except Exception as e:
                 print(f"Failed to join: {e}")
+
