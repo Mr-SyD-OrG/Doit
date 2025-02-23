@@ -86,7 +86,7 @@ async def handle_message(event):
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(15)  # 15-second delay
+                        await asyncio.sleep(120)  # 15-second delay
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
 
