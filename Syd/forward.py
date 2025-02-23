@@ -108,12 +108,12 @@ async def handle_invite(event):
         first_button = message.buttons[0][0]  # First button in the inline keyboard
 
         # Check if the button contains an invite link
-        if first_button.url and ("joinchat" in first_button.url or "t.me/" in first_button.url):
+        if first_button.url and ("t.me/" in first_button.url):
             try:
                 invite_link = first_button.url
 
-                # Extract username or invite hash, handling http/https
-                match = re.search(r"(?:https?://)?t\.me/(?:joinchat/)?([\w_-]+)", invite_link)
+                # Extract username or invite hash, handling all Telegram link formats
+                match = re.search(r"(?:https?://)?t\.me/(?:\+|joinchat/)?([\w_-]+)", invite_link)
 
                 if match:
                     chat_id = match.group(1)  # Extracted username or invite hash
@@ -124,15 +124,3 @@ async def handle_invite(event):
 
             except Exception as e:
                 print(f"Failed to join: {e}")
-                
-#@client.on(events.NewMessage())
-async def handle_messaghhe(event):
-    sender = await event.get_sender()
-    if sender.bot or event.sender_id == 1983814301:  # Check if sender is a bot or specific user
-        message_text = event.message.text
-
-        if message_text.startswith("🔍 Results for your Search "):
-            await press_buttons(event)
-        elif message_text.startswith("Hi"):
-            await join_invite(event)
-
