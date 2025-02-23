@@ -92,7 +92,7 @@ async def handle_message(event):
                         print(f"Error pressing button {button.text}: {e}")
 
             # If the last button is "NEXT", wait for the message to be edited
-            if last_button_text.startswith("NEXT"):
+            if last_button_text.startswith(" NEXT"):
                 print("Waiting for updated buttons...")
 
                 while True:
