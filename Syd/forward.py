@@ -13,7 +13,7 @@ from pyrogram.types import Message
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
 DESTINATION_CHATS = [-1002433450358, -1002464733363]
-SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301]
+SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, -1001780243928, -1002274015746, -1001862599580]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
