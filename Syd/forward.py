@@ -70,11 +70,12 @@ async def handle_new_source(event):
     else:
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
-
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
-    """Press all buttons in order, including new ones if NEXT appears."""
+    """Press all buttons in order, including updated ones after 'NEXT'."""
     message = event.message
+    chat_id = message.chat_id
+    message_id = message.id  # Track the same message ID
 
     while True:
         if message.buttons:
@@ -86,29 +87,26 @@ async def handle_message(event):
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(120)  # 15-second delay
+                        await asyncio.sleep(120)  # 120-second delay
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
 
-            # If the last button is "NEXT", wait for a new message
+            # If the last button is "NEXT", wait for the message to be edited
             if last_button_text.startswith("NEXT"):
-                print("Waiting for new buttons...")
-                
-                # Wait for the next message from the same user
-                new_event = await event.client.wait_for(
-                    events.NewMessage(from_users=1983814301), timeout=60
-                )
+                print("Waiting for updated buttons...")
 
-                if new_event:
-                    print("New message detected, continuing...")
-                    message = new_event.message  # Update message with new buttons
-                    continue  # Restart loop with new buttons
+                while True:
+                    await asyncio.sleep(8)  # Check for edits every 5 seconds
+                    edited_msg = await event.client.get_messages(chat_id, ids=message_id)
 
-                print("No new message received, stopping.")
-                break  
+                    if edited_msg and edited_msg.buttons != message.buttons:
+                        print("Message updated with new buttons, continuing...")
+                        message = edited_msg  # Update message with new buttons
+                        break  # Restart button clicking process
+
+                continue  # Loop again with updated buttons
 
         break  # Stop if no buttons left
-
 
 
 
