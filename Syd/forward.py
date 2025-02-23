@@ -1,6 +1,8 @@
 # plugins/forwarder.py
 import asyncio
 import re
+import pytz
+from datetime import datetime
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
 import random
@@ -144,3 +146,21 @@ async def handle_invite(event):
             except Exception as e:
                 print(f"Failed to join: {e}")
 
+
+IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
+
+@mrsyd.on(events.NewMessage(from_users=6592320604))
+async def forward_mesages(event):
+    async with semaphore:  # Ensures only one message is handled at a time
+        await asyncio.sleep(10 * 60)  # Wait 10 minutes (1800 seconds)
+
+        while True:
+            now = datetime.now(IST).time()
+            
+            if now.hour >= 1 and now.hour < 7:
+                await event.message.forward_to(1983814301)
+                print(f"Forwarded message at {now}")
+                break  # Stop after forwarding
+            else:
+                print(f"Not in forwarding time. Waiting until 1 AM IST...")
+                await asyncio.sleep(1000)  # Check every 5 minutes until forwarding is allowed
