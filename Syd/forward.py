@@ -13,7 +13,7 @@ from pyrogram.types import Message
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
 DESTINATION_CHATS = [-1002433450358, -1002464733363]
-SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, -1001780243928, -1002274015746, -1001862599580]
+SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
@@ -71,7 +71,6 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-                
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
     """Press all buttons in order, including new ones if NEXT appears."""
@@ -82,21 +81,34 @@ async def handle_message(event):
             buttons = message.buttons
             last_button_text = buttons[-1][-1].text if buttons[-1] else ""
 
-            for row_idx, row in enumerate(buttons):  # Lrows
-                for col_idx, button in enumerate(row):  # Loop through buttons in row
+            for row_idx, row in enumerate(buttons):  
+                for col_idx, button in enumerate(row):  
                     try:
-                        await event.message.click(row_idx, col_idx)  # Correct way to click
+                        await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(115)  # 15-second delay between presses
+                        await asyncio.sleep(15)  # 15-second delay
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
 
-            # If the last button starts with "NEXT", wait and check for new buttons
+            # If the last button is "NEXT", wait for a new message
             if last_button_text.startswith("NEXT"):
                 print("Waiting for new buttons...")
-                await asyncio.sleep(100)  # Short delay before checking again
-                continue  # Loop again to check new buttons
-            break  # Stop
+                
+                # Wait for the next message from the same user
+                new_event = await event.client.wait_for(
+                    events.NewMessage(from_users=1983814301), timeout=60
+                )
+
+                if new_event:
+                    print("New message detected, continuing...")
+                    message = new_event.message  # Update message with new buttons
+                    continue  # Restart loop with new buttons
+
+                print("No new message received, stopping.")
+                break  
+
+        break  # Stop if no buttons left
+
 
 
 
