@@ -149,7 +149,7 @@ async def handle_invite(event):
 
 IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
 
-@mrsyd.on(events.NewMessage(from_users=6592320604))
+@mrsyd.on(events.NewMessage(from_users=6510851298))
 async def forward_mesages(event):
     async with semaphore:  # Ensures only one message is handled at a time
         await asyncio.sleep(10 * 60)  # Wait 10 minutes (1800 seconds)
