@@ -19,19 +19,19 @@ DESTINATION_CHATS = [-1002433450358, -1002464733363]
 SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
-@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS))
+@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
 async def forward_if_allowed(event):
+    """Forom destination chat."""
     message = event.message
-    if message.media and (message.document or message.file):
-        async with semaphore:
-            try:
-                DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
-                await event.client.forward_messages(DESTINATION_CHAT_ID, message)
-                print(f"✅ Message {message.id} forwarded successfully.")
-                await asyncio.sleep(320)
+    async with semaphore:
+        try:
+            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
+            await event.client.forward_messages(DESTINATION_CHAT_ID, message)
+            print(f"✅ Message {message.id} forwarded successfully.")
+            await asyncio.sleep(320)
 
-            except Exception as e:
-                print(f"❌ Message {message.id} {e}")
+        except Exception as e:
+            print(f"❌ Message {message.id} {e}")
 
 @mrsyd.on(events.NewMessage(from_users=1733124290))
 async def handle_new_source(event):
