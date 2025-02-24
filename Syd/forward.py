@@ -158,7 +158,7 @@ async def forward_mesages(event):
             now = datetime.now(IST).time()
             
             if now.hour >= 1 and now.hour < 7:
-                await event.message.forward_to(1983814301)
+                await event.client.send_message(DESTINATION_ID, event.message.text)
                 print(f"Forwarded message at {now}")
                 break  # Stop after forwarding
             else:
