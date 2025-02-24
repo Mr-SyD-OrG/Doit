@@ -87,6 +87,8 @@ async def handle_message(event):
 
             for row_idx, row in enumerate(buttons):  
                 for col_idx, button in enumerate(row):  
+                    if button.text == "⬅️ BACK":
+                        continue
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
