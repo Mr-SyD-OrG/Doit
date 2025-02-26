@@ -73,45 +73,69 @@ async def handle_new_source(event):
     else:
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
+
 @mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
-    """Press all buttons in order, including updated ones after 'NEXT'."""
-    message = event.message
-    chat_id = message.chat_id
-    message_id = message.id  # Track the same message ID
+    """Press each button repeatedly every 15 seconds until a new message arrives, 
+    then move to the next button. Skips '⬅️ BACK' but ensures 'NEXT' is clicked last.
+    """
+    async with semaphore:
+        message = event.message
+        chat_id = message.chat_id
+        message_id = message.id  # Track the same message ID
 
-    while True:
-        if message.buttons:
-            buttons = message.buttons
-            last_button_text = buttons[-1][-1].text if buttons[-1] else ""
+        if not message.buttons:
+            return  # Exit if no buttons are present
 
-            for row_idx, row in enumerate(buttons):  
-                for col_idx, button in enumerate(row):  
-                    if button.text == "⬅️ BACK":
-                        continue
+        while True:
+            # Extract buttons and filter out "⬅️ BACK"
+            buttons = [(i, j, button) for i, row in enumerate(message.buttons) for j, button in enumerate(row)
+                       if button.text != "⬅️ BACK"]
+
+            next_button = None  # Store "NEXT" button separately
+
+            for row_idx, col_idx, button in buttons:
+                if button.text.startswith(" NEXT"):
+                    next_button = (row_idx, col_idx, button)  # Save "NEXT" button for later
+                    continue  # Skip clicking "NEXT" for now
+
+                while True:
+                    # Check if a new message has arrived
+                    new_message = await event.client.get_messages(chat_id, limit=1)
+                    if new_message and new_message[0].id != message_id:
+                        print("New message detected, moving to next button...")
+                        message_id = new_message[0].id  # Update message ID
+                        message = new_message[0]  # Update message
+                        break  # Move to the next button
+
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(120)  # 120-second delay
+                        await asyncio.sleep(15)  # 15-second delay before clicking again
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
+                        break  # If error occurs, move to the next button
 
-            # If the last button is "NEXT", wait for the message to be edited
-            if last_button_text.startswith(" NEXT"):
-                print("Waiting for updated buttons...")
+            # If "NEXT" exists, click it and restart button processing
+            if next_button:
+                row_idx, col_idx, button = next_button
+                try:
+                    await message.click(row_idx, col_idx)  # Click "NEXT" button
+                    print(f"Pressed: {button.text}, waiting for new buttons...")
+                    await asyncio.sleep(8)  # Wait for new buttons to load
 
-                while True:
-                    await asyncio.sleep(8)  # Check for edits every 5 seconds
-                    edited_msg = await event.client.get_messages(chat_id, ids=message_id)
+                    # Fetch the updated message with new buttons
+                    updated_msg = await event.client.get_messages(chat_id, ids=message_id)
+                    if updated_msg and updated_msg.buttons != message.buttons:
+                        print("Message updated with new buttons, restarting...")
+                        message = updated_msg  # Update message with new buttons
+                        continue  # Restart button processing
+                except Exception as e:
+                    print(f"Error pressing 'NEXT': {e}")
 
-                    if edited_msg and edited_msg.buttons != message.buttons:
-                        print("Message updated with new buttons, continuing...")
-                        message = edited_msg  # Update message with new buttons
-                        break  # Restart button clicking process
+            break  # Exit loop if no more buttons are left
 
-                continue  # Loop again with updated buttons
-
-        break  # Stop if no buttons left
+        print("All buttons processed.")
 
 
 
