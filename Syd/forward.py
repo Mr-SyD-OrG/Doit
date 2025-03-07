@@ -114,14 +114,12 @@ async def handle_message(event):
                     new_message = await event.client.get_messages(chat_id, limit=1)
                     if new_message and new_message[0].id != message_id:
                         print("New message detected, moving to next button...")
-                        message_id = new_message[0].id  # Update message ID
-                        message = new_message[0]  # Update message
                         break  # Move to the next button immediately
 
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(15)  # 15-second delay before clicking again
+                        await asyncio.sleep(65)  # 15-second delay before clicking again
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
                         break  # If error occurs, move to the next button
@@ -132,7 +130,7 @@ async def handle_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting for new buttons...")
-                    await asyncio.sleep(8)  # Wait for new buttons to load
+                    await asyncio.sleep(40)  # Wait for new buttons to load
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
