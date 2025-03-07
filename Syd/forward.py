@@ -74,10 +74,11 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
+
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
-    """Press each button repeatedly every 15 seconds until a new message arrives, 
-    then move to the next button. Skips '⬅️ BACK' but ensures 'NEXT' is clicked last.
+    """Press each button every 15 seconds on the same message until a new message arrives. 
+    Skips '⬅️ BACK', moves to the next button when a new message arrives, and only presses 'NEXT' at the end.
     """
     async with semaphore:
         message = event.message
@@ -85,20 +86,29 @@ async def handle_message(event):
         message_id = message.id  # Track the same message ID
 
         if not message.buttons:
+            print("No buttons found, exiting...")
             return  # Exit if no buttons are present
 
         while True:
-            # Extract buttons and filter out "⬅️ BACK"
-            buttons = [(i, j, button) for i, row in enumerate(message.buttons) for j, button in enumerate(row)
-                       if button.text != "⬅️ BACK"]
-
+            # Extract buttons and filter out "⬅️ BACK" and "NEXT"
+            buttons = []
             next_button = None  # Store "NEXT" button separately
 
-            for row_idx, col_idx, button in buttons:
-                if button.text.startswith(" NEXT"):
-                    next_button = (row_idx, col_idx, button)  # Save "NEXT" button for later
-                    continue  # Skip clicking "NEXT" for now
+            for row_idx, row in enumerate(message.buttons):
+                for col_idx, button in enumerate(row):
+                    if button.text == "⬅️ BACK":
+                        continue  # Skip "⬅️ BACK"
+                    if button.text.startswith(" NEXT ["):
+                        next_button = (row_idx, col_idx, button)  # Save "NEXT" button for later
+                        continue  # Skip clicking "NEXT" for now
+                    buttons.append((row_idx, col_idx, button))  # Store normal buttons
 
+            if not buttons and not next_button:
+                print("No clickable buttons found, exiting...")
+                break  # No buttons left to process
+
+            # Click each button until a new message arrives
+            for row_idx, col_idx, button in buttons:
                 while True:
                     # Check if a new message has arrived
                     new_message = await event.client.get_messages(chat_id, limit=1)
@@ -106,7 +116,7 @@ async def handle_message(event):
                         print("New message detected, moving to next button...")
                         message_id = new_message[0].id  # Update message ID
                         message = new_message[0]  # Update message
-                        break  # Move to the next button
+                        break  # Move to the next button immediately
 
                     try:
                         await message.click(row_idx, col_idx)  # Click button
@@ -116,7 +126,7 @@ async def handle_message(event):
                         print(f"Error pressing button {button.text}: {e}")
                         break  # If error occurs, move to the next button
 
-            # If "NEXT" exists, click it and restart button processing
+            # If "NEXT" exists, click it without waiting for a new message
             if next_button:
                 row_idx, col_idx, button = next_button
                 try:
@@ -136,7 +146,6 @@ async def handle_message(event):
             break  # Exit loop if no more buttons are left
 
         print("All buttons processed.")
-
 
 
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
