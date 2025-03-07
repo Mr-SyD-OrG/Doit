@@ -139,7 +139,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^Hi"))
+@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
