@@ -74,7 +74,7 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^🔍 Results for your Search"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
     """Press each button repeatedly every 15 seconds until a new message arrives, 
     then move to the next button. Skips '⬅️ BACK' but ensures 'NEXT' is clicked last.
@@ -139,7 +139,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=1983814301, pattern=r"^❗️Join SearchBot users"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
