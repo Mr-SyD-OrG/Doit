@@ -201,7 +201,7 @@ async def forward_messs(event):
                 message_text = event.message.text
 
                 # Check if message was already forwarded
-                if await event.client.find_used(message_id):
+                if await db.find_used(message_id):
                     print(f"⏩ Skipped duplicate: {message_text}")
                 else:
                     user_ids = [1983814301, 7755788244]
@@ -210,7 +210,7 @@ async def forward_messs(event):
                         await event.client.send_message(user_id, message_text)  # ✅ Indented correctly
                     
                     # Mark message as forwarded
-                    await event.client.add_used(message_id)
+                    await db.add_used(message_id)
                     print(f"✅ Forwarded: {message_text} at {now}")
 
                 break  # Stop after processing the message
