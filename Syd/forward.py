@@ -6,6 +6,7 @@ from datetime import datetime
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
 import random
+from helper.database import db
 from bot import mrsyd
 from asyncio import Semaphore
 from telethon import events
@@ -187,24 +188,36 @@ async def handle_invite(event):
 
 IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
 
+
 @mrsyd.on(events.NewMessage(from_users=6592320604))
-async def forwar_mesages(event):
+async def forward_messages(event):
     async with semaphore:  # Ensures only one message is handled at a time
-        await asyncio.sleep(10 * 60)  # Wait 10 minutes (1800 seconds)
+        await asyncio.sleep(10 * 60)  # Wait 10 minutes
 
         while True:
             now = datetime.now(IST).time()
             
-            if now.hour >= 1 and now.hour < 7:
-                user_ids = [1983814301, 7755788244]
-                for user_id in user_ids:
-                await event.client.send_message(user_id, event.message.text)
-                print(f"Forwarded message at {now}")
-                break  # Stop after forwarding
-            else:
-                print(f"Not in forwarding time. Waiting until 1 AM IST...")
-                await asyncio.sleep(1000)  # Check every 5 minutes until forwarding is allowed
+            if 1 <= now.hour < 7:  # Forwarding allowed only between 1 AM - 7 AM IST
+                message_id = event.message.id  # Use message ID to track uniqueness
+                message_text = event.message.text
 
+                # Check if message was already forwarded
+                if await event.client.find_used(message_id):
+                    print(f"⏩ Skipped duplicate: {message_text}")
+                else:
+                    user_ids = [1983814301, 7755788244]
+                    
+                    for user_id in user_ids:
+                        await event.client.send_message(user_id, message_text)
+                    
+                    # Mark message as forwarded
+                    await event.client.add_used(message_id)
+                    print(f"✅ Forwarded: {message_text} at {now}")
+
+                break  # Stop after processing the message
+            else:
+                print("⏳ Not in forwarding time. Waiting until 1 AM IST...")
+                await asyncio.sleep(1000)  # Wait before checking again
 
 @mrsyd.on(events.NewMessage(chats=-1002453555517))
 async def forwd_mesages(event):
