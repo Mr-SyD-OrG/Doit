@@ -15,6 +15,7 @@ from pyrogram.types import Message
 
 # Semaphore to limit concurrent forwards (adjust as needed)
 semaphore = Semaphore(2)
+semapore = asyncio.Semaphore(1)
 DESTINATION_CHATS = [-1002433450358, -1002464733363]
 SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
@@ -79,7 +80,7 @@ async def handle_message(event):
     """Press each button every 60 seconds on the same message until a new message arrives. 
     Skips '⬅️ BACK', moves to the next button when a new message arrives, and only presses 'NEXT' at the end.
     """
-    async with semaphore:
+    async with semapore:
         message = event.message
         chat_id = message.chat_id
         message_id = message.id  # Track the same message ID
