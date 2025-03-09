@@ -188,7 +188,6 @@ async def handle_invite(event):
 
 IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
 
-
 @mrsyd.on(events.NewMessage(from_users=6592320604))
 async def forward_messages(event):
     async with semaphore:  # Ensures only one message is handled at a time
@@ -207,8 +206,8 @@ async def forward_messages(event):
                 else:
                     user_ids = [1983814301, 7755788244]
                     
-                    for user_id in user_ids:
-                        await event.client.send_message(user_id, message_text)
+                    for user_id in user_ids:  # ✅ FIX: Indentation added below
+                        await event.client.send_message(user_id, message_text)  # ✅ Indented correctly
                     
                     # Mark message as forwarded
                     await event.client.add_used(message_id)
