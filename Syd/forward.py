@@ -75,12 +75,13 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
+
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
-    """Press each button every 60 seconds on the same message until a new message arrives. 
-    Skips '⬅️ BACK', moves to the next button when a new message arrives, and only presses 'NEXT' at the end.
+    """Press each button every 60 seconds until a new message arrives, then move to the next button.
+    'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
     """
-    async with semapore:
+    async with semaphore:
         message = event.message
         chat_id = message.chat_id
         message_id = message.id  # Track the same message ID
@@ -90,7 +91,7 @@ async def handle_message(event):
             return  # Exit if no buttons are present
 
         while True:
-            # Extract buttons and filter out "⬅️ BACK" and "NEXT"
+            # Extract buttons and filter out "⬅️ BACK"
             buttons = []
             next_button = None  # Store "NEXT" button separately
 
@@ -107,30 +108,34 @@ async def handle_message(event):
                 print("No clickable buttons found, exiting...")
                 break  # No buttons left to process
 
-            # Click each button until a new message arrives
+            # Click each button one by one until a new message arrives
             for row_idx, col_idx, button in buttons:
                 while True:
-                    # Check if a new message has arrived
-                    new_message = await event.client.get_messages(chat_id, limit=1)
-                    if new_message and new_message[0].id != message_id:
-                        print("New message detected, moving to next button...")
-                        break  # Move to the next button immediately
-
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(60)  # 60-second delay before clicking again
+
+                        # Wait 60 seconds before checking for a new message
+                        await asyncio.sleep(60)
+
+                        # Check if a new message has arrived
+                        new_message = await event.client.get_messages(chat_id, limit=1)
+                        if new_message and new_message[0].id != message_id:
+                            print("New message detected, moving to the next button...")
+                             # Update message
+                            break  # Move to the next button
+
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
                         break  # If error occurs, move to the next button
 
-            # If "NEXT" exists, click it without waiting for a new message
+            # If "NEXT" exists, press it immediately and wait 60 seconds before handling new buttons
             if next_button:
                 row_idx, col_idx, button = next_button
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
-                    print(f"Pressed: {button.text}, waiting for new buttons...")
-                    await asyncio.sleep(40)  # Wait 40 seconds for new buttons to load
+                    print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
+                    await asyncio.sleep(60)  # Wait 60 seconds before handling new buttons
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
@@ -144,6 +149,7 @@ async def handle_message(event):
             break  # Exit loop if no more buttons are left
 
         print("All buttons processed.")
+
 
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
