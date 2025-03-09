@@ -74,10 +74,9 @@ async def handle_new_source(event):
         await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
-
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
-    """Press each button every 15 seconds on the same message until a new message arrives. 
+    """Press each button every 60 seconds on the same message until a new message arrives. 
     Skips '⬅️ BACK', moves to the next button when a new message arrives, and only presses 'NEXT' at the end.
     """
     async with semaphore:
@@ -119,7 +118,7 @@ async def handle_message(event):
                     try:
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
-                        await asyncio.sleep(65)  # 15-second delay before clicking again
+                        await asyncio.sleep(60)  # 60-second delay before clicking again
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
                         break  # If error occurs, move to the next button
@@ -130,7 +129,7 @@ async def handle_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting for new buttons...")
-                    await asyncio.sleep(40)  # Wait for new buttons to load
+                    await asyncio.sleep(40)  # Wait 40 seconds for new buttons to load
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
@@ -144,7 +143,6 @@ async def handle_message(event):
             break  # Exit loop if no more buttons are left
 
         print("All buttons processed.")
-
 
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
