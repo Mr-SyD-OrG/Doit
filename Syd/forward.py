@@ -82,7 +82,7 @@ async def handle_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
     """
-    async with semapore:
+    async with semaphore:  # Ensuring only one task runs at a time
         message = event.message
         chat_id = message.chat_id
         message_id = message.id  # Track the same message ID
@@ -116,15 +116,19 @@ async def handle_message(event):
                         await message.click(row_idx, col_idx)  # Click button
                         print(f"Pressed: {button.text}")
 
-                        # Wait 60 seconds before checking for a new message
-                        await asyncio.sleep(58)
+                        # Wait up to 60 seconds for a new message
+                        for _ in range(60):  # Check every second for a new message
+                            await asyncio.sleep(1)
+                            new_message = await event.client.get_messages(chat_id, limit=1)
+                            if new_message and new_message[0].id != message_id:
+                                print("New message detected, moving to the next button...")
+                                message = new_message[0]  # Update message
+                                message_id = new_message[0].id  # Update ID
+                                break  # Move to the next button
+                        else:
+                            continue  # If no new message, keep pressing the same button
 
-                        # Check if a new message has arrived
-                        new_message = await event.client.get_messages(chat_id, limit=1)
-                        if new_message and new_message[0].id != message_id:
-                            print("New message detected, moving to the next button...")
-                             # Update message
-                            break  # Move to the next button
+                        break  # Exit while loop when a new message arrives
 
                     except Exception as e:
                         print(f"Error pressing button {button.text}: {e}")
@@ -136,7 +140,7 @@ async def handle_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
-                    await asyncio.sleep(40)  # Wait 60 seconds before handling new buttons
+                    await asyncio.sleep(60)  # Full 60-second wait before checking new buttons
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
@@ -150,6 +154,7 @@ async def handle_message(event):
             break  # Exit loop if no more buttons are left
 
         print("All buttons processed.")
+
 
 
 @mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
