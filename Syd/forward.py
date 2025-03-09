@@ -65,7 +65,7 @@ async def handle_new_source(event):
                         print(f"📤 Forwarding message {msg_id} from {source_chat}...")
                         await event.client.send_message(-1002398194127, message)
                         print(f"✅ Message {msg_id} forwarded successfully!")
-                        await asyncio.sleep(300)  # Small delay to avoid spam
+                        await asyncio.sleep(280)  # Small delay to avoid spam
                     else:
                         print(f"No ⚡ Message {msg_id} does not exist. Skipping.")
 
@@ -117,7 +117,7 @@ async def handle_message(event):
                         print(f"Pressed: {button.text}")
 
                         # Wait 60 seconds before checking for a new message
-                        await asyncio.sleep(60)
+                        await asyncio.sleep(58)
 
                         # Check if a new message has arrived
                         new_message = await event.client.get_messages(chat_id, limit=1)
@@ -136,7 +136,7 @@ async def handle_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
-                    await asyncio.sleep(60)  # Wait 60 seconds before handling new buttons
+                    await asyncio.sleep(40)  # Wait 60 seconds before handling new buttons
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
