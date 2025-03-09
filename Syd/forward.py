@@ -82,7 +82,7 @@ async def handle_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
     """
-    async with semaphore:
+    async with semapore:
         message = event.message
         chat_id = message.chat_id
         message_id = message.id  # Track the same message ID
