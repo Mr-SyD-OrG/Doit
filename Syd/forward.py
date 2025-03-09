@@ -196,7 +196,9 @@ async def forwar_mesages(event):
             now = datetime.now(IST).time()
             
             if now.hour >= 1 and now.hour < 7:
-                await event.client.send_message(DESTINATION_ID, event.message.text)
+                user_ids = [1983814301, 7755788244]
+                for user_id in user_ids:
+                await event.client.send_message(user_id, event.message.text)
                 print(f"Forwarded message at {now}")
                 break  # Stop after forwarding
             else:
