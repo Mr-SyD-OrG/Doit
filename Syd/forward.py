@@ -195,3 +195,11 @@ async def forward_mesages(event):
             else:
                 print(f"Not in forwarding time. Waiting until 1 AM IST...")
                 await asyncio.sleep(1000)  # Check every 5 minutes until forwarding is allowed
+
+
+@mrsyd.on(events.NewMessage(chats=-1002453555517))
+async def forwd_mesages(event):
+    await asyncio.sleep(100 * 60)
+    if message.buttons:
+        await message.click(0, 0)
+    
