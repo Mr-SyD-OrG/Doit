@@ -23,6 +23,7 @@ class Database:
         self.db = self._client[database_name]
         self.col = self.db.user
         self.bot = self.db.bots
+        self.nam = self.db.names
         self.req = self.db.requests
 
     async def find_join_req(self, id):
@@ -30,7 +31,13 @@ class Database:
         
     async def add_join_req(self, id):
         await self.req.insert_one({'id': id})
-        
+
+    async def find_used(self, id):
+        return await self.nam.find_one({'id': id})  # Checks if ID exists
+
+    async def add_used(self, id):
+        await self.nam.insert_one({'id': id})  # Stores new message ID
+
     async def del_join_req(self):
         await self.req.drop()
         
