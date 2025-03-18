@@ -30,7 +30,7 @@ async def forward_if_allowed(event):
             DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
             await event.client.forward_messages(DESTINATION_CHAT_ID, message)
             print(f"✅ Message {message.id} forwarded successfully.")
-            await asyncio.sleep(280)
+            await asyncio.sleep(200)
 
         except Exception as e:
             print(f"❌ Message {message.id} {e}")
