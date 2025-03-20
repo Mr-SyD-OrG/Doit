@@ -212,8 +212,8 @@ async def forward_messs(event):
                 else:
                     user_ids = [1983814301, 7755788244]
                     
-                    for user_id in user_ids:  # ✅ FIX: Indentation added below
-                        await event.client.send_message(user_id, message_text)  # ✅ Indented correctly
+                    #for user_id in user_ids:  # ✅ FIX: Indentation added below
+                       # await event.client.send_message(user_id, message_text)  # ✅ Indented correctly
                     
                     # Mark message as forwarded
                     await db.add_used(message_id)
