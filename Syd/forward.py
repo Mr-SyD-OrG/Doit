@@ -18,7 +18,7 @@ from pyrogram.types import Message
 semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 DESTINATION_CHATS = [-1002433450358, -1002464733363]
-SOURCE_CHATS = [-1002295881345, -1002281540615, 1983814301, 7755788244, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
+SOURCE_CHATS = [-1002295881345, 7065204410, -1002281540615, 1983814301, 7755788244, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
@@ -77,7 +77,7 @@ async def handle_new_source(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^🔍 Results for your Search"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
@@ -158,7 +158,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244], pattern=r"^❗️Join SearchBot users"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410], pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
