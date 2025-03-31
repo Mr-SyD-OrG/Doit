@@ -85,7 +85,8 @@ async def handle_message(event):
     async with semaphore:  # Ensuring only one task runs at a time
         message = event.message
         chat_id = message.chat_id
-        message_id = message.id  # Track the same message ID
+        message_id = message.id
+        last_processed_id = message_id  # Store the last processed message ID# Track the same message ID
 
         if not message.buttons:
             print("No buttons found, exiting...")
@@ -120,9 +121,9 @@ async def handle_message(event):
                         for _ in range(60):  # Check every second for a new message
                             await asyncio.sleep(1)
                             new_message = await event.client.get_messages(chat_id, limit=1)
-                            if new_message and new_message[0].id != message_id:
+                            if new_message and new_message[0].id != last_processed_id  # Store the last processed message ID:
                                 print("New message detected, moving to the next button...")
-                                
+                                last_processed_id = new_messages[0].id  # Update the last proce
                                 break  # Move to the next button
                         else:
                             await asyncio.sleep(10)
