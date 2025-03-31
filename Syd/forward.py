@@ -121,7 +121,7 @@ async def handle_message(event):
                         for _ in range(60):  # Check every second for a new message
                             await asyncio.sleep(1)
                             new_message = await event.client.get_messages(chat_id, limit=1)
-                            if new_message and new_message[0].id != last_processed_id  # Store the last processed message ID
+                            if new_message and new_message[0].id != last_processed_id:  # Store the last processed message ID
                                 print("New message detected, moving to the next button...")
                                 last_processed_id = new_message[0].id  # Update the last proce
                                 break  # Move to the next button
