@@ -1,5 +1,6 @@
 from telethon import events
 import asyncio
+from bot import mrsyd
 
 # Define your handler
 @mrsyd.on(events.NewMessage(from_users=[7065204410], pattern=r"^Check"))
