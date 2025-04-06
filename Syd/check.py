@@ -54,8 +54,8 @@ target_user_ids = [6592320604]
 
 # === CONFIG ===
 
-status_chat_id = -1001541018556  # Replace with chat ID of the message to be edited
-status_message_id = 17  # Replace with the message ID to update
+status_chat_id = -1001778495166  # Replace with chat ID of the message to be edited
+status_message_id = 8  # Replace with the message ID to update
 
 # === Globals ===
 user_flags = {uid: False for uid in target_user_ids}
@@ -74,12 +74,14 @@ async def trigger(event):
         await mrsyd.send_message(user_id, '/start')
         await asyncio.sleep(6)
     msg = await mrsyd.get_messages(status_chat_id, ids=status_message_id)
-    text = msg.message or msg.text  # get original message with formatting preserved
-    updated_text = text
+    raw_text = msg.raw_text
+    updated_text = raw_text
     #lines = message.text.splitlines()
 
     # Track which usernames were found/edited
     found_usernames = set()
+    report_lines = ["Today Report:"]
+    
 
     # Fetch usernames if needed
     for uid in target_user_ids:
@@ -93,16 +95,22 @@ async def trigger(event):
 
         uname = usernames_cache[uid]
         status_icon = '✅' if user_flags[uid] else '❌'
+        report_lines.append(f"{uname} {status_icon}")
 
         # Regex to replace only the icon, preserving formatting
-        pattern = rf"({re.escape(uname)}\s*)([✅❌])"
-        new_line = rf"\1{status_icon}"
-        updated_text, count = re.subn(pattern, new_line, updated_text)
-
+        pattern = rf"(?<=\b{re.escape(uname)}\s)([✅❌])"
+        new_text, count = re.subn(pattern, status_icon, updated_text)
+      
         if count > 0:
+            updated_text = new_text
             found_usernames.add(uname)
-          
-    await mrsyd.edit_message(status_chat_id, status_message_id, updated_text)
+            
+    if updated_text != raw_text:
+        await mrsyd.edit_message(status_chat_id, status_message_id, updated_text)
+
+    # Send report to admin
+    await mrsyd.send_message(admin_user_id, "\n".join(report_lines))
+    #await mrsyd.edit_message(status_chat_id, status_message_id, updated_text)
 
     # Reset flags
     for uid in user_flags:
