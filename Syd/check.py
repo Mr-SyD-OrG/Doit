@@ -4,11 +4,8 @@ from telethon import events
 from collections import defaultdict
 from bot import mrsyd
 
-
-target_users = [6592320604]  # Replace with real user IDs
-
-# Replace with your admin user ID
-admin_user_id = 1733124290
+target_user_ids = [6592320604, 5334261812]  # Replace with your target user IDs
+admin_user_id = 1733124290  # Replace with admin's user ID
 
 # Create a response tracker for ea
 @mrsyd.on(events.NewMessage(from_users=[admin_user_id], pattern=r"^Chek"))
@@ -35,8 +32,7 @@ async def trigger(event):
 
 
 # Assume you already have a list of user IDs to monitor
-target_user_ids = [6592320604, 5334261812]  # Replace with your target user IDs
-admin_user_id = 1733124290  # Replace with admin's user ID
+
 
 # Dictionary to track daily messages from target users
 user_message_log = defaultdict(lambda: None)
