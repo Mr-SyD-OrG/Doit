@@ -15,17 +15,6 @@ user_flags = {user_id: False for user_id in target_user_ids}
 usernames_cache = {}
 
 
-
-# Define your handler
-@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^Check"))
-async def trigger(event):
-    await event.respond("Starting the daily /start loop.")
-
-    while True:
-        for user_id in target_user_ids:
-            await mrsyd.send_message(user_id, '/start')
-            await asyncio.sleep(60)  # Delay between each message
-        await asyncio.sleep(2)  #Day
       
 # Set user flag True when a message is received from them
 @mrsyd.on(events.NewMessage(from_users=target_user_ids))
@@ -34,10 +23,12 @@ async def handle_target_user_message(event):
     user_flags[user_id] = True
 
 # When admin sends "Check", send the current status of each target user
-@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^Data"))
+@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
     report_lines = ["User message check report:"]
-    
+    for user_id in target_user_ids:
+        await mrsyd.send_message(user_id, '/start')
+        await asyncio.sleep(60)
     for uid, status in user_flags.items():
         # Fetch username from cache or Telegram
         if uid not in usernames_cache:
