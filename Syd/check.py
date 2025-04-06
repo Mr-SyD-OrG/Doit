@@ -8,8 +8,8 @@ import asyncio
 
 # Define your admin and target user IDs
 admin_user_id = 1733124290  # Replace with actual admin user ID
-target_user_ids = [6592320604, 5334261812, 5329540859, 5378426785, 6006903252, 5378661049, 6278143617, 8036619264, 7868859577, 7658164007, 7017921723, 7872466736]  # Replace with your target user IDs
-
+#target_user_ids = [6592320604, 5334261812, 5329540859, 5378426785, 6006903252, 5378661049, 6278143617, 8036619264, 7868859577, 7658164007, 7017921723, 7872466736]  # Replace with your target user IDs
+target_user_ids = [6592320604]
 # Create global boolean flags for each target user
 #user_flags = {user_id: False for user_id in target_user_ids}
 #usernames_cache = {}
