@@ -10,7 +10,7 @@ target_users = [6592320604]
 response_received = asyncio.Event()
 
 @mrsyd.on(events.NewMessage(from_users=target_users))
-async def handle_response(event):
+async def handle_rense(event):
     # Mark that a message was received
     response_received.set()
 
