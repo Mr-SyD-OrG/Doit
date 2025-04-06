@@ -17,11 +17,15 @@ usernames_cache = {}
 
       
 # Set user flag True when a message is received from them
-@mrsyd.on(events.NewMessage(from_users=target_user_ids))
-async def handle_target_user_message(event):
-    user_id = event.sender_id
-    user_flags[user_id] = True
+@mrsyd.on(events.NewMessage())
+async def handle_all_messages(event):
+    sender = await event.get_sender()
+    sender_id = sender.id
 
+    if sender_id in target_user_ids:
+        user_flags[sender_id] = True
+        print(f"Message received from target user {sender_id}, flag set to True.")
+      
 # When admin sends "Check", send the current status of each target user
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
@@ -29,6 +33,7 @@ async def trigger(event):
     for user_id in target_user_ids:
         await mrsyd.send_message(user_id, '/start')
         await asyncio.sleep(60)
+    await mrsyd.send_message(admin_user_id, 'start')
     for uid, status in user_flags.items():
         # Fetch username from cache or Telegram
         if uid not in usernames_cache:
