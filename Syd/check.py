@@ -43,7 +43,7 @@ target_user_ids = [6592320604]
         #name = usernames_cache[uid]
        # report_lines.append(f"@{name}: {'✅' if status else '❌'}")
     
-    ₹report = "\n".join(report_lines)
+    #report = "\n".join(report_lines)
     #await event.respond(report)
 
     # Reset all flags for the next day
