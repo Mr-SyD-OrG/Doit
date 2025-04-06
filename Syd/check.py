@@ -25,7 +25,7 @@ async def trigger(event):
         for user_id in target_user_ids:
             await mrsyd.send_message(user_id, '/start')
             await asyncio.sleep(60)  # Delay between each message
-        await asyncio.sleep(02)  #
+        await asyncio.sleep(2)  #Day
       
 # Set user flag True when a message is received from them
 @mrsyd.on(events.NewMessage(from_users=target_user_ids))
