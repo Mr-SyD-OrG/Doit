@@ -50,7 +50,7 @@ target_user_ids = [6592320604]
     #for uid in user_flags:
         #user_flags[uid] = False
 
-₹from telethon import events
+#from telethon import events
 
 # === CONFIG ===
 
