@@ -4,6 +4,7 @@ from bot import mrsyd
   # Replace with admin's user ID
 from telethon import events
 from telethon.tl.functions.users import GetFullUserRequest
+import asyncio
 
 # Define your admin and target user IDs
 admin_user_id = 1733124290  # Replace with actual admin user ID
@@ -13,6 +14,19 @@ target_user_ids = [6592320604, 5334261812]  # Replace with your target user IDs
 user_flags = {user_id: False for user_id in target_user_ids}
 usernames_cache = {}
 
+
+
+# Define your handler
+@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^Check"))
+async def trigger(event):
+    await event.respond("Starting the daily /start loop.")
+
+    while True:
+        for user_id in target_user_ids:
+            await mrsyd.send_message(user_id, '/start')
+            await asyncio.sleep(60)  # Delay between each message
+        await asyncio.sleep(02)  #
+      
 # Set user flag True when a message is received from them
 @mrsyd.on(events.NewMessage(from_users=target_user_ids))
 async def handle_target_user_message(event):
@@ -20,7 +34,7 @@ async def handle_target_user_message(event):
     user_flags[user_id] = True
 
 # When admin sends "Check", send the current status of each target user
-@mrsyd.on(events.NewMessage(from_users=[admin_user_id], pattern=r"^Check"))
+@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^Data"))
 async def trigger(event):
     report_lines = ["User message check report:"]
     
