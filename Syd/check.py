@@ -45,8 +45,7 @@ async def trigger(event):
     report = "\n".join(report_lines)
     await mrsyd.send_message(admin_user_id, 'C')
     await event.respond(report)
-    await mrsyd.send_message(admin_user_id, 'C')
-    await client.send_message(admin_user_id, report)
+    await mrsyd.send_message(admin_user_id, report)
 
     # Reset all flags for the next day
     await mrsyd.send_message(admin_user_id, 'C')
