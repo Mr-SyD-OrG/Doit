@@ -36,7 +36,7 @@ semapore = asyncio.Semaphore(1)
 
 @mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
-    async with semaphore:
+    async with semapore:
         await asyncio.sleep(0.5)
         sender = await event.get_sender()
         sender_id = sender.id
