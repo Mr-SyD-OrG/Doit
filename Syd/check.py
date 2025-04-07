@@ -32,7 +32,7 @@ async def trigger(event):
     report_lines = ["User message check report:"]
     for user_id in target_user_ids:
         await mrsyd.send_message(user_id, '/start')
-        await asyncio.sleep(60)
+        await asyncio.sleep(1)
     await mrsyd.send_message(admin_user_id, 'start')
     for uid, status in user_flags.items():
         # Fetch username from cache or Telegram
