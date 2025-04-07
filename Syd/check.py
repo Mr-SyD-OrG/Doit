@@ -42,9 +42,9 @@ async def trigger(event):
         await mrsyd.send_message(admin_user_id, 'C')
         name = usernames_cache[uid]
         report_lines.append(f"@{name}: {'✅' if status else '❌'}")
-    await mrsyd.send_message(admin_user_id, 'C')
     report = "\n".join(report_lines)
     await event.respond(report)
+    await client.send_message(admin_user_id, report)
 
     # Reset all flags for the next day
     await mrsyd.send_message(admin_user_id, 'C')
