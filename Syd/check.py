@@ -32,13 +32,17 @@ REPORT_CHAT_ID = -1001778495166
 REPORT_MSG_ID = 9  
 # <- Update with actual message ID
 
+semapore = asyncio.Semaphore(1)
+
 @mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
-    sender = await event.get_sender()
-    sender_id = sender.id
-    if sender_id in target_user_ids:
-        user_flags[sender_id] = True
-        print(f"Message received from target user {sender_id}, flag set to True.")
+    async with semaphore:
+        await asyncio.sleep(0.5)
+        sender = await event.get_sender()
+        sender_id = sender.id
+        if sender_id in target_user_ids:
+            user_flags[sender_id] = True
+            print(f"Message received from target user {sender_id}, flag set to True.")
 
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigge(event):
