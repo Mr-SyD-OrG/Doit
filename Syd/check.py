@@ -17,8 +17,8 @@ usernames_cache = {}
 
       
 # Set user flag True when a message is received from them
-@mrsyd.on(events.NewMessage())
-async def handle_all_messages(event):
+@mrsyd.on(events.NewMessage(chats=group_chat_id))
+async def handle_group_messages(event):
     sender = await event.get_sender()
     sender_id = sender.id
 
