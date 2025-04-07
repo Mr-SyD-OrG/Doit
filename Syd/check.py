@@ -24,7 +24,6 @@ REPORT_MSG_ID = 9
 async def handle_group_messages(event):
 
     sender = await event.get_sender()
-# Replace with your actual chat and message IDs
     sender_id = sender.id   #Update with actual message ID
     if sender_id in target_user_ids:
 
@@ -34,7 +33,7 @@ async def handle_group_messages(event):
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
     await mrsyd.send_message(REPORT_CHAT_ID, "/start")
-    await asyncio.sleep(1)
+    await asyncio.sleep(15)
     await mrsyd.send_message(admin_user_id, 'C')
 
     # Fetch the original message to edit
@@ -50,7 +49,7 @@ async def trigger(event):
             continue
 
         username = line.split(":")[0][1:].strip()  # remove @ and spaces
-        uid = next((uid for uid, uname in usernames_cache.items() if uname == username), None)
+        uid = next((uid for uid, uname in usernames_cache.items() if uname.lower() == username.lower()), None)
 
         if uid and uid in user_flags:
             status_icon = '✅' if user_flags[uid] else '❌'
