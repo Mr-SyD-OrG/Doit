@@ -227,6 +227,7 @@ async def forward_messs(event):
 
 @mrsyd.on(events.NewMessage(chats=-1002453555517))
 async def forwd_mesages(event):
+    message = event.message
     await asyncio.sleep(100 * 60)
     if message.buttons:
         await message.click(0, 0)
