@@ -32,7 +32,7 @@ async def handle_group_messages(event):
 
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
-    await mrsyd.send_message(REPORT_CHAT_ID, "/start")
+    await mrsyd.send_message(-1002687879857, "/start")
     await asyncio.sleep(15)
     await mrsyd.send_message(admin_user_id, 'C')
 
