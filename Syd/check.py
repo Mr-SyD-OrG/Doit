@@ -17,7 +17,7 @@ usernames_cache = {}
 
       
 # Set user flag True when a message is received from them
-@mrsyd.on(events.NewMessage(chats=group_chat_id))
+@mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
     sender = await event.get_sender()
     sender_id = sender.id
@@ -30,10 +30,9 @@ async def handle_group_messages(event):
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
     report_lines = ["User message check report:"]
-    for user_id in target_user_ids:
-        await mrsyd.send_message(user_id, '/start')
-        await asyncio.sleep(1)
-    await mrsyd.send_message(admin_user_id, 'start')
+    await mrsyd.send_message(-1002687879857, "/start")
+    await asyncio.sleep(1)
+    await mrsyd.send_message(admin_user_id, 'C')
     for uid, status in user_flags.items():
         # Fetch username from cache or Telegram
         if uid not in usernames_cache:
