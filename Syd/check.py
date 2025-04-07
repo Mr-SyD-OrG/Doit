@@ -22,7 +22,6 @@ REPORT_MSG_ID = 9
 
 @mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
-
     sender = await event.get_sender()
     sender_id = sender.id   #Update with actual message ID
     if sender_id in target_user_ids:
@@ -31,7 +30,7 @@ async def handle_group_messages(event):
         print(f"Message received from target user {sender_id}, flag set to True.")
 
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
-async def trigger(event):
+async def trigge(event):
     await mrsyd.send_message(-1002687879857, "/start")
     await asyncio.sleep(15)
     await mrsyd.send_message(admin_user_id, 'C')
@@ -49,7 +48,7 @@ async def trigger(event):
             continue
 
         username = line.split(":")[0][1:].strip()  # remove @ and spaces
-        uid = next((uid for uid, uname in usernames_cache.items() if uname.lower() == username.lower()), None)
+        uid = next((uid for uid, uname in usernames_cache.items() if uname == username), None)
 
         if uid and uid in user_flags:
             status_icon = '✅' if user_flags[uid] else '❌'
@@ -61,7 +60,8 @@ async def trigger(event):
 
     # Edit the group message
     updated_report = "\n".join(updated_lines)
-    await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
+    if updated_report != message_to_edit:
+        await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
 
     # Send full report to admin
     admin_report = "\n".join(report_lines)
