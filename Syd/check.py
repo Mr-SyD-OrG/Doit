@@ -8,13 +8,23 @@ import asyncio
 
 # Define your admin and target user IDs
 admin_user_id = 1733124290  # Replace with actual admin user ID
-#target_user_ids = [6592320604, 5334261812, 5329540859, 5378426785, 6006903252, 5378661049, 6278143617, 8036619264, 7868859577, 7658164007, 7017921723, 7872466736]  # Replace with your target user IDs
-target_user_ids = [6592320604, 5329540859]
+target_user_ids = [6592320604, 5334261812, 5329540859, 5378426785, 6006903252, 5378661049, 6278143617, 8036619264, 7868859577, 7658164007, 7017921723, 7872466736]  # Replace with your target user IDs
+#target_user_ids = [6592320604, 5329540859]
 # Create global boolean flags for each target user
 user_flags = {user_id: False for user_id in target_user_ids}
 usernames_cache = {
     6592320604: 'Mr_Movies_File_bot',
-    5329540859: 'Pro_Moviez_bot'
+    5329540859: 'Pro_Moviez_bot',
+    7872466736: 'Mr_Auto_Rename_Bot',
+    7658164007: 'Movies_forage_Bot',
+    7868859577: 'Files_Forwarding_Bot',
+    8036619264: 'Auto_Caption_Edit_bot',
+    6006903252: 'Instant_Approval_Bot',
+    5334261812: 'MrMoviez_bot',
+    5378426785: 'MoViE_2022_NT_Bot',
+    6278143617: 'Ms_FiLe2LINk_bOt',
+    7017921723: 'Mr_File_Forward_Bot',
+    5378661049: 'MS_ReNamEr_BoT'
 }
 
 # Replace with your actual chat and message IDs
