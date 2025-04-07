@@ -15,46 +15,59 @@ user_flags = {user_id: False for user_id in target_user_ids}
 usernames_cache = {}
 
 
-      
-# Set user flag True when a message is received from them
+# Replace with your actual chat and message IDs
+REPORT_CHAT_ID = -1001778495166
+REPORT_MSG_ID = 9  
+# <- Update with actual message ID
+
 @mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
-    sender = await event.get_sender()
-    sender_id = sender.id
 
+    sender = await event.get_sender()
+# Replace with your actual chat and message IDs
+    sender_id = sender.id   #Update with actual message ID
     if sender_id in target_user_ids:
+
         user_flags[sender_id] = True
         print(f"Message received from target user {sender_id}, flag set to True.")
-      
-# When admin sends "Check", send the current status of each target user
+
 @mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigger(event):
-    report_lines = ["User message check report:"]
-    await mrsyd.send_message(-1002687879857, "/start")
+    await mrsyd.send_message(REPORT_CHAT_ID, "/start")
     await asyncio.sleep(1)
     await mrsyd.send_message(admin_user_id, 'C')
-    for uid, status in user_flags.items():
-        # Fetch username from cache or Telegram
-        if uid not in usernames_cache:
-            user = await mrsyd.get_entity(uid)
-            usernames_cache[uid] = user.username if user.username else f"{user.first_name} {user.last_name or ''}".strip()
-        name = usernames_cache[uid]
-        report_lines.append(f"@{name}: {'✅' if status else '❌'}")
-    
-    await mrsyd.send_message(admin_user_id, 'C')
-    report = "\n".join(report_lines)
-    await mrsyd.send_message(admin_user_id, 'C')
-    await event.respond(report)
-    await mrsyd.send_message(admin_user_id, report)
 
-    # Reset all flags for the next day
-    await mrsyd.send_message(admin_user_id, 'C')
+    # Fetch the original message to edit
+    message_to_edit = await mrsyd.get_messages(REPORT_CHAT_ID, ids=REPORT_MSG_ID)
+    original_lines = message_to_edit.text.splitlines()
+
+    updated_lines = []
+    report_lines = ["User message check report:"]
+    
+    for line in original_lines:
+        if not line.startswith("@"):
+            updated_lines.append(line)
+            continue
+
+        username = line.split(":")[0][1:].strip()  # remove @ and spaces
+        uid = next((uid for uid, uname in usernames_cache.items() if uname == username), None)
+
+        if uid and uid in user_flags:
+            status_icon = '✅' if user_flags[uid] else '❌'
+            updated_line = f"@{username}: {status_icon}"
+            updated_lines.append(updated_line)
+            report_lines.append(updated_line)
+        else:
+            updated_lines.append(line)
+
+    # Edit the group message
+    updated_report = "\n".join(updated_lines)
+    await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
+
+    # Send full report to admin
+    admin_report = "\n".join(report_lines)
+    await mrsyd.send_message(admin_user_id, admin_report)
+
+    # Reset all flags
     for uid in user_flags:
         user_flags[uid] = False
-
-#from telethon import events
-
-# === CONFIG ===
-
-status_chat_id = -1001778495166  # Replace with chat ID of the message to be edited
-status_message_id = 8  # Replace with the message ID to update
