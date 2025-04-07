@@ -23,9 +23,8 @@ REPORT_MSG_ID = 9
 @mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
     sender = await event.get_sender()
-    sender_id = sender.id   #Update with actual message ID
+    sender_id = sender.id
     if sender_id in target_user_ids:
-
         user_flags[sender_id] = True
         print(f"Message received from target user {sender_id}, flag set to True.")
 
@@ -41,33 +40,36 @@ async def trigge(event):
 
     updated_lines = []
     report_lines = ["User message check report:"]
-    
+
     for line in original_lines:
         if not line.startswith("@"):
             updated_lines.append(line)
             continue
 
-        username = line.split(":")[0][1:].strip()  # remove @ and spaces
+        username = line.split(":")[0][1:].strip()  # remove @
         uid = next((uid for uid, uname in usernames_cache.items() if uname == username), None)
 
-        if uid and uid in user_flags:
-            status_icon = '✅' if user_flags[uid] else '❌'
+        if uid:
+            status = user_flags.get(uid, False)
+            status_icon = '✅' if status else '❌'
             updated_line = f"@{username}: {status_icon}"
             updated_lines.append(updated_line)
             report_lines.append(updated_line)
+
+            print(f"Processed @{username} -> {uid} with status: {status_icon}")
         else:
             updated_lines.append(line)
-
-    # Edit the group message
-    admin_report = "\n".join(report_lines)
-    await mrsyd.send_message(admin_user_id, admin_report)
-    updated_report = "\n".join(updated_lines)
-    if updated_report != message_to_edit:
-        await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
+            print(f"No UID found for @{username}")
 
     # Send full report to admin
-    
+    admin_report = "\n".join(report_lines)
+    await mrsyd.send_message(admin_user_id, admin_report)
 
-    # Reset all flags
+    # Edit group message if different
+    updated_report = "\n".join(updated_lines)
+    if updated_report != message_to_edit.text:
+        await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
+
+    # Reset flags
     for uid in user_flags:
         user_flags[uid] = False
