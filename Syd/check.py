@@ -36,16 +36,18 @@ async def trigger(event):
     for uid, status in user_flags.items():
         # Fetch username from cache or Telegram
         if uid not in usernames_cache:
+            await mrsyd.send_message(admin_user_id, 'C')
             user = await mrsyd.get_entity(uid)
             usernames_cache[uid] = user.username if user.username else f"{user.first_name} {user.last_name or ''}".strip()
-        
+        await mrsyd.send_message(admin_user_id, 'C')
         name = usernames_cache[uid]
         report_lines.append(f"@{name}: {'✅' if status else '❌'}")
-    
+    await mrsyd.send_message(admin_user_id, 'C')
     report = "\n".join(report_lines)
     await event.respond(report)
 
     # Reset all flags for the next day
+    await mrsyd.send_message(admin_user_id, 'C')
     for uid in user_flags:
         user_flags[uid] = False
 
