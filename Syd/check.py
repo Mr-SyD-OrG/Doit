@@ -12,8 +12,10 @@ admin_user_id = 1733124290  # Replace with actual admin user ID
 target_user_ids = [6592320604, 5329540859]
 # Create global boolean flags for each target user
 user_flags = {user_id: False for user_id in target_user_ids}
-usernames_cache = {}
-
+usernames_cache = {
+    6592320604: 'Mr_Movies_File_bot',
+    5329540859: 'Pro_Moviez_bot'
+}
 
 # Replace with your actual chat and message IDs
 REPORT_CHAT_ID = -1001778495166
@@ -34,7 +36,7 @@ async def trigge(event):
     await asyncio.sleep(15)
     await mrsyd.send_message(admin_user_id, 'C')
 
-    # Fetch the original message to edit
+    # Fetch the message to edit
     message_to_edit = await mrsyd.get_messages(REPORT_CHAT_ID, ids=REPORT_MSG_ID)
     original_lines = message_to_edit.text.splitlines()
 
@@ -46,26 +48,28 @@ async def trigge(event):
             updated_lines.append(line)
             continue
 
-        username = line.split(":")[0][1:].strip()  # remove @
-        uid = next((uid for uid, uname in usernames_cache.items() if uname == username), None)
+        username = line.split(":")[0][1:].strip()
 
-        if uid:
+        # Match username to UID from cache
+        uid = next(
+            (uid for uid, uname in usernames_cache.items() if uname.lower() == username.lower()),
+            None
+        )
+
+        if uid is not None:
             status = user_flags.get(uid, False)
             status_icon = '✅' if status else '❌'
             updated_line = f"@{username}: {status_icon}"
             updated_lines.append(updated_line)
             report_lines.append(updated_line)
-
-            print(f"Processed @{username} -> {uid} with status: {status_icon}")
         else:
             updated_lines.append(line)
-            print(f"No UID found for @{username}")
 
-    # Send full report to admin
+    # Send report to admin
     admin_report = "\n".join(report_lines)
     await mrsyd.send_message(admin_user_id, admin_report)
 
-    # Edit group message if different
+    # Update group message if changed
     updated_report = "\n".join(updated_lines)
     if updated_report != message_to_edit.text:
         await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
