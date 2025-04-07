@@ -59,13 +59,14 @@ async def trigge(event):
             updated_lines.append(line)
 
     # Edit the group message
+    admin_report = "\n".join(report_lines)
+    await mrsyd.send_message(admin_user_id, admin_report)
     updated_report = "\n".join(updated_lines)
     if updated_report != message_to_edit:
         await mrsyd.edit_message(REPORT_CHAT_ID, REPORT_MSG_ID, updated_report)
 
     # Send full report to admin
-    admin_report = "\n".join(report_lines)
-    await mrsyd.send_message(admin_user_id, admin_report)
+    
 
     # Reset all flags
     for uid in user_flags:
