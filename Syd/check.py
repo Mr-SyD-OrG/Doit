@@ -57,27 +57,34 @@ async def trigge(event):
     updated_lines = []
     report_lines = ["User message check report:"]
 
+    found_usernames = set()
+
     for line in original_lines:
         if not line.startswith("@"):
             updated_lines.append(line)
             continue
 
         username = line.split(":")[0][1:].strip()
+        found_usernames.add(username.lower())
 
-        # Match username to UID from cache
         uid = next(
             (uid for uid, uname in usernames_cache.items() if uname.lower() == username.lower()),
             None
         )
 
-        if uid is not None:
+        status = user_flags.get(uid, False) if uid is not None else False
+        status_icon = '✅' if status else '❌'
+        updated_line = f"@{username}: {status_icon}"
+
+        updated_lines.append(updated_line)
+        report_lines.append(updated_line)
+      
+    for uid, uname in usernames_cache.items():
+        if uname.lower() not in found_usernames:
             status = user_flags.get(uid, False)
             status_icon = '✅' if status else '❌'
-            updated_line = f"@{username}: {status_icon}"
-            updated_lines.append(updated_line)
-            report_lines.append(updated_line)
-        else:
-            updated_lines.append(line)
+            extra_line = f"@{uname}: {status_icon}"
+            report_lines.append(extra_line)
 
     # Send report to admin
     admin_report = "\n".join(report_lines)
