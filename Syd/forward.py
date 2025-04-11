@@ -137,21 +137,21 @@ async def handle_message(event):
                         break  # If error occurs, move to the next button
 
             # If "NEXT" exists, press it immediately and wait 60 seconds before handling new buttons
-            if next_button:
-                row_idx, col_idx, button = next_button
-                try:
-                    await message.click(row_idx, col_idx)  # Click "NEXT" button
-                    print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
-                    await asyncio.sleep(40)  # Full 60-second wait before checking new buttons
+          #  if next_button:
+               # row_idx, col_idx, button = next_button
+               # try:
+                  #  await message.click(row_idx, col_idx)  # Click "NEXT" button
+                  #  print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
+                  #  await asyncio.sleep(40)  # Full 60-second wait before checking new buttons
 
                     # Fetch the updated message with new buttons
-                    updated_msg = await event.client.get_messages(chat_id, ids=message_id)
-                    if updated_msg and updated_msg.buttons != message.buttons:
-                        print("Message updated with new buttons, restarting...")
-                        message = updated_msg  # Update message with new buttons
-                        continue  # Restart button processing
-                except Exception as e:
-                    print(f"Error pressing 'NEXT': {e}")
+                  #  updated_msg = await event.client.get_messages(chat_id, ids=message_id)
+                   # if updated_msg and updated_msg.buttons != message.buttons:
+                      #  print("Message updated with new buttons, restarting...")
+                     #   message = updated_msg  # Update message with new buttons
+                     #   continue  # Restart button processing
+              #  except Exception as e:
+                  #  print(f"Error pressing 'NEXT': {e}")
 
             break  # Exit loop if no more buttons are left
 
