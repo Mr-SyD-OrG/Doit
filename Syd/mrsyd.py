@@ -1,6 +1,7 @@
 from telethon import events
 import asyncio
 from bot import mrsyd
+import random
 
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
