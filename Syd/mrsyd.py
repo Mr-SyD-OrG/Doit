@@ -13,12 +13,12 @@ WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
 async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
 
-    for i, year in enumerate(range(start_year, end_year + 1)):
-        letter = letters[i % len(letters)]
-        for res in resolutions:
-            msg = f"{letter} {year} {res}"
-            await event.client.send_message(1983814301, msg)
-            print(f"Sent: {msg}")
-            await asyncio.sleep(random.choice(WAIT))  # 1 minute delay
+    for letter in letters:
+        for year in range(start_year, end_year + 1):
+            for res in resolutions:
+                msg = f"{letter} {year} {res}"
+                await event.client.send_message(1983814301, msg)
+                print(f"Sent: {msg}")
+                await asyncio.sleep(random.choice(WAIT))
 
     await event.client.send_message(1733124290, "Done sending all resolutions.")
