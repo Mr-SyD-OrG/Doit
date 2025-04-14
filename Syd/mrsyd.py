@@ -16,6 +16,8 @@ start_reached = False
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
 async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
+    start_from = "A 2000 2160p"
+    start_reached = False
 
     for letter in letters:
         for year in range(start_year, end_year + 1):
