@@ -32,8 +32,9 @@ async def handle_search_trigger(event):
                 # Skip if already sent
                 if msg in messge:
                     continue
+                sydd = random.choice(WAIT)
                 await event.client.send_message(1983814301, msg)
-                print(f"Sent: {msg}")
-                await asyncio.sleep(random.choice(WAIT))
+                print(f"Sent: {msg} Wait {sydd}")
+                await asyncio.sleep(sydd)
 
     await event.client.send_message(1733124290, "Done sending all resolutions.")
