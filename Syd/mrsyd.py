@@ -10,7 +10,7 @@ end_year = 2002
 messge = ["A 2000 480p", "A 2000 720p", "A 2000 1080p", "B 2001 480p", "B 2001 720p", "B 2001 1080p", "C 2002 480p", "C 2002 720p", "C 2002 1080p"]
 resolutions = ["240p", "480p", "720p", "1080p", "2160p"]
 WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
-start_from = "A 2000 2160p"
+start_from = "F 2000 240p"
 start_reached = False
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
