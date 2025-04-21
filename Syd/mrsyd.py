@@ -14,7 +14,7 @@ WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
 async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
-    start_from = "M 2001 480p"
+    start_from = "M 2000 480p"
     start_reached = False
 
     for letter in letters:
