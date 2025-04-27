@@ -18,7 +18,7 @@ from pyrogram.types import Message
 semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
-DESTINATION_CHAT = [-1002433450358, -1002464733363, -1002429058090]
+DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002429058090]
 SOURCE_CHATS = [-1002295881345, 7065204410, -1002281540615, 1983814301, 7755788244, -1002588744450, 7193976370, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
@@ -28,7 +28,7 @@ async def forward_if_allowed(event):
     message = event.message
     async with semaphore:
         try:
-            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHAT)
+            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
             await event.client.forward_messages(DESTINATION_CHAT_ID, message)
             print(f"✅ Message {message.id} forwarded successfully.")
             await asyncio.sleep(120)
