@@ -227,7 +227,7 @@ async def forward_messs(event):
                 print("⏳ Not in forwarding time. Waiting until 1 AM IST...")
                 await asyncio.sleep(1000)  # Wait before checking again
 
-@mrsyd.on(events.NewMessage(chats-1002658187814))
+@mrsyd.on(events.NewMessage(chats=-1002658187814))
 async def forwd_mesages(event):
     message = event.message
     await asyncio.sleep(100 * 60)
