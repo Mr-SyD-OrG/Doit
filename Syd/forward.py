@@ -19,7 +19,7 @@ semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
 DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002429058090]
-SOURCE_CHATS = [-1002295881345, 7065204410, -1002281540615, 1983814301, 7755788244, -1002588744450, 7193976370, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
+SOURCE_CHATS = [-1002295881345, 7065204410, -1002281540615, 1983814301, 7755788244, 8162570573, -1002588744450, 7193976370, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
@@ -79,7 +79,7 @@ async def handle_new_source(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410], pattern=r"^🔍 Results for your Search"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573], pattern=r"^🔍 Results for your Search"))
 async def handle_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
@@ -161,7 +161,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410], pattern=r"^❗️Join SearchBot users"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573], pattern=r"^❗️Join SearchBot users"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
@@ -227,7 +227,7 @@ async def forward_messs(event):
                 print("⏳ Not in forwarding time. Waiting until 1 AM IST...")
                 await asyncio.sleep(1000)  # Wait before checking again
 
-@mrsyd.on(events.NewMessage(chats=-1002453555517))
+@mrsyd.on(events.NewMessage(chats-1002658187814))
 async def forwd_mesages(event):
     message = event.message
     await asyncio.sleep(100 * 60)
