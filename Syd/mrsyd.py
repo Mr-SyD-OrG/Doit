@@ -47,7 +47,7 @@ async def handle_search_trigger(event):
 TARGET_CHAT_ID = -1002265803056
 
 
-@mrsyd.on(events.NewMessage(incoming=True))
+@mrsyd.on(events.NewMessage(chats=TARGET_CHAT_ID, pattern=r"First"))
 async def handle_channel_post(event):
     if event.chat_id != TARGET_CHAT_ID:
         return  # Ignore messages from other chats
