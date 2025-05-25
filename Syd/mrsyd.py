@@ -55,19 +55,21 @@ async def handle_channel_post(event):
     if event.is_channel and event.raw_text:
         text = event.raw_text.strip()
 
-        if 'code' in text:
-            # Extract expression after the word "code" using regex
-            match = re.search(r'code\s+(.+)', text)
-            if match:
-                expr = match.group(1).strip()
-                mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
-                if mul_match:
-                    a = int(mul_match.group(1))
-                    b = int(mul_match.group(2))
-                    result = a * b
-                    response = f"{a} × {b} = {result}"
-                else:
-                    response = "No valid multiplication found."
+        # Look for "code" or "question" and extract what follows
+        match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
+        if match:
+            keyword = match.group(1)
+            expr = match.group(2).strip()
+
+            # Try multiplication pattern
+            mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
+            if mul_match:
+                a = int(mul_match.group(1))
+                b = int(mul_match.group(2))
+                response = f"{a} × {b} = {a * b}"
+            else:
+                # Just echo the content after "code" or "question"
+                response = expr
             else:
                 response = "No expression found after 'code'."
             # Try to comment under the post (if discussion group exists)
