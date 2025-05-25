@@ -37,3 +37,50 @@ async def handle_search_trigger(event):
                 await asyncio.sleep(sydd)
 
     await event.client.send_message(1733124290, "Done sending all resolutions.")
+
+
+
+
+
+
+# Replace this with your target channel ID (use a negative number for channels)
+TARGET_CHAT_ID = -1002265803056
+
+
+@mrsyd.on(events.NewMessage(incoming=True))
+async def handle_channel_post(event):
+    if event.chat_id != TARGET_CHAT_ID:
+        return  # Ignore messages from other chats
+
+    if event.is_channel and event.raw_text:
+        text = event.raw_text.strip()
+
+        if 'code' in text:
+            # Extract expression after the word "code" using regex
+            match = re.search(r'code\s+(.+)', text)
+            if match:
+                expr = match.group(1).strip()
+                mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
+                if mul_match:
+                    a = int(mul_match.group(1))
+                    b = int(mul_match.group(2))
+                    result = a * b
+                    response = f"{a} × {b} = {result}"
+                else:
+                    response = "No valid multiplication found."
+            else:
+                response = "No expression found after 'code'."
+            # Try to comment under the post (if discussion group exists)
+            linked_chat = await client.get_entity(event.chat)
+            if linked_chat.linked_chat_id:
+                try:
+                    await client.send_message(
+                        entity=linked_chat.linked_chat_id,
+                        message=response,
+                        reply_to=event.id
+                    )
+                except Exception as e:
+                    print("Failed to comment:", e)
+            else:
+                print("No linked discussion group found.")
+
