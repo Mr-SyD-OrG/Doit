@@ -5,8 +5,9 @@ import random
 
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-start_year = 2000
-end_year = 2002
+#start_year = 2000
+start_year = 2020
+end_year = 2023
 messge = ["A 2000 480p", "A 2000 720p", "A 2000 1080p", "B 2001 480p", "B 2001 720p", "B 2001 1080p", "C 2002 480p", "C 2002 720p", "C 2002 1080p"]
 resolutions = ["240p", "480p", "720p", "1080p", "2160p"]
 WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
@@ -14,9 +15,9 @@ WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
 async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
-    start_from = "V 2001 480p"
+ #   start_from = "V 2001 480p"
     start_reached = False
-
+    start_from = "A 2020 240p"
     for letter in letters:
         for year in range(start_year, end_year + 1):
             for res in resolutions:
