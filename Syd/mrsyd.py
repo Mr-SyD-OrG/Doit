@@ -70,9 +70,6 @@ async def handle_channel_post(event):
             else:
                 # Just echo the content after "code" or "question"
                 response = expr
-            else:
-                response = "No expression found after 'code'."
-            # Try to comment under the post (if discussion group exists)
             linked_chat = await client.get_entity(event.chat)
             if linked_chat.linked_chat_id:
                 try:
