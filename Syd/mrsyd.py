@@ -47,42 +47,49 @@ async def handle_search_trigger(event):
 # Replace this with your target channel ID (use a negative number for channels)
 TARGET_CHAT_ID = -1002623780966
 
-@mrsyd.on(events.NewMessage(chats=TARGET_CHAT_ID, pattern=r"First"))
-async def handle_channel_post(event):
-    if event.chat_id != TARGET_CHAT_ID:
+DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
+ADMIN_ID = 1733124290  # Replace with the actual admin ID
+
+@mrsyd.on(events.NewMessage(chats=DISCUSSION_GROUP_ID))
+async def handle_comment(event):
+    # Only handle replies to channel posts
+    if not event.is_reply:
         return
 
-    if event.is_channel and event.raw_text:
-        text = event.raw_text.strip()
+    try:
+        original_msg = await event.get_reply_message()
+    except Exception as e:
+        print("Failed to fetch replied message:", e)
+        return
 
-        match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
-        if match:
-            keyword = match.group(1)
-            expr = match.group(2).strip()
+    if not original_msg or not original_msg.is_channel:
+        return  # Ignore replies to non-channel messages
 
-            # Try multiplication
-            mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
-            if mul_match:
-                a = int(mul_match.group(1))
-                b = int(mul_match.group(2))
-                response = f"{a} × {b} = {a * b}"
-            else:
-                response = expr
+    text = original_msg.raw_text or ""
+    text = text.strip()
 
-            linked_chat = await client.get_entity(event.chat)
-            if linked_chat.linked_chat_id:
-                try:
-                    # Fetch discussion message (from discussion group)
-                    discussion = await event.get_discussion_message()
-                    if discussion:
-                        await event.client.send_message(
-                            entity=linked_chat.linked_chat_id,
-                            message=response,
-                            reply_to=discussion.id
-                        )
-                    else:
-                        print("No discussion message found.")
-                except Exception as e:
-                    print("Failed to comment:", e)
-            else:
-                print("No linked discussion group found.")
+    match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
+
+    if match:
+        keyword = match.group(1)
+        expr = match.group(2).strip()
+
+        # Check for multiplication
+        mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
+        if mul_match:
+            a = int(mul_match.group(1))
+            b = int(mul_match.group(2))
+            response = f"{a} × {b} = {a * b}"
+        else:
+            response = expr
+
+        await event.reply(response)
+
+    else:
+        user = await event.get_sender()
+        msg_to_admin = (
+            f"❌ *No keyword* found in original channel message.\n\n"
+            f"👤 *From user:* [{user.first_name}](tg://user?id={user.id})\n"
+            f"💬 *Comment:* {event.raw_text}"
+        )
+        await event.client.send_message(ADMIN_ID, msg_to_admin, parse_mode='markdown')
