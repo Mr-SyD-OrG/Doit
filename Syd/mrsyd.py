@@ -52,8 +52,10 @@ ADMIN_ID = 1733124290  # Replace with the actual admin ID
 
 @mrsyd.on(events.NewMessage(chats=DISCUSSION_GROUP_ID))
 async def handle_comment(event):
+    print("🔔 New message in discussion group")
     # Only handle replies to channel posts
     if not event.is_reply:
+        print("❌ Not a reply, ignoring")
         return
 
     try:
