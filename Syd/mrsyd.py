@@ -56,22 +56,13 @@ async def handle_comment(event):
     # Only handle replies to channel posts
     
     
-    try:
-        original_msg = await event.get_discussion_message()
-    except Exception as e:
-        print("❌ Could not get linked original message:", e)
-        return
-
-    if not original_msg:
-        print("❌ This message is not a reply to a linked channel post")
-        return
 
     # ✅ Now we can check if the original message is from your channel
-    if original_msg.chat_id != TARGET_CHANNEL_ID:
+    if event.message.sender_chat.id != TARGET_CHANNEL_ID:
         print("⚠️ The original message is not from the target channel")
         return
         
-    text = original_msg.raw_text or ""
+    text = event.message.raw_text or ""
     text = text.strip()
 
     match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
