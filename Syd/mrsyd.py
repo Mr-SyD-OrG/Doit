@@ -61,10 +61,10 @@ async def handle_comment(event):
         print("Failed to fetch replied message:", e)
         return
 
-    if not original_msg or not original_msg.is_channel:
-        print("Not Channel")
-        return  # Ignore replies to non-channel messages
-
+    if original_msg.chat_id != TARGET_CHAT_ID:
+        print("⚠️ Not replying to a channel post")
+        return
+        
     text = original_msg.raw_text or ""
     text = text.strip()
 
