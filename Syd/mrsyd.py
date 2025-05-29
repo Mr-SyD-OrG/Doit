@@ -64,59 +64,58 @@ TARGET_CHANNEL_ID = 2623780966
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
 
-# Replace with your channel ID
+
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == TARGET_CHANNEL_ID))
 async def handle_channel_posted_message(event):
-    # ✅ This triggers ONLY when message is sent by the channel in a discussion group
-    text = event.message.raw_text or ""
-    await event.reply(f"Channel said: {text}")
-
-
-@mrsyd.on(events.NewMessage(chats=DISCUSSION_GROUP_ID))
-async def handle_comment(event):
     global PROCESS
     if not PROCESS:
         return
-    from_id = event.message.from_id
-
-    # Check if the message was sent as the channel
-    if not (isinstance(from_id, PeerChannel) and from_id.channel_id == TARGET_CHANNEL_ID):
-        return
 
     text = event.message.raw_text or ""
+    result = None
 
-    # Match keyword and extract expression
-    match = re.search(r'\b(code|question)\b\s*[:\-]?\s*(.+)', text, re.IGNORECASE)
-    if not match:
+    # Detect math problems like "10+10+10+10+10+9 =??" or "2×2×6×8×9 = ???"
+    math_expr_match = re.search(r'(\d+([+\sx×]\d+)+)\s*=?\?+', text)
+    if math_expr_match:
+        expr_raw = math_expr_match.group(1)
+
+        # Clean and standardize expression
+        expr = expr_raw.replace('×', '*').replace('x', '*').replace(' ', '')
+        try:
+            # Safe evaluation of math expression
+            result = str(eval(expr))
+        except Exception:
+            result = None
+
+    # If not a math question, try matching with keyword like "code:" or "question:"
+    if result is None:
+        match = re.search(r'\b(code|question)\b\s*[:\-]?\s*(.+)', text, re.IGNORECASE)
+        if match:
+            expr = match.group(2).strip()
+            
+            # Handle multiplication
+            mul_match = re.match(r'^(\d+)\s*[x×]\s*(\d+)$', expr)
+            if mul_match:
+                a = int(mul_match.group(1))
+                b = int(mul_match.group(2))
+                result = str(a * b)
+
+            # Handle addition
+            elif re.fullmatch(r'(\d+\+)+\d+', expr):
+                parts = list(map(int, expr.split('+')))
+                result = str(sum(parts))
+
+            else:
+                # Fallback: just echo the extracted text (removing special chars)
+                result = re.sub(r'[^\w\s]', '', expr).strip()
+
+    if not result:
         await event.client.send_message(ADMIN_ID, "NO MATCH FOUND", parse_mode='markdown')
-        return  # No keyword found
+        return
 
-    expr = match.group(2).strip()
-
-    # Handle multiplication
-    mul_match = re.match(r'^(\d+)\s*[x×]\s*(\d+)$', expr)
-    if mul_match:
-        a = int(mul_match.group(1))
-        b = int(mul_match.group(2))
-        result = f"{a * b}"
-
-    # Handle addition
-    elif re.fullmatch(r'(\d+\+)+\d+', expr):
-        parts = list(map(int, expr.split('+')))
-        total = sum(parts)
-        result = f"{total}"
-
-    else:
-        result = expr
-
-    # Count number of words in response
+    # Decide how to respond
     word_count = len(result.strip().split())
-
     if word_count <= 2:
-        # Repeat short responses for emphasis
         await event.reply(result)
     else:
-        # Reply once for long responses
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
-
-   # PROCESS = False
