@@ -59,7 +59,7 @@ async def handle_off_trigger(event):
 
 
 # Replace this with your target channel ID (use a negative number for channels)
-TARGET_CHANNEL_ID = 2623780966
+TARGET_CHANNEL_ID = 2265803056
 
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
@@ -119,3 +119,4 @@ async def handle_channel_posted_message(event):
         await event.reply(result)
     else:
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
+    PROCESS = False
