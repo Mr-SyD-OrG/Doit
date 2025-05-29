@@ -75,7 +75,7 @@ async def handle_channel_post(event):
                     # Fetch discussion message (from discussion group)
                     discussion = await event.get_discussion_message()
                     if discussion:
-                        await client.send_message(
+                        await event.client.send_message(
                             entity=linked_chat.linked_chat_id,
                             message=response,
                             reply_to=discussion.id
