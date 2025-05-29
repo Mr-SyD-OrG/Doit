@@ -88,7 +88,7 @@ async def handle_comment(event):
         if mul_match:
             a = int(mul_match.group(1))
             b = int(mul_match.group(2))
-            response = f"{a} × {b} = {a * b}"
+            response = f"{a * b}"
         else:
             response = expr
 
