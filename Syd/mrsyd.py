@@ -75,7 +75,7 @@ async def handle_channel_posted_message(event):
     result = None
 
     # Detect math problems like "10+10+10+10+10+9 =??" or "2×2×6×8×9 = ???"
-    math_expr_match = re.search(r'(\d+([+\sx×]\d+)+)\s*=?\?+', text)
+    math_expr_match = re.search(r'([\d+×x\s]+)\s*=?\?+', text)
     if math_expr_match:
         expr_raw = math_expr_match.group(1)
 
