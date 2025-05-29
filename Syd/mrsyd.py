@@ -5,6 +5,7 @@ from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
 
+PROCESS = False
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #start_year = 2000
@@ -43,6 +44,18 @@ async def handle_search_trigger(event):
 
 
 
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"on"))
+async def handle_on_trigger(event):
+    global PROCESS
+    PROCESS = True
+    await event.reply("Set To True")
+
+    
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
+async def handle_off_trigger(event):
+    global PROCESS
+    PROCESS = False
+    await event.reply("Set To False")
 
 
 # Replace this with your target channel ID (use a negative number for channels)
@@ -51,54 +64,53 @@ TARGET_CHANNEL_ID = 2623780966
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
 
+# Replace with your channel ID
+
 @mrsyd.on(events.NewMessage(chats=DISCUSSION_GROUP_ID))
 async def handle_comment(event):
-    print("🔔 New message in discussion group")
-    # Only handle replies to channel posts
-    
-    
-
-    # ✅ Now we can check if the original message is from your channel
+    global PROCESS
+    if not PROCESS:
+        return
     from_id = event.message.from_id
 
-    if isinstance(from_id, PeerChannel):
-        channel_id = from_id.channel_id
-        if channel_id == TARGET_CHANNEL_ID:
-            print("✅ Message sent by target channel")
-        else:
-            print("⚠️ Message sent by other channel:", channel_id)
-            return
-    else:
-        print("Message sent by user or chat:", from_id)
+    # Check if the message was sent as the channel
+    if not (isinstance(from_id, PeerChannel) and from_id.channel_id == TARGET_CHANNEL_ID):
         return
 
-
-        
     text = event.message.raw_text or ""
-    text = text.strip()
 
-    match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
+    # Match keyword and extract expression
+    match = re.search(r'\b(code|question)\b\s*[:\-]?\s*(.+)', text, re.IGNORECASE)
+    if not match:
+        await event.client.send_message(ADMIN_ID, "NO MATCH FOUND", parse_mode='markdown')
+        return  # No keyword found
 
-    if match:
-        keyword = match.group(1)
-        expr = match.group(2).strip()
+    expr = match.group(2).strip()
 
-        # Check for multiplication
-        mul_match = re.match(r'(\d+)\s*[x×]\s*(\d+)', expr)
-        if mul_match:
-            a = int(mul_match.group(1))
-            b = int(mul_match.group(2))
-            response = f"{a * b}"
-        else:
-            response = expr
+    # Handle multiplication
+    mul_match = re.match(r'^(\d+)\s*[x×]\s*(\d+)$', expr)
+    if mul_match:
+        a = int(mul_match.group(1))
+        b = int(mul_match.group(2))
+        result = f"{a * b}"
 
-        await event.reply(response)
+    # Handle addition
+    elif re.fullmatch(r'(\d+\+)+\d+', expr):
+        parts = list(map(int, expr.split('+')))
+        total = sum(parts)
+        result = f"{total}"
 
     else:
-        user = await event.get_sender()
-        msg_to_admin = (
-            f"❌ *No keyword* found in original channel message.\n\n"
-            f"👤 *From user:* [{user.first_name}](tg://user?id={user.id})\n"
-            f"💬 *Comment:* {event.raw_text}"
-        )
-        await event.client.send_message(ADMIN_ID, msg_to_admin, parse_mode='markdown')
+        result = expr
+
+    # Count number of words in response
+    word_count = len(result.strip().split())
+
+    if word_count <= 2:
+        # Repeat short responses for emphasis
+        await event.reply(result)
+    else:
+        # Reply once for long responses
+        await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
+
+   # PROCESS = False
