@@ -3,6 +3,7 @@ import asyncio
 import re
 from bot import mrsyd
 import random
+from telethon.tl.types import PeerChannel
 
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -58,9 +59,20 @@ async def handle_comment(event):
     
 
     # ✅ Now we can check if the original message is from your channel
-    if event.message.sender_chat.id != TARGET_CHANNEL_ID:
-        print("⚠️ The original message is not from the target channel")
+    from_id = event.message.from_id
+
+    if isinstance(from_id, PeerChannel):
+        channel_id = from_id.channel_id
+        if channel_id == TARGET_CHANNEL_ID:
+            print("✅ Message sent by target channel")
+        else:
+            print("⚠️ Message sent by other channel:", channel_id)
+            return
+    else:
+        print("Message sent by user or chat:", from_id)
         return
+
+
         
     text = event.message.raw_text or ""
     text = text.strip()
