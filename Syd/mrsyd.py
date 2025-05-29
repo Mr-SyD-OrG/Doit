@@ -54,10 +54,7 @@ ADMIN_ID = 1733124290  # Replace with the actual admin ID
 async def handle_comment(event):
     print("🔔 New message in discussion group")
     # Only handle replies to channel posts
-    if not event.is_reply:
-        print("❌ Not a reply, ignoring")
-        return
-
+    
     try:
         original_msg = await event.get_reply_message()
     except Exception as e:
@@ -65,6 +62,7 @@ async def handle_comment(event):
         return
 
     if not original_msg or not original_msg.is_channel:
+        print("Not Channel")
         return  # Ignore replies to non-channel messages
 
     text = original_msg.raw_text or ""
