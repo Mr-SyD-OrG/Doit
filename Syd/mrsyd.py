@@ -47,7 +47,7 @@ async def handle_search_trigger(event):
 # Replace this with your target channel ID (use a negative number for channels)
 TARGET_CHAT_ID = -1002623780966
 
-@client.on(events.NewMessage(chats=TARGET_CHAT_ID, pattern=r"First"))
+@mrsyd.on(events.NewMessage(chats=TARGET_CHAT_ID, pattern=r"First"))
 async def handle_channel_post(event):
     if event.chat_id != TARGET_CHAT_ID:
         return
