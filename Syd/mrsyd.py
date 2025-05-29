@@ -65,6 +65,12 @@ DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
 
 # Replace with your channel ID
+@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == TARGET_CHANNEL_ID))
+async def handle_channel_posted_message(event):
+    # ✅ This triggers ONLY when message is sent by the channel in a discussion group
+    text = event.message.raw_text or ""
+    await event.reply(f"Channel said: {text}")
+
 
 @mrsyd.on(events.NewMessage(chats=DISCUSSION_GROUP_ID))
 async def handle_comment(event):
