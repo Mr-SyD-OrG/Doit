@@ -46,7 +46,7 @@ async def handle_search_trigger(event):
 
 
 # Replace this with your target channel ID (use a negative number for channels)
-TARGET_CHANNEL_ID = -1002623780966
+TARGET_CHANNEL_ID = 2623780966
 
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
