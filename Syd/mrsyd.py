@@ -55,17 +55,12 @@ async def handle_comment(event):
     print("🔔 New message in discussion group")
     # Only handle replies to channel posts
     
-    try:
-        original_msg = await event.get_reply_message()
-    except Exception as e:
-        print("Failed to fetch replied message:", e)
-        return
-
-    if original_msg.chat_id != TARGET_CHAT_ID:
+    
+    if event.chat_id != TARGET_CHAT_ID:
         print("⚠️ Not replying to a channel post")
         return
         
-    text = original_msg.raw_text or ""
+    text = event.raw_text or ""
     text = text.strip()
 
     match = re.search(r'\b(code|question)\b\s+(.+)', text, re.IGNORECASE)
