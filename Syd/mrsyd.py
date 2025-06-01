@@ -191,10 +191,11 @@ async def handle_channel_postd_message(event):
 
     # 5. Send result
     if not result:
-        await event.client.send_message(ADMIN_ID, "NO MATCH FOUND", parse_mode='markdown')
+        await event.client.send_message(ADMIN_ID, f"NO MATCH FOUND {text}", parse_mode='markdown')
         return
 
     if len(result.strip().split()) <= 2:
         await event.reply(result)
+        PROCESS = False
     else:
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
