@@ -119,4 +119,4 @@ async def handle_channel_posted_message(event):
         await event.reply(result)
     else:
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
-    PROCESS = False
+  #  PROCESS = False
