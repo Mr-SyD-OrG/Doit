@@ -9,7 +9,7 @@ from .mrsyd import PROCESS
 IST = timezone("Asia/Kolkata")
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2623780966))
-async def handle_channel_posted_message(event):
+async def handle_channel_d_message(event):
     global PROCESS
     if not PROCESS:
         return
