@@ -128,12 +128,13 @@ from pytz import timezone
 
 IST = timezone("Asia/Kolkata")
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2623780966))
+@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
         return
-
+    await event.client.send_message(ADMIN_ID, "Recieved Message", parse_mode='markdown')
+    
     text = event.message.raw_text or ""
     result = None
     lower_text = text.lower()
