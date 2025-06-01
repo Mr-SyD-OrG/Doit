@@ -2,6 +2,7 @@ import re
 import asyncio
 from datetime import datetime, timedelta
 from pytz import timezone
+from bot import mrsyd
 from telethon.tl.types import PeerChannel
 
 IST = timezone("Asia/Kolkata")
