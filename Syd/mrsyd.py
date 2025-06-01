@@ -48,14 +48,14 @@ async def handle_search_trigger(event):
 async def handle_on_trigger(event):
     global PROCESS
     PROCESS = True
-    await event.reply("Set To True")
+    await event.reply("Set To True .")
 
     
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
 async def handle_off_trigger(event):
     global PROCESS
     PROCESS = False
-    await event.reply("Set To False")
+    await event.reply("Set To False .")
 
 
 # Replace this with your target channel ID (use a negative number for channels)
@@ -129,7 +129,7 @@ from pytz import timezone
 IST = timezone("Asia/Kolkata")
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2623780966))
-async def handle_channel_posted_message(event):
+async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
         return
