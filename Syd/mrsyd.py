@@ -59,7 +59,7 @@ async def handle_off_trigger(event):
 
 
 # Replace this with your target channel ID (use a negative number for channels)
-TARGET_CHANNEL_ID = 1562527013
+TARGET_CHANNEL_ID = 1562013
 
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
@@ -128,7 +128,7 @@ from pytz import timezone
 
 IST = timezone("Asia/Kolkata")
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
+@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 1562527013))
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
