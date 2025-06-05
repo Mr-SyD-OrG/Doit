@@ -59,7 +59,7 @@ async def handle_off_trigger(event):
 
 
 # Replace this with your target channel ID (use a negative number for channels)
-TARGET_CHANNEL_ID = 2265801056
+TARGET_CHANNEL_ID = 1562527013
 
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Replace with the actual admin ID
