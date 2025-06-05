@@ -42,6 +42,50 @@ async def handle_search_trigger(event):
     await event.client.send_message(1733124290, "Done sending all resolutions.")
 
 
+import re
+import asyncio
+from datetime import datetime, timedelta
+from telethon.tl.types import PeerUser
+from pytz import timezone
+
+  # Replace with your actual admin user ID
+IST = timezone('Asia/Kolkata')
+
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"send"))
+async def handle_admn_message(event):
+    text = event.message.raw_text.strip()
+
+    # Match pattern: Send @username time 4:30 Message here
+    match = re.match(r'^send\s+@?(\w{5,32})\s+time\s+(\d{1,2})[:;](\d{2})\s+(.+)', text, re.IGNORECASE)
+    if not match:
+        await event.reply("❌ Invalid format. Use:\nSend @username time 4:30 Your message")
+        return
+
+    username = match.group(1)
+    hour = int(match.group(2))
+    minute = int(match.group(3))
+    message_text = match.group(4).strip()
+
+    # Time calculation
+    now = datetime.now(IST)
+    target_time = now.replace(hour=hour % 12, minute=minute, second=0, microsecond=0)
+    
+    # Adjust for next day or AM/PM
+    if target_time <= now:
+        target_time += timedelta(hours=12) if hour <= 6 else timedelta(days=1)
+
+    wait_time = (target_time - now).total_seconds()
+
+    await event.reply(f"✅ Message will be sent to @{username} at {target_time.strftime('%I:%M %p')} IST.")
+
+    await asyncio.sleep(wait_time)
+
+    try:
+        user = await event.client.get_entity(username)
+        await event.client.send_message(user, message_text)
+        await event.reply(f"✅ Sent message to @{username}")
+    except Exception as e:
+        await event.reply(f"❌ Failed to send message to @{username}\nError: {e}")
 
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"on"))
@@ -123,10 +167,6 @@ async def handle_channel_posted_message(event):
 
 
 
-from datetime import datetime, timedelta
-from pytz import timezone
-
-IST = timezone("Asia/Kolkata")
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 1562527013))
 async def handle_channel_postd_message(event):
