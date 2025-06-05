@@ -144,7 +144,7 @@ async def handle_channel_postd_message(event):
         await asyncio.sleep(1)
 
     # 2. Detect time (e.g., "Time 12:32", "At 12:32", "at 5:03 😎")
-    time_match = re.search(r'\b(?:time|at)\s+(\d{1,2}):(\d{2})', lower_text)
+    time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
     if time_match:
         hour = int(time_match.group(1))
         minute = int(time_match.group(2))
