@@ -167,8 +167,9 @@ async def handle_channel_posted_message(event):
 
 
 
+ALLOWED_CHANNEL_DS = [2265803056, 1562527013, 1845700427, 2623780966]  # Add more channel IDs here
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 1562527013))
+@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
