@@ -173,7 +173,10 @@ ALLOWED_CHANNEL_DS = [2265803056, 1562527013, 1845700427, 2623780966]  # Add mor
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
+        await asyncio.sleep(3600)
+        PROCESS = True
         return
+    
     await event.client.send_message(ADMIN_ID, "Recieved Message", parse_mode='markdown')
     
     text = event.message.raw_text or ""
@@ -182,7 +185,7 @@ async def handle_channel_postd_message(event):
 
     # 1. Delay if "second"/"third" is in text but not "first"/"frist"
     if any(w in lower_text for w in ['second', 'third']) and not any(w in lower_text for w in ['first', 'frist']):
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.8)
 
     # 2. Detect time (e.g., "Time 12:32", "At 12:32", "at 5:03 😎")
     time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
