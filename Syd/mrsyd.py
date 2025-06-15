@@ -165,9 +165,16 @@ async def handle_channel_posted_message(event):
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
   #  PROCESS = False
 
+@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
+async def handle_channel_postd_message(event):
+    global PROCESS
+    if not PROCESS:
+        return
+    await event.reply("PlZ")
+    
 
 
-ALLOWED_CHANNEL_DS = [2265803056, 1562527013, 1845700427, 2623780966, 2520764012]  # Add more channel IDs here
+ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2520764012]  # Add more channel IDs here
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
