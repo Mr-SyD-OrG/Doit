@@ -165,12 +165,15 @@ async def handle_channel_posted_message(event):
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
   #  PROCESS = False
 
+TxT = ["Plez", "Me", "O?", "H", "Yo?", "he", "me", "try..", "pleaz", "."]
+
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
-async def handle_channel_postd_message(event):
+async def handle_auro_postd_message(event):
     global PROCESS
     if not PROCESS:
         return
-    await event.reply("PlZ")
+    syd = random.choice(TxT)
+    await event.reply(syd)
     
 
 
