@@ -75,7 +75,7 @@ async def handle_new_source(event):
                     print(f"⚠️ Error forwarding message {msg_id}: {e}")
 
     else:
-        await event.respond("❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
+        await event.client.send_message(1733124290, "❌ Invalid format! Use: `-100XXXX YYYY ZZZZ` (Source Chat, Start ID, End ID)")
 
 
 
