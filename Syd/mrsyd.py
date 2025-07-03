@@ -167,7 +167,7 @@ async def handle_channel_posted_message(event):
 
 TxT = ["Plez", "Me", "O?", "H", "Yo?", "he", "me", "try..", "pleaz", "."]
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
+#@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
 async def handle_auro_postd_message(event):
     global PROCESS
     if not PROCESS:
@@ -177,7 +177,7 @@ async def handle_auro_postd_message(event):
     
 
 
-ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2520764012]  # Add more channel IDs here
+ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2520764012, 2265803056)]  # Add more channel IDs here
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
