@@ -4,7 +4,6 @@ import re
 from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
-
 PROCESS = False
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
