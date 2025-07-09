@@ -178,6 +178,8 @@ async def handle_auro_postd_message(event):
 
 ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2827374506, 2520764012, 2265803056]  # Add more channel IDs here
 
+
+
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
     global PROCESS
@@ -192,23 +194,21 @@ async def handle_channel_postd_message(event):
     lower_text = text.lower()
     result = None
 
-    # Delay if "second"/"third" is in text but not "first"/"frist"
+    # 1️⃣ Delay if "second"/"third" but not "first"/"frist"
     if any(w in lower_text for w in ['second', 'third']) and not any(w in lower_text for w in ['first', 'frist']):
         await asyncio.sleep(0.8)
 
-    # Detect time like "time 6:30"
+    # 2️⃣ Detect time like "time 6:30" → wait till nearest future occurrence (AM/PM)
     time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
     if time_match:
         hour = int(time_match.group(1))
         minute = int(time_match.group(2))
-
         now = datetime.now(IST)
 
-        # FIX: get nearest future time today: try AM first, else PM
         target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
         if target_time <= now:
             if hour < 12:
-                # if hour <12, try PM (hour+12)
+                # try PM (hour+12)
                 target_time_pm = now.replace(hour=hour+12, minute=minute, second=0, microsecond=0)
                 if target_time_pm > now:
                     target_time = target_time_pm
@@ -220,8 +220,8 @@ async def handle_channel_postd_message(event):
         wait_time = (target_time - now).total_seconds()
         await asyncio.sleep(wait_time)
 
-    # Detect math expr like 10+5-2+3=??
-    math_expr_match = re.search(r'(?i)(\d+(?:\s*[-+×x]\s*\d+)+)\s*=*\s*\?+', text)
+    # 3️⃣ Detect math expr like 10+5-2+3=?? or similar
+    math_expr_match = re.search(r'(?i)(\d+(?:\s*[-+×x*/]\s*\d+)+)\s*=*\s*\?+', text)
     if math_expr_match:
         expr_raw = math_expr_match.group(1)
         expr = expr_raw.replace('×', '*').replace('x', '*').replace(' ', '')
@@ -230,38 +230,45 @@ async def handle_channel_postd_message(event):
         except Exception:
             result = None
 
-    # Detect "1st comment win", "1st ans win", etc.
-    if result is None and re.search(r'1st\s*(comment|ans|answer)\s*win', lower_text):
-        numbers_match = re.search(r'que\.?\s*([0-9+\-×x\s]+)', lower_text)
+    # 4️⃣ Detect "1st comment win", "1st ans win", "first answer win" etc.
+    if result is None and re.search(r'1st\s*(comment|ans|answer)\s*win|first\s*(comment|ans|answer)\s*win', lower_text):
+        numbers_match = re.search(r'que\.?\s*([0-9+\-×x*/\s]+)', lower_text)
         if numbers_match:
             expr = numbers_match.group(1).replace('×', '*').replace('x', '*').replace(' ', '')
+            # check if expr is only digits & operators
             if re.fullmatch(r'[\d+\-*/]+', expr):
                 try:
                     result = str(eval(expr))
                 except Exception:
                     result = None
 
-    # Fallback: code: or question:
+    # 5️⃣ Detect if message ONLY says "first comment win" (ignore emojis/punct) → reply random text
+    if result is None:
+        cleaned_text = re.sub(r'[^\w\s]', '', lower_text).strip()
+        if cleaned_text == 'first comment win':
+            random_texts = ["ok", "yes", "done", "✅", "🙌", "👀"]
+            result = random.choice(random_texts)
+
+    # 6️⃣ Fallback: detect "code:" or "question:" → either eval math or send text
     if result is None:
         match = re.search(r'\b(code|question)\b\s*[:\-]?\s*(.+)', text, re.IGNORECASE)
         if match:
             expr = match.group(2).strip().replace('×', '*').replace('x', '*')
-            # FIX: do NOT remove spaces; keep them for text answers
-            # If it's math, eval; else keep as is with spaces
-            expr_nospace = expr.replace(' ', '')
-            if re.fullmatch(r'[\d+\-*/]+', expr_nospace) or re.fullmatch(r'(\d+[*]\d+)+', expr_nospace):
+            # keep only numbers, + - * / and spaces
+            expr_cleaned = re.sub(r'[^0-9+\-*/ ]', '', expr)
+            expr_nospace = expr_cleaned.replace(' ', '')
+            if re.fullmatch(r'[\d+\-*/]+', expr_nospace):
                 try:
                     result = str(eval(expr_nospace))
                 except Exception:
                     result = None
             else:
-                # Remove only punctuation, keep words & spaces
+                # keep words and spaces, remove other punctuation
                 result = re.sub(r'[^\w\s]', '', expr).strip()
 
-    # Send result
-    if result and len(result.strip().split()) <= 12:  # allow up to ~12 words
+    # ✅ Send result
+    if result and len(result.strip().split()) <= 12:
         await event.reply(result)
         PROCESS = False
     else:
         await event.client.send_message(ADMIN_ID, f"NO MATCH FOUND or Too Long: {text}", parse_mode='markdown')
-
