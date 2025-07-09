@@ -251,7 +251,7 @@ async def handle_channel_postd_message(event):
             # FIX: do NOT remove spaces; keep them for text answers
             # If it's math, eval; else keep as is with spaces
             expr_nospace = expr.replace(' ', '')
-            if re.fullmatch(r'(\d+[-+]\d+)+', expr_nospace) or re.fullmatch(r'(\d+[*]\d+)+', expr_nospace):
+            if re.fullmatch(r'[\d+\-*/]+', expr_nospace) or re.fullmatch(r'(\d+[*]\d+)+', expr_nospace):
                 try:
                     result = str(eval(expr_nospace))
                 except Exception:
