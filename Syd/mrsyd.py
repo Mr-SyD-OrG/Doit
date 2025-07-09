@@ -236,7 +236,7 @@ async def handle_channel_postd_message(event):
         numbers_match = re.search(r'que\.?\s*([0-9+\-×x\s]+)', lower_text)
         if numbers_match:
             expr = numbers_match.group(1).replace('×', '*').replace('x', '*').replace(' ', '')
-            if re.fullmatch(r'(\d+[-+]\d+)+', expr):
+            if re.fullmatch(r'[\d+\-*/]+', expr):
                 try:
                     result = str(eval(expr))
                 except Exception:
