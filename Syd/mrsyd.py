@@ -194,7 +194,7 @@ async def handle_channel_postd_message(event):
         wsyd = random.choice(WAIT_SYD)
         await asyncio.sleep(wsyd)
         await event.client.send_message(ADMIN_ID, f"Matched SYDSET: Channel {channel_id}, Wait {wsyd}")
-        return
+        
 
     
     text = event.message.raw_text or ""
