@@ -196,8 +196,7 @@ async def handle_channel_postd_message(event):
         await event.client.send_message(ADMIN_ID, f"Matched SYDSET: Channel {channel_id}, Wait {wsyd}")
         return
 
-    await event.client.send_message(ADMIN_ID, "Received Message", parse_mode='markdown')
-
+    
     text = event.message.raw_text or ""
     lower_text = text.lower()
     result = None
