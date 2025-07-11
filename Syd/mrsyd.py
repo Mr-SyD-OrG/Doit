@@ -237,7 +237,7 @@ async def handle_channel_postd_message(event):
             result = str(eval(expr))
             if int(result) >= 400:
                 wwsyd = random.choice(WAIT_SYD)
-                await event.client.send_message(ADMIN_ID, f"Long {result} so ===> {wwsyd} ¹")
+                print(f"Long {result} so ===> {wwsyd} ¹")
                 await asyncio.sleep(wwsyd if 1 <= wwsyd <= 4 else 2)
         except Exception:
             result = None
@@ -274,7 +274,7 @@ async def handle_channel_postd_message(event):
                     result = str(eval(expr_nospace))
                     if int(result) >= 500:
                         wwwsyd = random.choice(WAIT_SYD)
-                        await event.client.send_message(ADMIN_ID, f"Long {result} so ===> {wwwsyd} ²")
+                        print(f"Long {result} so ===> {wwwsyd} ²")
                         await asyncio.sleep(wwwsyd if 1 <= wwwsyd <= 4 else 2)
                 except Exception:
                     result = None
