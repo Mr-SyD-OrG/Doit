@@ -184,7 +184,7 @@ ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2827374506, 2520764012
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
-        await asyncio.sleep(3600)
+        await asyncio.sleep(300)
         PROCESS = True
         return
 
