@@ -164,7 +164,7 @@ async def handle_channel_posted_message(event):
         await event.client.send_message(ADMIN_ID, f"Too Long {result} Ignoring", parse_mode='markdown')
   #  PROCESS = False
 
-TxT = ["Plez", "Me", "O?", "H", "Yo?", "he", "me", "try..", "pleaz", "."]
+TxT = ["Plez", "Me", "O?", "H", "Yo?", "he", "me", "try..", "plez", "."]
 
 #@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
 async def handle_auro_postd_message(event):
@@ -177,7 +177,8 @@ async def handle_auro_postd_message(event):
 
 
 ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2623780966, 2827374506, 2520764012, 2265803056]  # Add more channel IDs here
-
+SYDSET = [2827374506, 2623780966]
+WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8]
 
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
@@ -186,6 +187,13 @@ async def handle_channel_postd_message(event):
     if not PROCESS:
         await asyncio.sleep(300)
         PROCESS = True
+        return
+    channel_id = event.message.from_id.channel_id
+    
+    if channel_id in SYDSET:
+        wsyd = random.choice(WAIT_SYD)
+        await asyncio.sleep(wsyd)
+        await event.client.send_message(ADMIN_ID, f"Matched SYDSET: Channel {channel_id}, Wait {wsyd}")
         return
 
     await event.client.send_message(ADMIN_ID, "Received Message", parse_mode='markdown')
@@ -227,6 +235,10 @@ async def handle_channel_postd_message(event):
         expr = expr_raw.replace('×', '*').replace('x', '*').replace(' ', '')
         try:
             result = str(eval(expr))
+            if int(result) >= 400:
+                wwsyd = random.choice(WAIT_SYD)
+                await event.client.send_message(ADMIN_ID, f"Long {result} so ===> {wwsyd} ¹")
+                await asyncio.sleep(wwsyd if 1 <= wwsyd <= 4 else 2)
         except Exception:
             result = None
 
@@ -246,8 +258,8 @@ async def handle_channel_postd_message(event):
     if result is None:
         cleaned_text = re.sub(r'[^\w\s]', '', lower_text).strip()
         if cleaned_text == 'first comment win':
-            random_texts = ["ok", "yes", "done", "✅", "🙌", "👀"]
-            result = random.choice(random_texts)
+           # random_texts = ["ok", "yes", "done", "✅", "🙌", "👀"]
+            result = random.choice(TxT)
 
     # 6️⃣ Fallback: detect "code:" or "question:" → either eval math or send text
     if result is None:
@@ -260,15 +272,27 @@ async def handle_channel_postd_message(event):
             if re.fullmatch(r'[\d+\-*/]+', expr_nospace):
                 try:
                     result = str(eval(expr_nospace))
+                    if int(result) >= 500:
+                        wwwsyd = random.choice(WAIT_SYD)
+                        await event.client.send_message(ADMIN_ID, f"Long {result} so ===> {wwwsyd} ²")
+                        await asyncio.sleep(wwwsyd if 1 <= wwwsyd <= 4 else 2)
                 except Exception:
                     result = None
             else:
                 # keep words and spaces, remove other punctuation
                 result = re.sub(r'[^\w\s]', '', expr).strip()
 
+    
     # ✅ Send result
     if result and len(result.strip().split()) <= 12:
-        await event.reply(result)
-        PROCESS = False
+        sent = await event.reply(result)
+
+        # Check message ID difference between channel message and sent message
+        if sent.id - event.message.id == 1:
+            PROCESS = False
+            await event.client.send_message(ADMIN_ID, "Turned Off: First Message \n ```on```")
+            return
+            
+
     else:
         await event.client.send_message(ADMIN_ID, f"NO MATCH FOUND or Too Long: {text}", parse_mode='markdown')
