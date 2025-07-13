@@ -201,7 +201,7 @@ async def handle_channel_postd_message(event):
     text = event.message.raw_text or ""
     lower_text = text.lower()
     result = None
-
+    
     # 1️⃣ Delay if "second"/"third" but not "first"/"frist"
     if any(w in lower_text for w in ['second', 'third']) and not any(w in lower_text for w in ['first', 'frist']):
         await asyncio.sleep(0.8)
@@ -287,6 +287,7 @@ async def handle_channel_postd_message(event):
     if result and len(result.strip().split()) <= 12:
         sent = await event.reply(result)
 
+        await event.client.send_message(ADMIN_ID, f" {text} === {result}")
         # Check message ID difference between channel message and sent message
         if sent.id - event.message.id == 1:
             PROCESS = False
