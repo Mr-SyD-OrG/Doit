@@ -320,6 +320,7 @@ async def handle_channel_postd_message(event):
                     await event.client.send_message(ADMIN_ID, f"❌ Failed to DM {username} → `{str(e)}`")
 
             asyncio.create_task(delayed_dm())
+            return
 
 
     # ✅ Send result
