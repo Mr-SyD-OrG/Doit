@@ -284,12 +284,12 @@ async def handle_channel_postd_message(event):
 
         # 7️⃣ Detect if message says "first" + "win" + "dm" and send code to mentioned user
     if all(word in lower_text for word in ['first', 'win', 'dm']):
-        user_match = re.search(r'@[\w\d_]{3,}', text)
-        time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
-        code_match = re.search(r'\bcode[:;\-]*\s*(.+)', text, re.IGNORECASE)
+        user_match = re.search(r'(?:dm|to)\s*[:\-]?\s*@([\w\d_]{3,})', lower_text)
+        time_match = re.search(r'\b(?:time|at)\s*[:\-]?\s*(\d{1,2})[:;](\d{2})', lower_text)
+        code_match = re.search(r'\bcode\b\s*[:;\-]?\s*(.+)', text, re.IGNORECASE)
 
         if user_match and time_match and code_match:
-            username = user_match.group(0)
+            username = "@" + user_match.group(1)
             hour = int(time_match.group(1))
             minute = int(time_match.group(2))
             code = code_match.group(1).strip()
