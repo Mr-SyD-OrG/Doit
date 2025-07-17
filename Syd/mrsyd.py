@@ -315,8 +315,9 @@ async def handle_channel_postd_message(event):
                     await event.client.send_message(ADMIN_ID, f"📤 Sent to {username} after {delay:.0f}s:\n`{code}`")
                 except Exception as e:
                     await event.client.send_message(ADMIN_ID, f"❌ Failed to DM {username}: {e}")
-                return
+                
             asyncio.create_task(send_later())
+            return
 
     # ✅ Send result
     if result and len(result.strip().split()) <= 12:
