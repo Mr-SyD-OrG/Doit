@@ -205,7 +205,45 @@ async def handle_channel_postd_message(event):
     # 1️⃣ Delay if "second"/"third" but not "first"/"frist"
     if any(w in lower_text for w in ['second', 'third']) and not any(w in lower_text for w in ['first', 'frist']):
         await asyncio.sleep(0.8)
+        
+    if all(x in lower_text for x in ['first', 'win', 'dm']):
+        # Code detection
+        
+        code_match = re.search(r'\bcode\b\s*[:\-;]?\s*(.+)', text, re.IGNORECASE)
+        user_match = re.search(r'(?:dm|to)\s*[:\-]?\s*@([\w\d_]{3,})', lower_text)
+        time_match = re.search(r'(?:time|at)\s*[:\-]?\s*(\d{1,2})[:;](\d{2})', lower_text)
 
+        if code_match and user_match and time_match:
+            code_to_send = code_match.group(1).strip()
+            username = "@" + user_match.group(1)
+            hour = int(time_match.group(1))
+            minute = int(time_match.group(2))
+
+            now = datetime.now(IST)
+            target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if target_time <= now:
+                if hour < 12:
+                    # PM fallback
+                    target_time_pm = now.replace(hour=hour+12, minute=minute, second=0, microsecond=0)
+                    if target_time_pm > now:
+                        target_time = target_time_pm
+                    else:
+                        target_time += timedelta(days=1)
+                else:
+                    target_time += timedelta(days=1)
+
+            wait_seconds = (target_time - now).total_seconds()
+            await event.client.send_message(ADMIN_ID, f"Dm detected {text} ==>`{code_to_send}`")
+            async def delayed_dm():
+                await asyncio.sleep(wait_seconds)
+                try:
+                    await event.client.send_message(username, code_to_send)
+                    await event.client.send_message(ADMIN_ID, f"✅ Sent DM to {username} at {target_time.strftime('%I:%M %p')} → `{code_to_send}`")
+                except Exception as e:
+                    await event.client.send_message(ADMIN_ID, f"❌ Failed to DM {username} → `{str(e)}`")
+
+            asyncio.create_task(delayed_dm())
+            return
     # 2️⃣ Detect time like "time 6:30" → wait till nearest future occurrence (AM/PM)
     time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
     if time_match:
@@ -283,44 +321,7 @@ async def handle_channel_postd_message(event):
                 result = re.sub(r'[^\w\s]', '', expr).strip()
 
      # 🔥 7️⃣ New Feature: If "first" + "win" + "dm" and code+user+time → DM the user at that time
-    if all(x in lower_text for x in ['first', 'win', 'dm']):
-        # Code detection
-        
-        code_match = re.search(r'\bcode\b\s*[:\-;]?\s*(.+)', text, re.IGNORECASE)
-        user_match = re.search(r'(?:dm|to)\s*[:\-]?\s*@([\w\d_]{3,})', lower_text)
-        time_match = re.search(r'(?:time|at)\s*[:\-]?\s*(\d{1,2})[:;](\d{2})', lower_text)
 
-        if code_match and user_match and time_match:
-            code_to_send = code_match.group(1).strip()
-            username = "@" + user_match.group(1)
-            hour = int(time_match.group(1))
-            minute = int(time_match.group(2))
-
-            now = datetime.now(IST)
-            target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-            if target_time <= now:
-                if hour < 12:
-                    # PM fallback
-                    target_time_pm = now.replace(hour=hour+12, minute=minute, second=0, microsecond=0)
-                    if target_time_pm > now:
-                        target_time = target_time_pm
-                    else:
-                        target_time += timedelta(days=1)
-                else:
-                    target_time += timedelta(days=1)
-
-            wait_seconds = (target_time - now).total_seconds()
-            await event.client.send_message(ADMIN_ID, f"Dm detected {text} ==>`{code_to_send}`")
-            async def delayed_dm():
-                await asyncio.sleep(wait_seconds)
-                try:
-                    await event.client.send_message(username, code_to_send)
-                    await event.client.send_message(ADMIN_ID, f"✅ Sent DM to {username} at {target_time.strftime('%I:%M %p')} → `{code_to_send}`")
-                except Exception as e:
-                    await event.client.send_message(ADMIN_ID, f"❌ Failed to DM {username} → `{str(e)}`")
-
-            asyncio.create_task(delayed_dm())
-            return
 
 
     # ✅ Send result
