@@ -282,12 +282,47 @@ async def handle_channel_postd_message(event):
                 # keep words and spaces, remove other punctuation
                 result = re.sub(r'[^\w\s]', '', expr).strip()
 
-    
+        # 7️⃣ Detect if message says "first" + "win" + "dm" and send code to mentioned user
+    if all(word in lower_text for word in ['first', 'win', 'dm']):
+        user_match = re.search(r'@[\w\d_]{3,}', text)
+        time_match = re.search(r'\b(?:time|at)[\s:\-–—]*\s*(\d{1,2})[:;](\d{2})', lower_text)
+        code_match = re.search(r'\bcode[:;\-]*\s*(.+)', text, re.IGNORECASE)
+
+        if user_match and time_match and code_match:
+            username = user_match.group(0)
+            hour = int(time_match.group(1))
+            minute = int(time_match.group(2))
+            code = code_match.group(1).strip()
+
+            now = datetime.now(IST)
+            target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if target_time <= now:
+                if hour < 12:
+                    target_time_pm = now.replace(hour=hour+12, minute=minute, second=0, microsecond=0)
+                    if target_time_pm > now:
+                        target_time = target_time_pm
+                    else:
+                        target_time += timedelta(days=1)
+                else:
+                    target_time += timedelta(days=1)
+
+            delay = (target_time - now).total_seconds()
+
+            async def send_later():
+                await asyncio.sleep(delay)
+                try:
+                    await event.client.send_message(username, code)
+                    await event.client.send_message(ADMIN_ID, f"📤 Sent to {username} after {delay:.0f}s:\n`{code}`")
+                except Exception as e:
+                    await event.client.send_message(ADMIN_ID, f"❌ Failed to DM {username}: {e}")
+                return
+            asyncio.create_task(send_later())
+
     # ✅ Send result
     if result and len(result.strip().split()) <= 12:
         sent = await event.reply(result)
 
-        await event.client.send_message(ADMIN_ID, f" {text} === {result}")
+        await event.client.send_message(ADMIN_ID, f" {text} ===> {result}")
         # Check message ID difference between channel message and sent message
         if sent.id - event.message.id == 1:
             PROCESS = False
