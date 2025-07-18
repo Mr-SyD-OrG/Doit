@@ -194,8 +194,9 @@ async def handle_bot_message(event):
     global OCESS
     if not OCESS:
         return
-    await event.client.send_message(ADMIN_ID, "D: Unlocked all.")
+    await event.client.send_message(ADMIN_ID, f"D: Unlocked all. {event.text.strip().lower()}")
     if event.text.strip().lower() == TRIGGER_TEXT.lower():
+        await event.client.send_message(ADMIN_ID, "D: Unlocked all.")
         await event.reply(random.choice(TxxT))
         
 ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2107245494, 2623780966, 2827374506, 2520764012, 2265803056]  # Add more channel IDs here
@@ -207,7 +208,7 @@ WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5
 async def handle_channel_postd_message(event):
     global PROCESS
     if not PROCESS:
-        await asyncio.sleep(300)
+        await asyncio.sleep(300) 
         PROCESS = True
         return
     channel_id = event.message.from_id.channel_id
