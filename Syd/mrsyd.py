@@ -322,10 +322,10 @@ async def handle_channel_postd_message(event):
 
      # 🔥 7️⃣ New Feature: If "first" + "win" + "dm" and code+user+time → DM the user at that time
 
-
+    
 
     # ✅ Send result
-    if result and len(result.strip().split()) <= 12:
+    if result and len(result.strip().split()) <= 12 and "dm" not in lower_text:
         sent = await event.reply(result)
         sennt = None
         if result.lower() == "dhruv ka age":
@@ -340,4 +340,4 @@ async def handle_channel_postd_message(event):
             
 
     else:
-        await event.client.send_message(ADMIN_ID, f"NO MATCH / Too Long: {text}", parse_mode='markdown')
+        await event.client.send_message(ADMIN_ID, f"NO MATCH / Too Long / DM: {text}", parse_mode='markdown')
