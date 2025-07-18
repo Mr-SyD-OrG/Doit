@@ -95,14 +95,14 @@ async def handle_on_trigger(event):
     await event.reply("Set To True .")
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"onit"))
-async def handle_on_trigger(event):
+async def hand_on_trigger(event):
     global OCESS
     OCESS = True
     await event.reply("Bot Set To True .")
 
     
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"offit"))
-async def handle_off_trigger(event):
+async def hand_off_trigger(event):
     global OCESS
     OCESS = False
     await event.reply("Bot Set To False .")
