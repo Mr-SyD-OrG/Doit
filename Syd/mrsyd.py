@@ -331,7 +331,7 @@ async def handle_channel_postd_message(event):
         if result.lower() == "dhruv ka age":
             sennt = await event.reply("16")
         link = f"https://t.me/c/{str(event.chat.id)[4:]}/{sent.id}"
-        await event.client.send_message(ADMIN_ID, f' {text} ===> <a href="{link}">{result}</a>' + (f" ===> {sennt.text}" if 'sennt' in locals() and sennt else ""))
+        await event.client.send_message(ADMIN_ID, f' {text} ===> <a href="{link}">{result}</a>' + (f" ===> {sennt.text}" if 'sennt' in locals() and sennt else ""), parse_mode='html')
         # Check message ID difference between channel message and sent message
         if sent.id - event.message.id == 1:
             PROCESS = False
