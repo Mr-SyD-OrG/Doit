@@ -5,7 +5,7 @@ from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
 PROCESS = False
-
+OCESS = False
 
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #start_year = 2000
@@ -94,6 +94,18 @@ async def handle_on_trigger(event):
     PROCESS = True
     await event.reply("Set To True .")
 
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"onit"))
+async def handle_on_trigger(event):
+    global OCESS
+    OCESS = True
+    await event.reply("Bot Set To True .")
+
+    
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"offit"))
+async def handle_off_trigger(event):
+    global OCESS
+    OCESS = False
+    await event.reply("Bot Set To False .")
     
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
 async def handle_off_trigger(event):
@@ -166,6 +178,7 @@ async def handle_channel_posted_message(event):
   #  PROCESS = False
 
 TxT = ["Plez", "Me", "O?", "H", "Yo?", "he", "me", "try..", "plez", "."]
+TRIGGER_TEXT = "Unlocked all."
 
 #@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == 2265803056))
 async def handle_auro_postd_message(event):
@@ -175,8 +188,15 @@ async def handle_auro_postd_message(event):
     syd = random.choice(TxT)
     await event.reply(syd)
     
-
-
+TxxT = ["/unlock", "i"]
+@mrsyd.on(events.NewMessage(from_users=609517172))
+async def handle_bot_message(event):
+    global OCESS
+    if not OCESS:
+        return
+    if event.text.strip().lower() == TRIGGER_TEXT.lower():
+        await event.reply(random.choice(TxxT))
+        
 ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2107245494, 2623780966, 2827374506, 2520764012, 2265803056]  # Add more channel IDs here
 SYDSET = [2827374506, 2107245494, 2623780966]
 WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8]
