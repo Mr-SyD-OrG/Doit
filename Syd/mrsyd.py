@@ -94,18 +94,18 @@ async def handle_on_trigger(event):
     PROCESS = True
     await event.reply("Set To True .")
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"onit"))
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"oon"))
 async def hand_on_trigger(event):
     global OCESS
     OCESS = True
-    await event.reply("Bot Set To True .")
+    await event.reply("Bot- Set To True .")
 
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"offit"))
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ooff"))
 async def hand_off_trigger(event):
     global OCESS
     OCESS = False
-    await event.reply("Bot Set To False .")
+    await event.reply("Bot- Set To False .")
     
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
 async def handle_off_trigger(event):
