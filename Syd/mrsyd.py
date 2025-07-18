@@ -327,14 +327,16 @@ async def handle_channel_postd_message(event):
     # ✅ Send result
     if result and len(result.strip().split()) <= 12:
         sent = await event.reply(result)
-
-        await event.client.send_message(ADMIN_ID, f" {text} ===> {result}")
+        sennt = None
+        if result.lower() == "dhruv ka age":
+            sennt = await event.reply("16")
+        await event.client.send_message(ADMIN_ID, f" {text} ===> {result}" + (f" ===> {sennt.text}" if 'sennt' in locals() and sennt else ""))
         # Check message ID difference between channel message and sent message
         if sent.id - event.message.id == 1:
             PROCESS = False
-            await event.client.send_message(ADMIN_ID, "Turned Off: First Message \n ```on```")
+            await event.client.send_message(ADMIN_ID, "Turned Off: First Message \n ```Send = `on` ```")
             return
             
 
     else:
-        await event.client.send_message(ADMIN_ID, f"NO MATCH FOUND or Too Long: {text}", parse_mode='markdown')
+        await event.client.send_message(ADMIN_ID, f"NO MATCH / Too Long: {text}", parse_mode='markdown')
