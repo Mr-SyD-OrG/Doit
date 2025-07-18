@@ -195,7 +195,7 @@ async def handle_bot_message(event):
     if not OCESS:
         return
     await event.client.send_message(ADMIN_ID, f"D: Unlocked all. {event.text.strip().lower()}")
-    if event.text.strip().lower() == TRIGGER_TEXT.lower():
+    if event.raw_text.strip().lower() == TRIGGER_TEXT.lower():
         await event.client.send_message(ADMIN_ID, "D: Unlocked all.")
         await event.reply(random.choice(TxxT))
         
