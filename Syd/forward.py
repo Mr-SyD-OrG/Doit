@@ -19,7 +19,7 @@ semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
 DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002429058090]
-SOURCE_CHATS = [-1002295881345, -1002525578839, 7065204410, -1002281540615, 7671667739, 7519971717, 8128434604, 1983814301, 7755788244, 8162570573, -1002588744450, 7193976370, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
+SOURCE_CHATS = [-1002295881345, -1002525578839, 7065204410, -1002281540615, 7671667739, 7519971717, 7525672242, 8128434604, 1983814301, 7755788244, 8162570573, -1002588744450, 7193976370, -1001780243928, -1002274015746, -1001862599580, -1002077435396]
 
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
@@ -131,7 +131,7 @@ async def syde_message(event):
                             await asyncio.sleep(10)
                             continue  # If no new message, keep pressing the same button
 
-                        await asyncio.sleep(60)
+                        await asyncio.sleep(20)
                         break  # Exit while loop when a new message arrives
 
                     except Exception as e:
@@ -144,7 +144,7 @@ async def syde_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
-                    await asyncio.sleep(40)  # Full 60-second wait before checking new buttons
+                    await asyncio.sleep(30)  # Full 60-second wait before checking new buttons
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
