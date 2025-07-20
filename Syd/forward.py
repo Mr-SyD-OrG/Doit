@@ -128,10 +128,10 @@ async def syde_message(event):
                                 last_processed_id = new_message[0].id  # Update the last proce
                                 break  # Move to the next button
                         else:
-                            await asyncio.sleep(10)
+                            await asyncio.sleep(5)
                             continue  # If no new message, keep pressing the same button
 
-                        await asyncio.sleep(20)
+                        await asyncio.sleep(12)
                         break  # Exit while loop when a new message arrives
 
                     except Exception as e:
@@ -144,7 +144,7 @@ async def syde_message(event):
                 try:
                     await message.click(row_idx, col_idx)  # Click "NEXT" button
                     print(f"Pressed: {button.text}, waiting 60 seconds for new buttons...")
-                    await asyncio.sleep(30)  # Full 60-second wait before checking new buttons
+                    await asyncio.sleep(10)  # Full 60-second wait before checking new buttons
 
                     # Fetch the updated message with new buttons
                     updated_msg = await event.client.get_messages(chat_id, ids=message_id)
