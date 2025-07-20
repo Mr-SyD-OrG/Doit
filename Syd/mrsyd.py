@@ -35,7 +35,7 @@ async def handle_search_trigger(event):
                 if msg in messge:
                     continue
                 sydd = random.choice(WAIT)
-                await event.client.send_message(1983814301, msg)
+                await event.client.send_message(7519971717, msg)
                 print(f"Sent: {msg} Wait {sydd}")
                 await asyncio.sleep(sydd)
 
