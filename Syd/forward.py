@@ -79,8 +79,8 @@ async def handle_new_source(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573, 7519971717, 8128434604, 7671667739], pattern=r"^🔍 Results for your Search"))
-async def handle_message(event):
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573, 7519971717, 8128434604, 7525672242, 7671667739], pattern=r"^🔍 Results for your Search"))
+async def syde_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a 60-second delay before fetching new buttons.
     """
@@ -161,7 +161,7 @@ async def handle_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573, 7671667739], pattern=r"^❗️Join"))
+@mrsyd.on(events.NewMessage(from_users=[1983814301, 7755788244, 7065204410, 8162570573, 7525672242, 7671667739], pattern=r"^❗️Join"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
