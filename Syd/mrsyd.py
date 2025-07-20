@@ -188,7 +188,7 @@ async def handle_auro_postd_message(event):
     syd = random.choice(TxT)
     await event.reply(syd)
     
-TxxT = ["/unlock", "i"]
+TxxT = "/unlock"
 @mrsyd.on(events.NewMessage(from_users=609517172))
 async def handle_bot_message(event):
     global OCESS
@@ -197,9 +197,9 @@ async def handle_bot_message(event):
     await event.client.send_message(ADMIN_ID, f"D: Unlocked all. {event.raw_text.strip().lower()}")
     if event.raw_text.strip().lower() == TRIGGER_TEXT.lower():
         await event.client.send_message(ADMIN_ID, "D: Unlocked all.")
-        await event.reply(random.choice(TxxT))
+        await event.reply(TxxT)
         
-ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2107245494, 2623780966, 2827374506, 2520764012, 2265803056]  # Add more channel IDs here
+ALLOWED_CHANNEL_DS = [1562527013, 1845700427, 2107245494, 2623780966, 2827374506, 2520764012, 2265803056, 2857066294]  # Add more channel IDs here
 SYDSET = [2827374506, 2107245494, 2623780966]
 WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8]
 
