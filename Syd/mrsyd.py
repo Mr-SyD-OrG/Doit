@@ -6,7 +6,7 @@ import random
 from telethon.tl.types import PeerChannel
 PROCESS = False
 OCESS = False
-
+MPROCESS = True
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #start_year = 2000
 start_year = 2020
@@ -76,7 +76,7 @@ async def handle_admn_message(event):
 
     wait_time = (target_time - now).total_seconds()
 
-    await event.reply(f"✅ Message will be sent to @{username} at {target_time.strftime('%I:%M %p')} IST.")
+    await event.reply(f"✅ Mess will be sent to @{username} at {target_time.strftime('%I:%M %p')} IST.")
 
     await asyncio.sleep(wait_time)
 
@@ -95,10 +95,23 @@ async def handle_on_trigger(event):
     await event.reply("Set To True .")
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"oon"))
-async def hand_on_trigger(event):
+async def hand_on_ntrigger(event):
     global OCESS
     OCESS = True
     await event.reply("Bot- Set To True .")
+
+    
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ON"))
+async def hand_offf_trigger(event):
+    global MPROCESS
+    MPROCESS = False
+    await event.reply("ALL Set To False .")
+    
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"OFF"))
+async def hand_on_trigger(event):
+    global MPROCESS
+    MPROCESS = True
+    await event.reply("All Set To True .")
 
     
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ooff"))
@@ -118,7 +131,7 @@ async def handle_off_trigger(event):
 TARGET_CHANNEL_ID = 1562013
 
 DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
-ADMIN_ID = 1733124290  # Replace with the actual admin ID
+ADMIN_ID = 1733124290  # Repoce with the actual admin ID
 
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == TARGET_CHANNEL_ID))
@@ -206,7 +219,9 @@ WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5
 
 @mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
-    global PROCESS
+    global PROCESS, MPROCESS
+    if not MPROCESS:
+        return
     if not PROCESS:
         await asyncio.sleep(300) 
         PROCESS = True
@@ -220,7 +235,9 @@ async def handle_channel_postd_message(event):
         
 
     
-    text = event.message.raw_text or ""
+    text = event.message.raw_text
+    if not text:
+        return
     lower_text = text.lower()
     result = None
     
@@ -317,7 +334,7 @@ async def handle_channel_postd_message(event):
     # 5️⃣ Detect if message ONLY says "first comment win" (ignore emojis/punct) → reply random text
     if result is None:
         cleaned_text = re.sub(r'[^\w\s]', '', lower_text).strip()
-        if cleaned_text == 'first comment win':
+        if cleaned_text == 'first comment win' or 'second comment win' or 'third comment win' or 'fourth comment win':
            # random_texts = ["ok", "yes", "done", "✅", "🙌", "👀"]
             result = random.choice(TxT)
 
