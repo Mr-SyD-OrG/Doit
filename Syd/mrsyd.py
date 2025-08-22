@@ -101,14 +101,14 @@ async def hand_on_ntrigger(event):
     await event.reply("Bot- Set To True .")
 
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ON"))
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
 async def hand_offf_trigger(event):
     global MPROCESS
     MPROCESS = False
     await event.reply("ALL Set To False .")
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"OFF"))
-async def hand_on_trigger(event):
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
+async def had_on_tigger(event):
     global MPROCESS
     MPROCESS = True
     await event.reply("All Set To True .")
