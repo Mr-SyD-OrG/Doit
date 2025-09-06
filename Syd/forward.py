@@ -229,8 +229,20 @@ async def forward_messs(event):
 
 @mrsyd.on(events.NewMessage(chats=-1002658187814))
 async def forwd_mesages(event):
-    message = event.message
     await asyncio.sleep(100 * 60)
-    if message.buttons:
-        await message.click(0, 0)
-    
+
+    msg = await event.client.get_messages(event.chat_id, ids=event.id)
+
+    if msg.buttons:
+        for row in msg.buttons:
+            for button in row:
+                if button.url and button.url.startswith("tg://resolve"):
+                    # Extract domain and start parameter
+                    match = re.search(r"domain=([^&]+).*start=([^&]+)", button.url)
+                    if match:
+                        bot_username = match.group(1)
+                        start_data = match.group(2)
+
+                        # Send /start with the data
+                        await event.client.send_message(bot_username, f"/start {start_data}")
+                        print(f"Sent /start {start_data} to @{bot_username}")
