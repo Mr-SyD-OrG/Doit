@@ -228,7 +228,7 @@ async def forward_messs(event):
                 await asyncio.sleep(1000)  # Wait before checking again
 
 import re
-syd = asyncio.Semaphore(3)
+syd = asyncio.Semaphore(1)
 
 @mrsyd.on(events.NewMessage(chats=-1002658187814))
 async def forwd_mesages(event):
