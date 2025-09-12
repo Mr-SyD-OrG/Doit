@@ -228,29 +228,32 @@ async def forward_messs(event):
                 await asyncio.sleep(1000)  # Wait before checking again
 
 import re
-import asyncio
-from telethon import events
+syd = asyncio.Semaphore(3)
 
 @mrsyd.on(events.NewMessage(chats=-1002658187814))
 async def forwd_mesages(event):
-    try:
-        await asyncio.sleep(100 * 60)
+    async with syd:   # Limit concurrent execution
+        try:
+            await asyncio.sleep(100 * 60)
 
-        msg = await event.client.get_messages(event.chat_id, ids=event.id)
+            msg = await event.client.get_messages(event.chat_id, ids=event.id)
 
-        if msg.buttons:
-            for row in msg.buttons:
-                for button in row:
-                    if button.url and button.url.startswith("tg://resolve"):
-                        # Extract domain and start parameter
-                        match = re.search(r"domain=([^&]+).*start=([^&]+)", button.url)
-                        if match:
-                            bot_username = match.group(1)
-                            start_data = match.group(2)
+            if msg.buttons:
+                for row in msg.buttons:
+                    for button in row:
+                        if button.url and button.url.startswith("tg://resolve"):
+                            # Extract domain and start parameter
+                            match = re.search(r"domain=([^&]+).*start=([^&]+)", button.url)
+                            if match:
+                                bot_username = match.group(1)
+                                start_data = match.group(2)
 
-                            # Send /start with the data
-                            await event.client.send_message(bot_username, f"/start {start_data}")
-                            await event.client.send_message(1733124290, f"✅ Sent /start {start_data} to @{bot_username}")
+                                # Send /start with the data
+                                await event.client.send_message(bot_username, f"/start {start_data}")
+                                await event.client.send_message(
+                                    1733124290,
+                                    f"✅ Sent /start {start_data} to @{bot_username}"
+                                )
 
-    except Exception as e:
-        await event.client.send_message(1733124290, f"{e}")
+        except Exception as e:
+            await event.client.send_message(1733124290, f"❌ Error: {e}")
