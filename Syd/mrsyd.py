@@ -20,7 +20,7 @@ async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
  #   start_from = "V 2001 480p"
     start_reached = False
-    start_from = "A 2020 240p"
+    start_from = "A 2021 240p"
     for letter in letters:
         for year in range(start_year, end_year + 1):
             for res in resolutions:
