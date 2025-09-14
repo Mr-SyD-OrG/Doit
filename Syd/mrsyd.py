@@ -6,7 +6,7 @@ import random
 from telethon.tl.types import PeerChannel
 PROCESS = False
 OCESS = False
-MPROCESS = True
+MPROCESS = False
 letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #start_year = 2000
 start_year = 2020
