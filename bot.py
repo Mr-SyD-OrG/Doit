@@ -35,9 +35,9 @@ async def start_bot():
 
     # Load plugins manually from Syd/
     load_plugins()
-    app = web.AppRunner(await web_server())
-    await app.setup()
+    appp = web.AppRunner(await web_server())
+    await appp.setup()
     bind_address = "0.0.0.0"
-    await web.TCPSite(app, bind_address, 8080).start()
+    await web.TCPSite(appp, bind_address, 8080).start()
 
-    await mrsyd.run_until_disconnected()
+    #await mrsyd.run_until_disconnected()
