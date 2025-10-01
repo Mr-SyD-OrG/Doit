@@ -7,7 +7,7 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
 import random
 from helper.database import db
-#from bot import mrsyd
+from bot import mrsyd
 from asyncio import Semaphore
 from telethon import events
 from pyrogram.types import Message
