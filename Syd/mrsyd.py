@@ -1,7 +1,7 @@
 from telethon import events
 import asyncio
 import re
-from bot import mrsyd
+#from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
 PROCESS = False
@@ -15,7 +15,7 @@ messge = ["A 2000 480p", "A 2000 720p", "A 2000 1080p", "B 2001 480p", "B 2001 7
 resolutions = ["240p", "480p", "720p", "1080p", "2160p"]
 WAIT = [35, 120, 240, 300, 360, 420, 540, 600, 700, 800, 1000, 1200, 3000]
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"Search"))
 async def handle_search_trigger(event):
     await event.reply("Starting resolution.")
  #   start_from = "V 2001 480p"
@@ -51,7 +51,7 @@ from pytz import timezone
   # Replace with your actual admin user ID
 IST = timezone('Asia/Kolkata')
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"send"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"send"))
 async def handle_admn_message(event):
     text = event.message.raw_text.strip()
 
@@ -88,39 +88,39 @@ async def handle_admn_message(event):
         await event.reply(f"❌ Failed to send message to @{username}\nError: {e}")
 
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"on"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"on"))
 async def handle_on_trigger(event):
     global PROCESS
     PROCESS = True
     await event.reply("Set To True .")
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"oon"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"oon"))
 async def hand_on_ntrigger(event):
     global OCESS
     OCESS = True
     await event.reply("Bot- Set To True .")
 
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
 async def hand_offf_trigger(event):
     global MPROCESS
     MPROCESS = False
     await event.reply("ALL Set To False .")
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
 async def had_on_tigger(event):
     global MPROCESS
     MPROCESS = True
     await event.reply("All Set To True .")
 
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ooff"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"ooff"))
 async def hand_off_trigger(event):
     global OCESS
     OCESS = False
     await event.reply("Bot- Set To False .")
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
+#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"off"))
 async def handle_off_trigger(event):
     global PROCESS
     PROCESS = False
@@ -134,7 +134,7 @@ DISCUSSION_GROUP_ID = -1002470503901  # ID of the group linked to the channel
 ADMIN_ID = 1733124290  # Repoce with the actual admin ID
 
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == TARGET_CHANNEL_ID))
+##@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id == TARGET_CHANNEL_ID))
 async def handle_channel_posted_message(event):
     global PROCESS
     if not PROCESS:
@@ -217,7 +217,7 @@ SYDSET = [2827374506, 2107245494, 2623780966]
 WAIT_SYD = [0, 0.5, 1, 1, 1, 1.4, 1.2, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8]
 
 
-@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
+#@mrsyd.on(events.NewMessage(func=lambda e: isinstance(e.message.from_id, PeerChannel) and e.message.from_id.channel_id in ALLOWED_CHANNEL_DS))
 async def handle_channel_postd_message(event):
     global PROCESS, MPROCESS
     if not MPROCESS:
