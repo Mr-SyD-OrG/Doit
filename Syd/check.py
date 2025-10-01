@@ -153,5 +153,6 @@ async def on_document(event):
                     except Exception as e:
                         print(f"⚠️ Failed to approve {user_id}: {e}")
     except Exception as main_e:
+        await mrsyd.send_message(admin_user_id, main_e)
         print(f"❌ Unexpected error in event handler: {main_e}")
 
