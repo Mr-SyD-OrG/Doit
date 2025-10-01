@@ -7,7 +7,7 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
 import random
 from helper.database import db
-from bot import mrsyd
+#from bot import mrsyd
 from asyncio import Semaphore
 from telethon import events
 from pyrogram.types import Message
@@ -22,7 +22,7 @@ DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002280144341, -1002429058
 SOURCE_CHATS = [-1002295881345, 7885202047, -1002525578839, 7065204410, 7519971717, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1002726550105, -1001862599580, -1002077435396]
 
 
-@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
+#@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
 async def forward_if_allowed(event):
     """Forom destination chat."""
     message = event.message
@@ -79,7 +79,7 @@ async def handle_new_source(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^🔍 Results for your Search"))
+#@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^🔍 Results for your Search"))
 async def syde_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a elay before fetching new buttons.
@@ -161,7 +161,7 @@ async def syde_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^❗️Join"))
+#@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^❗️Join"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
@@ -197,7 +197,7 @@ async def handle_invite(event):
 
 IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
 
-@mrsyd.on(events.NewMessage(from_users=6592320604))
+#@mrsyd.on(events.NewMessage(from_users=6592320604))
 async def forward_messs(event):
     async with semapore:  # Ensures only one message is handled at a time
         await asyncio.sleep(10 * 60)  # Wait 10 minutes
@@ -230,7 +230,7 @@ async def forward_messs(event):
 import re
 syd = asyncio.Semaphore(1)
 
-@mrsyd.on(events.NewMessage(chats=-1002658187814))
+#@mrsyd.on(events.NewMessage(chats=-1002658187814))
 async def forwd_mesages(event):
     async with syd:   # Limit concurrent execution
         try:
