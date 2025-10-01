@@ -132,14 +132,14 @@ async def on_document(event):
                 if line.isdigit():
                     blocked_users.add(int(line))
         except Exception as e:
-            await mrsyd.send_message(admin_user_id, f"⚠️ Failed to process document: {e}")
+            await event.client.send_message(admin_user_id, f"⚠️ Failed to process document: {e}")
             blocked_users = set(BLOCK_LIST)
 
         # Fetch pending requests in TARGET_CHAT
         try:
-            full_chat = await client(GetFullChannelRequest(TARGET_CHAT))
+            full_chat = await event.client(GetFullChannelRequest(TARGET_CHAT))
         except Exception as e:
-            await mrsyd.send_message(admin_user_id, f"⚠️ Failed to get channel info: {e}")
+            await event.client.send_message(admin_user_id, f"⚠️ Failed to get channel info: {e}")
             return
 
         participants = getattr(full_chat.full_chat, "participants", None)
@@ -149,7 +149,7 @@ async def on_document(event):
                 user_id = req.user_id
                 if user_id not in blocked_users:
                     try:
-                        await client(functions.messages.HideChatJoinRequestRequest(
+                        await event.client(functions.messages.HideChatJoinRequestRequest(
                             peer=TARGET_CHAT,
                             user_id=user_id,
                             approved=True
@@ -158,6 +158,6 @@ async def on_document(event):
                     except Exception as e:
                         await mrsyd.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
     except Exception as main_e:
-        await mrsyd.send_message(admin_user_id, main_e)
+        await event.client.send_message(admin_user_id, main_e)
         print(f"❌ Unexpected error in event handler: {main_e}")
 
