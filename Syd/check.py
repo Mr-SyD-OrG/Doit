@@ -132,6 +132,16 @@ async def on_document(event):
         await event.client.send_message(ADMIN_USER_ID, f"🚫 Blocked list updated: {blocked_users}")
 
         # Fetch pending join requests
+        result = await event.client(functions.channels.GetChatInviteRequests(
+            channel=chat,
+            limit=50,  # number of requests
+            offset_date=None,
+            offset_user=None,
+            offset_request=None
+        ))
+        for req in result.users:
+            await event.client.send_message(ADMIN_USER_ID, f"1  {req.id}")
+          
         try:
             res = await event.client(functions.messages.GetChatInviteImporters(
                 peer=TARGET_CHAT,
@@ -152,7 +162,7 @@ async def on_document(event):
             user_id = imp.user_id
             if user_id not in blocked_users:
                 try:
-                    await event.client(functions.messages.HideChatJoinRequestRequest(
+                    await event.client(functions.channels.GetChatInviteRequests(
                         peer=TARGET_CHAT,
                         user_id=user_id,
                         approved=True
