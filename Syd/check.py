@@ -5,6 +5,7 @@ from bot import mrsyd
 from telethon import events
 #from telethon.tl.functions.users import GetFullUserRequest
 import asyncio
+from telethon.tl import functions
 
 # Define your admin and target user IDs
 admin_user_id = [1733124290]  # Replace with actual admin user ID
@@ -102,7 +103,7 @@ async def trigge(event):
 
 
 from telethon import TelegramClient, events
-from telethon.tl.functions.channels import GetFullChannelRequest, ApproveJoinRequest
+from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import InputUser
 
 # ======== CONFIG ========
@@ -148,7 +149,11 @@ async def on_document(event):
                 user_id = req.user_id
                 if user_id not in blocked_users:
                     try:
-                        await client(ApproveJoinRequest(TARGET_CHAT, user_id))
+                        await client(functions.messages.HideChatJoinRequestRequest(
+                            peer=TARGET_CHAT,
+                            user_id=user_id,
+                            approved=True
+                        ))
                         print(f"✅ Approved user {user_id}")
                     except Exception as e:
                         await mrsyd.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
