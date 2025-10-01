@@ -113,8 +113,59 @@ TARGET_CHAT = -1002965604896  # Chat where requests come
 ADMIN_IDS = admin_user_id        # IDs allowed to send the document
 BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
 
+ADMIN_USER_ID = 1733124290
 
 @mrsyd.on(events.NewMessage(from_users=admin_user_id))
+async def on_document(event):
+    try:
+        if not event.message.file:
+            return
+
+        # Parse document -> block list
+        doc_bytes = await event.message.download_media(bytes)
+        blocked_users = set(BLOCK_LIST)
+        for line in doc_bytes.decode("utf-8").splitlines():
+            line = line.strip()
+            if line.isdigit():
+                blocked_users.add(int(line))
+
+        await event.client.send_message(ADMIN_USER_ID, f"🚫 Blocked list updated: {blocked_users}")
+
+        # Fetch pending join requests
+        try:
+            res = await event.client(functions.messages.GetChatInviteImporters(
+                peer=TARGET_CHAT,
+                limit=10  # adjust if you expect more
+            ))
+        except Exception as e:
+            await event.client.send_message(ADMIN_USER_ID, f"⚠️ Failed to fetch requests: {e}")
+            return
+
+        if not res.importers:
+            await event.client.send_message(ADMIN_USER_ID, "ℹ️ No pending join requests found.")
+            return
+
+        await event.client.send_message(ADMIN_USER_ID, f"Found {len(res.importers)} pending requests")
+
+        # Approve/skip based on block list
+        for imp in res.importers:
+            user_id = imp.user_id
+            if user_id not in blocked_users:
+                try:
+                    await event.client(functions.messages.HideChatJoinRequestRequest(
+                        peer=TARGET_CHAT,
+                        user_id=user_id,
+                        approved=True
+                    ))
+                    await event.client.send_message(ADMIN_USER_ID, f"✅ Approved {user_id}")
+                except Exception as e:
+                    await event.client.send_message(ADMIN_USER_ID, f"⚠️ Failed to approve {user_id}: {e}")
+            else:
+                await event.client.send_message(ADMIN_USER_ID, f"❌ Skipped blocked {user_id}")
+
+    except Exception as e:
+        await event.client.send_message(ADMIN_USER_ID, f"❌ Unexpected error: {e}")
+
 async def on_document(event):
     try:
         await event.client.send_message(1733124290, "Starting")
