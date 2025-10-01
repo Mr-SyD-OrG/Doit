@@ -44,8 +44,12 @@ async def forward_round_robin(event):
             # Pick the next destination in round-robin order
             DESTINATION_CHAT_ID = all_chats[next_dest_index]
 
-            await event.client.forward_messages(DESTINATION_CHAT_ID, message)
-            print(f"✅ Message {message.id} forwarded to {DESTINATION_CHAT_ID}")
+            if getattr(message, "noforwards", False):
+                print(f"⚠️ Skipped {message.id}, forwarding restricted.")
+            else:
+                # Copy message to destination
+                await message.copy(chat_id=DESTINATION_CHAT_ID)
+                print(f"✅ Message {message.id} copied to {DESTINATION_CHAT_ID}")
 
             # Move to next index
             next_dest_index += 1
