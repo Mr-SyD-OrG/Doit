@@ -1,7 +1,7 @@
 from telethon import events
 import asyncio
 import re
-#from bot import mrsyd
+from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
 PROCESS = False
