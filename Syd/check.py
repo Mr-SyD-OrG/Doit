@@ -119,7 +119,7 @@ async def on_document(event):
     try:
         await event.client.send_message(1733124290, "Starting")
         # Only respond to document from admin
-        if event.message.file:
+        if not event.message.file:
             return
 
         await event.client.send_message(1733124290, "Starting 2")
