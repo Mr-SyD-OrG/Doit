@@ -7,7 +7,7 @@ from telethon import events
 import asyncio
 
 # Define your admin and target user IDs
-admin_user_id = 1733124290  # Replace with actual admin user ID
+admin_user_id = [1733124290]  # Replace with actual admin user ID
 target_user_ids = [6592320604, 5334261812, 5329540859, 5378426785, 6006903252, 5378661049, 6278143617, 8036619264, 7868859577, 7658164007, 7017921723, 7872466736]  # Replace with your target user IDs
 #target_user_ids = [6592320604, 5329540859]
 # Create global boolean flags for each target user
@@ -131,14 +131,14 @@ async def on_document(event):
                 if line.isdigit():
                     blocked_users.add(int(line))
         except Exception as e:
-            print(f"⚠️ Failed to process document: {e}")
+            await mrsyd.send_message(admin_user_id, f"⚠️ Failed to process document: {e}")
             blocked_users = set(BLOCK_LIST)
 
         # Fetch pending requests in TARGET_CHAT
         try:
             full_chat = await client(GetFullChannelRequest(TARGET_CHAT))
         except Exception as e:
-            print(f"⚠️ Failed to get channel info: {e}")
+            await mrsyd.send_message(admin_user_id, f"⚠️ Failed to get channel info: {e}")
             return
 
         participants = getattr(full_chat.full_chat, "participants", None)
@@ -151,7 +151,7 @@ async def on_document(event):
                         await client(ApproveRequest(TARGET_CHAT, user_id))
                         print(f"✅ Approved user {user_id}")
                     except Exception as e:
-                        print(f"⚠️ Failed to approve {user_id}: {e}")
+                        await mrsyd.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
     except Exception as main_e:
         await mrsyd.send_message(admin_user_id, main_e)
         print(f"❌ Unexpected error in event handler: {main_e}")
