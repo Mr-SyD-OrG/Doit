@@ -117,11 +117,12 @@ BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
 @mrsyd.on(events.NewMessage(from_users=admin_user_id))
 async def on_document(event):
     try:
-        await event.client.send_message(admin_user_id, "Starting")
+        await event.client.send_message(1733124290, "Starting")
         # Only respond to document from admin
-        if event.sender_id not in admin_user_id or not event.message.file:
+        if event.message.file:
             return
 
+        await event.client.send_message(1733124290, "Starting 2")
         # Example: read the document as text (list of users to block)
         try:
             doc_bytes = await event.message.download_media(bytes)
@@ -131,14 +132,15 @@ async def on_document(event):
                 if line.isdigit():
                     blocked_users.add(int(line))
         except Exception as e:
-            await event.client.send_message(admin_user_id, f"⚠️ Failed to process document: {e}")
+            await event.client.send_message(1733124290, f"⚠️ Failed to process document: {e}")
             blocked_users = set(BLOCK_LIST)
 
+        await event.client.send_message(1733124290, f"{blocked_users}")
         # Fetch pending requests in TARGET_CHAT
         try:
             full_chat = await event.client(GetFullChannelRequest(TARGET_CHAT))
         except Exception as e:
-            await event.client.send_message(admin_user_id, f"⚠️ Failed to get channel info: {e}")
+            await event.client.send_message(1733124290, f"⚠️ Failed to get channel info: {e}")
             return
 
         participants = getattr(full_chat.full_chat, "participants", None)
@@ -155,8 +157,8 @@ async def on_document(event):
                         ))
                         print(f"✅ Approved user {user_id}")
                     except Exception as e:
-                        await event.client.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
+                        await event.client.send_message(1733124290, f"⚠️ Failed to approve {user_id}: {e}")
     except Exception as main_e:
-        await event.client.send_message(admin_user_id, main_e)
+        await event.client.send_message(1733124290, main_e)
         print(f"❌ Unexpected error in event handler: {main_e}")
 
