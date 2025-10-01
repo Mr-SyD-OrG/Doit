@@ -19,22 +19,44 @@ semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
 DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002280144341, -1002429058090]
-SOURCE_CHATS = [-1002295881345, 7885202047, -1002525578839, 7065204410, 7519971717, 7456653375, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1002726550105, -1001862599580, -1002077435396]
+SOURCE_CHATS = [-1002295881345, 7885202047, -1002525578839, 7065204410, 7519971717, 7456653375, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1002726550105, -1001862599580, -1002899768746, -1002077435396]
 
+import asyncio
 
-#@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
-async def forward_if_allowed(event):
-    """Forom destination chat."""
+# Global variables
+next_dest_index = 0
+DIRECT = True  
+EXTRA_CHATS = [-1003183027276, -1002901811032, -1003164435604, -1003137700522]       # additional destinations
+
+@mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
+async def forward_round_robin(event):
+    global next_dest_index
     message = event.message
+
     async with semaphore:
         try:
-            DESTINATION_CHAT_ID = random.choice(DESTINATION_CHATS)
+            # Combine chats based on DIRECT flag
+            if DIRECT:
+                all_chats = DESTINATION_CHATS + EXTRA_CHATS
+            else:
+                all_chats = DESTINATION_CHATS
+
+            # Pick the next destination in round-robin order
+            DESTINATION_CHAT_ID = all_chats[next_dest_index]
+
             await event.client.forward_messages(DESTINATION_CHAT_ID, message)
-            print(f"✅ Message {message.id} forwarded successfully.")
-            await asyncio.sleep(120)
+            print(f"✅ Message {message.id} forwarded to {DESTINATION_CHAT_ID}")
+
+            # Move to next index
+            next_dest_index += 1
+            if next_dest_index >= len(all_chats):
+                next_dest_index = 0  # loop back
+
+            await asyncio.sleep(2)  # small delay to avoid flood
 
         except Exception as e:
-            print(f"❌ Message {message.id} {e}")
+            print(f"❌ Message {message.id} failed: {e}")
+
 
 
 @mrsyd.on(events.NewMessage(from_users=1733124290))
