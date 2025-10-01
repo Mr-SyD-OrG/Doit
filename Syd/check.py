@@ -118,15 +118,16 @@ BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
 async def on_document(event):
     try:
         await event.client.send_message(1733124290, "Starting")
-        # Only respond to document from admin
+
         if not event.message.file:
             return
 
         await event.client.send_message(1733124290, "Starting 2")
-        # Example: read the document as text (list of users to block)
+
+        # Process document
         try:
             doc_bytes = await event.message.download_media(bytes)
-            blocked_users = set(BLOCK_LIST)  # start with predefined block list
+            blocked_users = set(BLOCK_LIST)
             for line in doc_bytes.decode("utf-8").splitlines():
                 line = line.strip()
                 if line.isdigit():
@@ -135,17 +136,19 @@ async def on_document(event):
             await event.client.send_message(1733124290, f"⚠️ Failed to process document: {e}")
             blocked_users = set(BLOCK_LIST)
 
-        await event.client.send_message(1733124290, f"{blocked_users}")
-        # Fetch pending requests in TARGET_CHAT
+        await event.client.send_message(1733124290, f"Blocked users: {blocked_users}")
+
+        # Fetch pending join requests
         try:
             full_chat = await event.client(GetFullChannelRequest(TARGET_CHAT))
-        except Exception as e:
-            await event.client.send_message(1733124290, f"⚠️ Failed to get channel info: {e}")
-            return
+            participants = getattr(full_chat.full_chat, "participants", None)
+            if not participants or not hasattr(participants, "requests"):
+                await event.client.send_message(1733124290, "No pending join requests found.")
+                return
 
-        participants = getattr(full_chat.full_chat, "participants", None)
-        if participants and hasattr(participants, "requests"):
-            requests = participants.requests  # list of User objects requesting access
+            requests = participants.requests
+            await event.client.send_message(1733124290, f"Found {len(requests)} pending requests.")
+
             for req in requests:
                 user_id = req.user_id
                 if user_id not in blocked_users:
@@ -155,10 +158,15 @@ async def on_document(event):
                             user_id=user_id,
                             approved=True
                         ))
-                        print(f"✅ Approved user {user_id}")
+                        await event.client.send_message(1733124290, f"✅ Approved user {user_id}")
                     except Exception as e:
-                        await event.client.send_message(1733124290, f"⚠️ Failed to approve {user_id}: {e}")
-    except Exception as main_e:
-        await event.client.send_message(1733124290, main_e)
-        print(f"❌ Unexpected error in event handler: {main_e}")
+                        await event.client.send_message(1733124290, f"⚠️ Failed to approve {user_id}: {str(e)}")
+                else:
+                    await event.client.send_message(1733124290, f"❌ Skipped blocked user {user_id}")
 
+        except Exception as e:
+            await event.client.send_message(1733124290, f"⚠️ Failed to get channel info or approve requests: {str(e)}")
+
+    except Exception as main_e:
+        await event.client.send_message(1733124290, f"❌ Unexpected error: {str(main_e)}")
+        print(f"❌ Unexpected error in event handler: {main_e}")
