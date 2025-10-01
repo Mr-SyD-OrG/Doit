@@ -98,3 +98,60 @@ async def trigge(event):
     # Reset flags
     for uid in user_flags:
         user_flags[uid] = False
+
+
+
+from telethon import TelegramClient, events
+from telethon.tl.functions.channels import GetFullChannelRequest, ApproveRequest
+from telethon.tl.types import InputUser
+
+# ======== CONFIG ========
+API_ID = 12345
+API_HASH = "your_api_hash"
+SESSION_NAME = "userbot_session"
+
+TARGET_CHAT = -1002965604896  # Chat where requests come
+ADMIN_IDS = admin_user_id        # IDs allowed to send the document
+BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
+
+
+@mrsyd.on(events.NewMessage(from_users=admin_user_id)
+async def on_document(event):
+    try:
+        # Only respond to document from admin
+        if event.sender_id not in admin_user_id or not event.message.file:
+            return
+
+        # Example: read the document as text (list of users to block)
+        try:
+            doc_bytes = await event.message.download_media(bytes)
+            blocked_users = set(BLOCK_LIST)  # start with predefined block list
+            for line in doc_bytes.decode("utf-8").splitlines():
+                line = line.strip()
+                if line.isdigit():
+                    blocked_users.add(int(line))
+        except Exception as e:
+            print(f"⚠️ Failed to process document: {e}")
+            blocked_users = set(BLOCK_LIST)
+
+        # Fetch pending requests in TARGET_CHAT
+        try:
+            full_chat = await client(GetFullChannelRequest(TARGET_CHAT))
+        except Exception as e:
+            print(f"⚠️ Failed to get channel info: {e}")
+            return
+
+        participants = getattr(full_chat.full_chat, "participants", None)
+        if participants and hasattr(participants, "requests"):
+            requests = participants.requests  # list of User objects requesting access
+            for req in requests:
+                user_id = req.user_id
+                if user_id not in blocked_users:
+                    try:
+                        await client(ApproveRequest(TARGET_CHAT, user_id))
+                        print(f"✅ Approved user {user_id}")
+                    except Exception as e:
+                        print(f"⚠️ Failed to approve {user_id}: {e}")
+    except Exception as main_e:
+        print(f"❌ Unexpected error in event handler: {main_e}")
+
