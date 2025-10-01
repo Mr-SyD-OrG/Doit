@@ -1,15 +1,22 @@
 # bot.py
 from telethon import TelegramClient
 from telethon.sessions import StringSession
-from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID
+from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID, TELETHON_SESSION
 import glob
 from aiohttp import web
 from Syd.web_support import web_server
 import importlib.util
 import os
+from pyrogram import Client
+from pyrogram.session import StringSession
 
 # Create Telegram client
 mrsyd = TelegramClient(StringSession(PHONE_NUMBER), API_ID, API_HASH)
+app = Client(
+    StringSession(TELETHON_SESSION),
+    api_id=API_ID,
+    api_hash=API_HASH
+)
 # Function to dynamically load plugins from the 'Syd' directory
 def load_plugins():
     plugins_path = "Syd"  # Change from "plugins" to "Syd"
@@ -22,7 +29,8 @@ def load_plugins():
         print(f"Loaded plugin: {module_name}")
 
 async def start_bot():
-    await mrsyd.start()  # Userbot requires phone number login
+#    await mrsyd.start()
+    await app.start() # Userbot requires phone number login
     print("Userbot is running...")
 
     # Load plugins manually from Syd/
