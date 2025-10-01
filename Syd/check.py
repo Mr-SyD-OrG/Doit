@@ -8,7 +8,7 @@ TARGET_CHAT = -1002965604896
 
 @app.on_message(filters.command("pending") & filters.private)
 async def pending_requests(client, message):
-    await message.reply(f"**Fetching pending join requests for chat ID {CHAT_ID}...**")
+    await message.reply(f"**Fetching pending join requests for chat ID {TARGET_CHAT}...**")
     
     text = f"**Pending join requests in chat {TARGET_CHAT}:**\n\n"
     count = 0
