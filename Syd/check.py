@@ -1,31 +1,6 @@
 
 
-from bot import app
-
-
-TARGET_CHAT = -1002965604896
-
-
-@app.on_message(filters.command("pending") & filters.private)
-async def pending_requests(client, message):
-    await message.reply(f"**Fetching pending join requests for chat ID {TARGET_CHAT}...**")
-    
-    text = f"**Pending join requests in chat {TARGET_CHAT}:**\n\n"
-    count = 0
-
-    # List all pending requests
-    async for req in client.get_chat_join_requests(TARGET_CHAT):
-        user = req.from_user
-        text += f"- {user.first_name} (@{user.username or 'no username'}) [id: {user.id}]\n"
-        count += 1
-
-    if count == 0:
-        text = "✅ No pending join requests found."
-
-    await message.reply(text)
-
-
-
+from bot import mrsyd
   # Replace with admin's user ID
 from telethon import events
 #from telethon.tl.functions.users import GetFullUserRequest
@@ -60,7 +35,7 @@ REPORT_MSG_ID = 9
 
 semapore = asyncio.Semaphore(1)
 
-#@mrsyd.on(events.NewMessage(chats=-1002687879857))
+@mrsyd.on(events.NewMessage(chats=-1002687879857))
 async def handle_group_messages(event):
     async with semapore:
         await asyncio.sleep(0.5)
@@ -70,7 +45,7 @@ async def handle_group_messages(event):
             user_flags[sender_id] = True
             print(f"Message received from target user {sender_id}, flag set to True.")
 
-#@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
+@mrsyd.on(events.NewMessage(from_users=admin_user_id, pattern=r"^SyD"))
 async def trigge(event):
     await mrsyd.send_message(-1002687879857, "/start")
     await asyncio.sleep(15)
