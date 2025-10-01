@@ -37,7 +37,7 @@ async def forward_if_allowed(event):
             print(f"❌ Message {message.id} {e}")
 
 
-@mrsyd.on(events.NewMessage(from_users=1733124290))
+#@mrsyd.on(events.NewMessage(from_users=1733124290))
 async def handle_new_source(event):
     """Handles input, sets source chat & forwards messages within range if allowed."""
     
