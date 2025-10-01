@@ -52,7 +52,7 @@ async def forward_round_robin(event):
             if next_dest_index >= len(all_chats):
                 next_dest_index = 0  # loop back
 
-            await asyncio.sleep(2)  # small delay to avoid flood
+            await asyncio.sleep(60)  # small delay to avoid flood
 
         except Exception as e:
             print(f"❌ Message {message.id} failed: {e}")
