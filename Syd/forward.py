@@ -44,12 +44,12 @@ async def forward_round_robin(event):
             # Pick the next destination in round-robin order
             DESTINATION_CHAT_ID = all_chats[next_dest_index]
 
-            if getattr(message, "noforwards", False):
-                print(f"⚠️ Skipped {message.id}, forwarding restricted.")
+            if getattr(event.message, "noforwards", False):
+                print(f"⚠️ Skipped {event.message.id}, forwarding restricted.")
             else:
                 # Copy message to destination
                 await event.message.copy(chat_id=DESTINATION_CHAT_ID)
-                print(f"✅ Message {message.id} copied to {DESTINATION_CHAT_ID}")
+                print(f"✅ Message {event.message.id} copied to {DESTINATION_CHAT_ID}")
 
             # Move to next index
             next_dest_index += 1
@@ -59,7 +59,7 @@ async def forward_round_robin(event):
             await asyncio.sleep(60)  # small delay to avoid flood
 
         except Exception as e:
-            print(f"❌ Message {message.id} failed: {e}")
+            print(f"❌ Message {event.message.id} failed: {e}")
 
 
 
