@@ -115,7 +115,7 @@ ADMIN_IDS = admin_user_id        # IDs allowed to send the document
 BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
 
 
-@mrsyd.on(events.NewMessage(from_users=admin_user_id)
+@mrsyd.on(events.NewMessage(from_users=admin_user_id))
 async def on_document(event):
     try:
         # Only respond to document from admin
