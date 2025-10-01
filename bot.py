@@ -8,7 +8,7 @@ from Syd.web_support import web_server
 import importlib.util
 import os
 from pyrogram import Client
-from pyrogram.session import StringSession
+from pyrogram.types import StringSession
 
 # Create Telegram client
 mrsyd = TelegramClient(StringSession(PHONE_NUMBER), API_ID, API_HASH)
