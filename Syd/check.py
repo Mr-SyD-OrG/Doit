@@ -107,9 +107,7 @@ from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import InputUser
 
 # ======== CONFIG ========
-API_ID = 12345
-API_HASH = "your_api_hash"
-SESSION_NAME = "userbot_session"
+
 
 TARGET_CHAT = -1002965604896  # Chat where requests come
 ADMIN_IDS = admin_user_id        # IDs allowed to send the document
@@ -119,6 +117,7 @@ BLOCK_LIST = [11111111, 22222222]  # Users to ignore/deny
 @mrsyd.on(events.NewMessage(from_users=admin_user_id))
 async def on_document(event):
     try:
+        await event.client.send_message(admin_user_id, "Starting")
         # Only respond to document from admin
         if event.sender_id not in admin_user_id or not event.message.file:
             return
@@ -156,7 +155,7 @@ async def on_document(event):
                         ))
                         print(f"✅ Approved user {user_id}")
                     except Exception as e:
-                        await mrsyd.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
+                        await event.client.send_message(admin_user_id, f"⚠️ Failed to approve {user_id}: {e}")
     except Exception as main_e:
         await event.client.send_message(admin_user_id, main_e)
         print(f"❌ Unexpected error in event handler: {main_e}")
