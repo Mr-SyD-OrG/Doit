@@ -48,7 +48,7 @@ async def forward_round_robin(event):
                 print(f"⚠️ Skipped {event.message.id}, forwarding restricted.")
             else:
                 # Copy message to destination
-                await event.message.copy(chat_id=DESTINATION_CHAT_ID)
+                await event.client.send_message(DESTINATION_CHAT_ID, event.message)
                 print(f"✅ Message {event.message.id} copied to {DESTINATION_CHAT_ID}")
 
             # Move to next index
