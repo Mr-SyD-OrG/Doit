@@ -29,9 +29,9 @@ DIRECT = False
 EXTRA_CHATS = [-1003183027276, -1002901811032, -1003164435604, -1003137700522]       # additional destinations
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
-async def forward_round_robin(event):
+async def forward_sydround_robin(event):
     global next_dest_index
-    message = event.message
+    
 
     async with semaphore:
         try:
