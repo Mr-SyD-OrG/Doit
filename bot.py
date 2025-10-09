@@ -30,7 +30,7 @@ async def start_bot():
     print("Userbot is running...")
 
     # Load plugins manually from Syd/
-   # load_plugins()
+    load_plugins()
     appp = web.AppRunner(await web_server())
     await appp.setup()
     bind_address = "0.0.0.0"
