@@ -59,7 +59,7 @@ async def forward_round_robin(event):
             await asyncio.sleep(60)  # small delay to avoid flood
 
         except Exception as e:
-            print(f"❌ Message {event.message.id} failed: {e}")
+            print(f"Message 🧊 {event.message.id} failed: {e}")
 
 
 
