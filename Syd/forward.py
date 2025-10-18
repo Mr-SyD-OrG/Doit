@@ -20,13 +20,44 @@ semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
 DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002280144341, -1002429058090]
 SOURCE_CHATS = [-1002295881345, 7885202047, 7065204410, 7519971717, 7456653375, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1001862599580, -1002899768746, -1002077435396]
-
+BOT_IDS = {7872466736, 5804839092, 7274740598, 7017921723}
+TARGET_CHATS = [-1002332730533, -1002498086501, -1002305372915]  
 import asyncio
 
 # Global variables
 next_dest_index = 0
 DIRECT = False  
 EXTRA_CHATS = [-1003183027276, -1002901811032, -1003164435604, -1003137700522]       # additional destinations
+STARTED_PATTERN = re.compile(r"Iꜱ Sᴛᴀʀᴛᴇᴅ\.*✨️", re.IGNORECASE)
+
+@client.on(events.NewMessage(from_users=BOT_IDS))
+async def handle_bot_message(event):
+    text = event.raw_text or ""
+
+    if STARTED_PATTERN.search(text):
+        print(f"Matched message from {event.sender_id}: {text}")
+
+        sent_msgs = []
+
+        # Send to both channels
+        for chat in TARGET_CHATS:
+            try:
+                sent = await client.send_message(chat, text)
+                sent_msgs.append(sent)
+                await asyncio.sleep(1)  # avoid floodwait
+            except Exception as e:
+                print(f"❌ Error sending to {chat}: {e}")
+
+        # Wait for 30 seconds
+        await asyncio.sleep(DELETE_AFTER)
+
+        # Delete all sent messages
+        for sent in sent_msgs:
+            try:
+                await sent.delete()
+            except Exception as e:
+                print(f"❌ Error deleting message in {sent.chat_id}: {e}")
+
 
 @mrsyd.on(events.NewMessage(chats=SOURCE_CHATS, func=lambda e: e.message.media and (e.message.video or e.message.document)))
 async def forward_sydround_robin(event):
