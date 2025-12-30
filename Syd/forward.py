@@ -136,7 +136,7 @@ async def handle_new_source(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^🔍 Results for your Search"))
+@mrsyd.on(events.NewMessage(from_users=[8523171350, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^🔍 Results for your Search"))
 async def syde_message(event):
     """Press each button every 60 seconds until a new message arrives, then move to the next button.
     'NEXT' is only pressed at the end, followed by a elay before fetching new buttons.
@@ -218,7 +218,7 @@ async def syde_message(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=[7885202047, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^❗️Join"))
+@mrsyd.on(events.NewMessage(from_users=[8523171350, 1983814301, 7755788244, 7519971717, 8128434604], pattern=r"^❗️Join"))
 async def handle_invite(event):
     """Click the first inline button if it's an invite link and request to join."""
     message = event.message
@@ -287,7 +287,7 @@ async def forward_messs(event):
 import re
 syd = asyncio.Semaphore(1)
 
-@mrsyd.on(events.NewMessage(chats=-1002658187814))
+@mrsyd.on(events.NewMessage(chats=-1003230035868))
 async def forwd_mesages(event):
     async with syd:   # Limit concurrent execution
         try:
@@ -314,3 +314,22 @@ async def forwd_mesages(event):
 
         except Exception as e:
             await event.client.send_message(1733124290, f"❌ Error: {e}")
+
+
+
+@mrsyd.on(events.NewMessage(from_users=8192265990))
+async def forward_mesydsage(event):
+    if not event.text:
+        return
+
+    async with semaphore:
+        try:
+            await client.send_message(
+                7519971717,
+                event.text
+            )
+            await asyncio.sleep(15 * 60)
+
+        except Exception as e:
+            print(f"Forward error: {e}")
+        
