@@ -324,7 +324,7 @@ async def forward_mesydsage(event):
 
     async with semaphore:
         try:
-            await client.send_message(
+            await event.client.send_message(
                 7519971717,
                 event.text
             )
