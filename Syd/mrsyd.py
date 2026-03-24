@@ -477,5 +477,5 @@ async def handlerpmmm(event):
         # ✅ Update last sent date
         last_sent_date = today
 
-    except Exception as e:
-        print("Error:", e)
+    
+
