@@ -388,7 +388,7 @@ SYD_CCHANNELS = [
 
 TARGET_BOT = "raffle_tickets_bot"   # bot username (without @)
 
-@client.on(events.NewMessage(chats=SYD_CCHANNELS))
+@mrsyd.on(events.NewMessage(chats=SYD_CCHANNELS))
 async def handlergifft(event):
     try:
         text = event.raw_text or ""
