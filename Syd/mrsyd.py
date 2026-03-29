@@ -388,7 +388,7 @@ SYD_CCHANNELS = [
 
 TARGET_BOT = "raffle_tickets_bot"   # bot username (without @)
 
-@mrsyd.on(events.NewMessage(chats=SYD_CCHANNELS))
+#@mrsyd.on(events.NewMessage(chats=SYD_CCHANNELS))
 async def handlergifft(event):
     try:
         text = event.raw_text or ""
@@ -458,7 +458,7 @@ last_sent_date = None
 
 
 
-@mrsyd.on(events.NewMessage(from_users=TARGETT_USER_ID))
+#@mrsyd.on(events.NewMessage(from_users=TARGETT_USER_ID))
 async def handlerpmmm(event):
     if isinstance(event.message, MessageService):
         today = datetime.now().date()
