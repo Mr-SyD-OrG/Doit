@@ -482,7 +482,7 @@ async def handlerpmmm(event):
 from telethon import TelegramClient, events, functions
 from telethon.tl.types import KeyboardButtonWebView, KeyboardButtonUrl
 
-
+CHAT_ID = 7974361539
 async def open_and_close_webapp(button, peer, bot):
     try:
         # for web app buttons
