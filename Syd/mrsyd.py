@@ -518,7 +518,7 @@ async def press_button(message, text_to_find):
 
                 # webapp button
                 if isinstance(btn.button, KeyboardButtonWebView):
-                    await open_and_close_webapp(btn.button, message.peer_id, CHAT_ID)
+                    await open_and_close_webapp(btn.button, message.peer_id, 7974361539)
 
                 else:
                     await message.click(text=txt)
@@ -550,7 +550,7 @@ async def handlersyyddd(event):
                                 await open_and_close_webapp(
                                     btn.button,
                                     msg.peer_id,
-                                    CHAT_ID
+                                    7974361539
                                 )
                             else:
                                 await msg.click(text="XXX")
@@ -560,7 +560,7 @@ async def handlersyyddd(event):
 
         # find next message below current image message
         async for nxt in mrsyd.iter_messages(
-            CHAT_ID,
+            7974361539,
             min_id=msg.id,
             reverse=True,
             limit=5
