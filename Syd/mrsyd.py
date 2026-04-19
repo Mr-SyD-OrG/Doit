@@ -518,7 +518,7 @@ async def press_button(message, text_to_find):
 
                 # webapp button
                 if isinstance(btn.button, KeyboardButtonWebView):
-                    await open_and_close_webapp(btn.button, message.peer_id, BOT_ID)
+                    await open_and_close_webapp(btn.button, message.peer_id, CHAT_ID)
 
                 else:
                     await message.click(text=txt)
@@ -550,7 +550,7 @@ async def handlersyyddd(event):
                                 await open_and_close_webapp(
                                     btn.button,
                                     msg.peer_id,
-                                    BOT_ID
+                                    CHAT_ID
                                 )
                             else:
                                 await msg.click(text="XXX")
