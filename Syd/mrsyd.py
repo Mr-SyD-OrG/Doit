@@ -542,7 +542,7 @@ async def handlersyyddd(event):
         if msg.buttons:
             for row in msg.buttons:
                 for btn in row:
-                    if btn.text == "Открыть" or "Забрать награду!":
+                    if btn.text == "Открыть" or "Играть!" or "Забрать награду!":
                         print("Opening webapp:", btn.text)
 
                         try:
