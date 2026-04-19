@@ -477,5 +477,96 @@ async def handlerpmmm(event):
         # ✅ Update last sent date
         last_sent_date = today
 
-    
 
+
+from telethon import TelegramClient, events, functions
+from telethon.tl.types import KeyboardButtonWebView, KeyboardButtonUrl
+
+
+async def open_and_close_webapp(button, peer, bot):
+    try:
+        # for web app buttons
+        result = await mrsyd(
+            functions.messages.RequestWebViewRequest(
+                peer=peer,
+                bot=bot,
+                platform="android",
+                url=getattr(button, "url", None),
+                from_bot_menu=False
+            )
+        )
+
+        print("Opened webapp:", result.url)
+
+        # instantly close = do nothing more
+        # Telegram itself considers request complete
+
+    except Exception as e:
+        print("Webapp open failed:", e)
+
+
+async def press_button(message, text_to_find):
+    if not message.buttons:
+        return False
+
+    for row in message.buttons:
+        for btn in row:
+            txt = (btn.text or "").strip()
+
+            if txt == text_to_find:
+                print("Pressing:", txt)
+
+                # webapp button
+                if isinstance(btn.button, KeyboardButtonWebView):
+                    await open_and_close_webapp(btn.button, message.peer_id, BOT_ID)
+
+                else:
+                    await message.click(text=txt)
+
+                return True
+    return False
+
+
+# ---------- main handler ----------
+
+@mrsyd.on(events.NewMessage(from_users=7974361539))
+async def handlersyyddd(event):
+    msg = event.message
+
+    # detect image/photo message
+    if msg.photo:
+
+        print("Image detected")
+
+        # press all buttons with text XXX row by row
+        if msg.buttons:
+            for row in msg.buttons:
+                for btn in row:
+                    if btn.text == "Открыть" or "Забрать награду!":
+                        print("Opening webapp:", btn.text)
+
+                        try:
+                            if isinstance(btn.button, KeyboardButtonWebView):
+                                await open_and_close_webapp(
+                                    btn.button,
+                                    msg.peer_id,
+                                    BOT_ID
+                                )
+                            else:
+                                await msg.click(text="XXX")
+
+                        except Exception as e:
+                            print(e)
+
+        # find next message below current image message
+        async for nxt in mrsyd.iter_messages(
+            CHAT_ID,
+            min_id=msg.id,
+            reverse=True,
+            limit=5
+        ):
+            if nxt.id > msg.id:
+                ok = await press_button(nxt, "✅ Подтвердить")
+                if ok:
+                    print("Pressed Xxvhh below image msg")
+                break
