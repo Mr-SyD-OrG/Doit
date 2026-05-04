@@ -6,7 +6,7 @@ import glob
 from aiohttp import web
 from Syd.web_support import web_server
 import importlib.util
-import os
+import os, asyncio
 from pyrogram import Client
 #from pyrogram.types import StringSession
 
@@ -37,3 +37,8 @@ async def start_bot():
     await web.TCPSite(appp, bind_address, 8080).start()
 
     await mrsyd.run_until_disconnected()
+
+
+if __name__ == "__main__":
+    asyncio.run(start_bot())
+    
