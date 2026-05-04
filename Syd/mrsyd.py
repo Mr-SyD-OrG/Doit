@@ -607,16 +607,20 @@ async def open_real(url):
 # ---------- extract + open ----------
 async def handle_button(btn, msg):
     try:
-        #bot_entity = await mrsyd.get_entity(7974361539)
-
+        print("1")
+        bot_entity = await mrsyd.get_entity(7974361539)
+        print("2")
         if isinstance(btn, KeyboardButtonUrl):
+            print("3")
             url = btn.url
             print("URL found:", url)
             await open_real(url)
         else:
+            print("4")
             await msg.click(text=btn.text)
 
     except Exception as e:
+        print(e)
         import traceback
         traceback.print_exc()
 
