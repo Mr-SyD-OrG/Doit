@@ -591,7 +591,7 @@ bot_id = 7974361539
 # ---------- open in real browser ----------
 async def open_real(url):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)  # set True if needed
+        browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])  # set True if needed
         page = await browser.new_page()
 
         print("Opening in browser:", url)
