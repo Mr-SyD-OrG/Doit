@@ -4,6 +4,10 @@ import re
 from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 client = mrsyd
 PROCESS = False
 OCESS = False
@@ -633,6 +637,7 @@ async def handlllller(event):
     msg = event.message
 
     if msg.photo and msg.buttons:
+        logging.info("Hello from Docker")
         print("Image detected")
 
         targets = ["Открыть", "Вперёд!", "Присоединяйся!", "Играть!", "Забрать награду!"]
