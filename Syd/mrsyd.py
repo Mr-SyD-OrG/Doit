@@ -641,6 +641,7 @@ async def handlllller(event):
                     print("Matched:", btn.text)
 
                     await handle_button(btn, msg)
+                    print("Yo")
 
                     # avoid spam clicking too fast
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(5)
