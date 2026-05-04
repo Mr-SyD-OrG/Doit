@@ -535,14 +535,12 @@ async def handlersyyddd(event):
 
     # detect image/photo message
     if msg.photo:
-
         print("Image detected")
-
-        # press all buttons with text XXX row by row
         if msg.buttons:
             for row in msg.buttons:
                 for btn in row:
-                    if btn.text == "Открыть" or "Играть!" or "Забрать награду!":
+                    targets = ["Открыть", "Играть!", "Забрать награду!"]
+                    if btn.text and any(t in btn.text for t in targets):
                         print("Opening webapp:", btn.text)
 
                         try:
@@ -553,8 +551,10 @@ async def handlersyyddd(event):
                                     7974361539
                                 )
                             else:
-                                await msg.click(text="XXX")
-
+                                try:
+                                    await msg.click(text=btn.text)
+                                except Exception as e:
+                                    print(f"Failed to click {btn.text}: {e}")
                         except Exception as e:
                             print(e)
 
