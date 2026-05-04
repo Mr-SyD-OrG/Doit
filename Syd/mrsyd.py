@@ -486,6 +486,7 @@ CHAT_ID = 7974361539
 async def open_and_close_webapp(button, peer, bot):
     try:
         # for web app buttons
+        print("12")
         result = await mrsyd(
             functions.messages.RequestWebViewRequest(
                 peer=peer,
@@ -544,15 +545,19 @@ async def handlersyyddd(event):
                         print("Opening webapp:", btn.text)
 
                         try:
-                            if isinstance(btn.button, KeyboardButtonWebView):
+                            if isinstance(btn, KeyboardButtonWebView):
+                                print("1")
                                 await open_and_close_webapp(
                                     btn.button,
                                     msg.peer_id,
                                     7974361539
                                 )
+                                print("2")
                             else:
                                 try:
+                                    print("3")
                                     await msg.click(text=btn.text)
+                                    print("4")
                                 except Exception as e:
                                     print(f"Failed to click {btn.text}: {e}")
                         except Exception as e:
