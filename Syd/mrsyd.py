@@ -607,7 +607,7 @@ async def open_real(url):
 # ---------- extract + open ----------
 async def handle_button(btn, msg):
     try:
-        bot_entity = await mrsyd.get_entity(bot_id)
+        #bot_entity = await mrsyd.get_entity(7974361539)
 
         if isinstance(btn, KeyboardButtonUrl):
             url = btn.url
