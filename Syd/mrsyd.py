@@ -652,3 +652,83 @@ async def handlllller(event):
 
                     # avoid spam clicking too fast
                     await asyncio.sleep(5)
+
+
+
+import asyncio
+import re
+
+ADMIN_ID = 123456789  # replace with your admin id
+
+@mrsyd.on(events.NewMessage(from_users=ADMIN_ID))
+async def auto_runner(event):
+    msg = event.message
+
+    if msg.text and "start auto process" in msg.text.lower():
+        logging.info("Auto process triggered")
+
+        start_id = None
+        last_id = None
+
+        # --- SEND 300 MESSAGES ---
+        for i in range(30):
+            try:
+                sent = await mrsyd.send_message(bot_id, "💎 Задания")
+
+                if start_id is None:
+                    start_id = sent.id
+
+                last_id = sent.id
+
+                logging.info(f"Sent {i+1}/300 → id {sent.id}")
+
+                await asyncio.sleep(10)
+
+            except Exception as e:
+                logging.error(f"Send failed at {i}: {e}")
+                await asyncio.sleep(60)
+
+        # --- DEFINE RANGE ---
+        if start_id and last_id:
+            end_id = last_id + 3
+
+            logging.info(f"Auto range: {start_id} → {end_id}")
+
+            # --- PROCESS LOOP ---
+            for message_id in range(start_id, end_id + 1):
+                try:
+                    target_msg = await mrsyd.get_messages(bot_id, ids=message_id)
+
+                    if not target_msg:
+                        continue
+
+                    # reuse your logic style
+                    if target_msg.buttons:
+                        for row in target_msg.buttons:
+                            for btn in row:
+                                if not btn.text:
+                                    continue
+
+                                # PHOTO FLOW
+                                if target_msg.photo and any(t in btn.text for t in ["Открыть", "Вперёд!", "Посмотреть", "Присоединяйся!", "Играть!", "Забрать награду!"]):
+                                    logging.info(f"[AUTO PHOTO] {btn.text}")
+                                    await handle_button(btn, target_msg)
+                                    await asyncio.sleep(3)
+                                    break
+
+                                # NORMAL BUTTON FLOW
+                               # if any(t in btn.text for t in ["Открыть", "Вперёд!", "Посмотреть", "Присоединяйся!", "Играть!", "Забрать награду!"]):
+                                    #logging.info(f"[AUTO TEXT] {btn.text}")
+                                 #   await target_msg.click(text=btn.text)
+                                    #await asyncio.sleep(3)
+                                #    break
+
+                                # CONFIRM FLOW
+                                if "Подтвердить" in btn.text:
+                                    logging.info(f"[AUTO CONFIRM] {btn.text}")
+                                    await target_msg.click(text=btn.text)
+                                    await asyncio.sleep(2)
+                                    break
+
+                except Exception as e:
+                    logging.error(f"Error processing {message_id}: {e}")
