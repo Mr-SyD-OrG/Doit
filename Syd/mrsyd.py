@@ -635,7 +635,7 @@ async def handlllller(event):
     if msg.photo and msg.buttons:
         print("Image detected")
 
-        targets = ["Открыть", "Вперёд!", "Играть!", "Забрать награду!"]
+        targets = ["Открыть", "Вперёд!", "Присоединяйся!", "Играть!", "Забрать награду!"]
 
         for row in msg.buttons:
             for btn in row:
