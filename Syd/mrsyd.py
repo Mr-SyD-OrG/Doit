@@ -610,6 +610,8 @@ async def handle_button(btn, msg):
         print("1")
         bot_entity = await mrsyd.get_entity(7974361539)
         print("2")
+        await open_real(btn.url)
+        print("2.5")
         if isinstance(btn, KeyboardButtonUrl):
             print("3")
             url = btn.url
