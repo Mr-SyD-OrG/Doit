@@ -530,7 +530,7 @@ async def press_button(message, text_to_find):
 
 # ---------- main handler ----------
 
-@mrsyd.on(events.NewMessage(from_users=7974361539))
+#@mrsyd.on(events.NewMessage(from_users=7974361539))
 async def handlersyyddd(event):
     msg = event.message
 
@@ -575,3 +575,67 @@ async def handlersyyddd(event):
                 if ok:
                     print("Pressed Xxvhh below image msg")
                 break
+
+
+
+from telethon import TelegramClient, events, functions
+from telethon.tl.types import KeyboardButtonWebView
+from playwright.async_api import async_playwright
+import asyncio
+
+bot_id = 7974361539
+
+
+
+# ---------- open in real browser ----------
+async def open_real(url):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)  # set True if needed
+        page = await browser.new_page()
+
+        print("Opening in browser:", url)
+
+        await page.goto(url, wait_until="domcontentloaded")
+
+        # simulate real user presence
+        await page.wait_for_timeout(5000)
+
+        await browser.close()
+
+
+# ---------- extract + open ----------
+async def handle_button(btn, msg):
+    try:
+        bot_entity = await client.get_entity(bot_id)
+
+        if isinstance(btn, KeyboardButtonUrl):
+            url = btn.url
+            print("URL found:", url)
+            await open_real(url)
+        else:
+            await msg.click(text=btn.text)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+
+# ---------- main handler ----------
+@client.on(events.NewMessage(from_users=bot_id))
+async def handlllller(event):
+    msg = event.message
+
+    if msg.photo and msg.buttons:
+        print("Image detected")
+
+        targets = ["Открыть", "Вперёд!", "Играть!", "Забрать награду!"]
+
+        for row in msg.buttons:
+            for btn in row:
+                if btn.text and any(t in btn.text for t in targets):
+                    print("Matched:", btn.text)
+
+                    await handle_button(btn, msg)
+
+                    # avoid spam clicking too fast
+                    await asyncio.sleep(2)
