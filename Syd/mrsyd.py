@@ -4,6 +4,7 @@ import re
 from bot import mrsyd
 import random
 from telethon.tl.types import PeerChannel
+client = mrsyd
 PROCESS = False
 OCESS = False
 MPROCESS = False
@@ -579,7 +580,7 @@ async def handlersyyddd(event):
 
 
 from telethon import TelegramClient, events, functions
-from telethon.tl.types import KeyboardButtonWebView
+from telethon.tl.types import KeyboardButtonWebView, KeyboardButtonUrl
 from playwright.async_api import async_playwright
 import asyncio
 
