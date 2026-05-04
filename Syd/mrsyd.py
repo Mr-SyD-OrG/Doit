@@ -621,7 +621,7 @@ async def handle_button(btn, msg):
 
 
 # ---------- main handler ----------
-@client.on(events.NewMessage(from_users=bot_id))
+@mrsyd.on(events.NewMessage(from_users=bot_id))
 async def handlllller(event):
     msg = event.message
 
