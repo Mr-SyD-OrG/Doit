@@ -598,7 +598,7 @@ async def open_real(url):
         browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])  # set True if needed
         page = await browser.new_page()
 
-        print("Opening in browser:", url)
+        logging.info("Opening in browser:", url)
 
         await page.goto(url, wait_until="domcontentloaded")
 
@@ -611,22 +611,22 @@ async def open_real(url):
 # ---------- extract + open ----------
 async def handle_button(btn, msg):
     try:
-        print("1")
+        logging.info("1")
         bot_entity = await mrsyd.get_entity(7974361539)
-        print("2")
+        logging.info("2")
         await open_real(btn.url)
-        print("2.5")
+        logging.info("2.5")
         if isinstance(btn, KeyboardButtonUrl):
             print("3")
             url = btn.url
-            print("URL found:", url)
+            logging.info("URL found:", url)
             await open_real(url)
         else:
-            print("4")
+            logging.info("4")
             await msg.click(text=btn.text)
 
     except Exception as e:
-        print(e)
+        logging.info(e)
         import traceback
         traceback.print_exc()
 
@@ -640,15 +640,15 @@ async def handlllller(event):
         logging.info("Hello from Docker")
         print("Image detected")
 
-        targets = ["Открыть", "Вперёд!", "Присоединяйся!", "Играть!", "Забрать награду!"]
+        targets = ["Открыть", "Вперёд!", "Посмотреть", "Присоединяйся!", "Играть!", "Забрать награду!"]
 
         for row in msg.buttons:
             for btn in row:
                 if btn.text and any(t in btn.text for t in targets):
-                    print("Matched:", btn.text)
+                    logging.info("Matched:", btn.text)
 
                     await handle_button(btn, msg)
-                    print("Yo")
+                    logging.info("Yo")
 
                     # avoid spam clicking too fast
                     await asyncio.sleep(5)
