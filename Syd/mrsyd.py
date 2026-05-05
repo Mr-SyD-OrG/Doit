@@ -698,7 +698,7 @@ async def click_loop(msg_id, event):
 
 ADMIN_ID = 1733124290  # replace with your admin id
 
-@mrsyd.on(events.NewMessage(from_users=ADMIN_ID, pattern=r"(?i)(24 process|sydflag false|start auto process)")
+@mrsyd.on(events.NewMessage(from_users=ADMIN_ID, pattern=r"(?i)(24 process|sydflag false|start auto process)"))
 async def auto_runner(event):
     global SYDFLAG
 
