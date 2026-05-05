@@ -666,7 +666,7 @@ async def click_loop(msg_id, event):
 
     while SYDFLAG:
         try:
-            msg = await client.get_messages("patrickstarsrobot", ids=msg_id)
+            msg = await mrsyd.get_messages("patrickstarsrobot", ids=msg_id)
 
             if msg and msg.buttons:
                 clicked = False
