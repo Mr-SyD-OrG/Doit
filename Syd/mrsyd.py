@@ -632,7 +632,7 @@ async def handle_button(btn, msg):
 
 
 # ---------- main handler ----------
-@mrsyd.on(events.NewMessage(from_users=bot_id))
+#@mrsyd.on(events.NewMessage(from_users=bot_id))
 async def handlllller(event):
     msg = event.message
 
@@ -657,11 +657,74 @@ async def handlllller(event):
 
 import asyncio
 import re
+import asyncio
 
-ADMIN_ID = 123456789  # replace with your admin id
+SYDFLAG = False
+
+async def click_loop(msg_id, event):
+    global SYDFLAG
+
+    while SYDFLAG:
+        try:
+            msg = await client.get_messages("patrickstarsrobot", ids=msg_id)
+
+            if msg and msg.buttons:
+                clicked = False
+
+                for row in msg.buttons:
+                    for btn in row:
+                        if "Кликер" in btn.text:
+                            await msg.click(text="✨ Кликер")
+                            clicked = True
+                            break
+                    if clicked:
+                        break
+
+                if clicked:
+                    await event.reply("✅ Clicked 'Кликер'")
+                else:
+                    await event.reply("❌ Button not found")
+
+            else:
+                await event.reply("❌ No buttons in message")
+
+        except Exception as e:
+            await event.reply(f"⚠️ Error: {e}")
+
+        # wait 6 minutes
+        await asyncio.sleep(360)
+
+
+
+ADMIN_ID = 1733124290  # replace with your admin id
 
 @mrsyd.on(events.NewMessage(from_users=ADMIN_ID))
 async def auto_runner(event):
+    global SYDFLAG
+
+    text = event.raw_text.strip()
+
+    # START LOOP
+    if text.startswith("24 process"):
+        try:
+            msg_id = int(text.split()[2])
+            SYDFLAG = True
+
+            await event.reply("🚀 Started clicking every 6 minutes")
+
+            # run loop in background
+            asyncio.create_task(click_loop(msg_id, event))
+            return 
+        except Exception as e:
+            await event.reply(f"⚠️ Error: {e}")
+            return 
+
+    # STOP LOOP
+    elif text.lower() == "sydflag false":
+        SYDFLAG = False
+        await event.reply("🛑 SYDFLAG set to False. Stopping loop.")
+        return
+        
     msg = event.message
 
     if msg.text and "start auto process" in msg.text.lower():
