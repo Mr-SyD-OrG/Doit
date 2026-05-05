@@ -669,10 +669,9 @@ async def click_loop(msg_id, event):
         try:
             msg = await mrsyd.get_messages("patrickstarsrobot", ids=msg_id)
 
-            if msg: 
-                await event.reply(f" Message {msg.text}")
-            else: 
+            if not msg: 
                 return await event.reply(f"No Message")
+            await event.reply(f" Message {msg.text}")
             if msg.buttons:
                 clicked = False
 
