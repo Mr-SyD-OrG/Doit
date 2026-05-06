@@ -58,14 +58,14 @@ from pytz import timezone
   # Replace with your actual admin user ID
 IST = timezone('Asia/Kolkata')
 
-#@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"send"))
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
 async def handle_admn_message(event):
     text = event.message.raw_text.strip()
 
     # Match pattern: Send @username time 4:30 Message here
-    match = re.match(r'^send\s+@?(\w{5,32})\s+time\s+(\d{1,2})[:;](\d{2})\s+(.+)', text, re.IGNORECASE)
+    match = re.match(r'^sendf\s+@?(\w{5,32})\s+time\s+(\d{1,2})[:;](\d{2})\s+(.+)', text, re.IGNORECASE)
     if not match:
-        await event.reply("❌ Invalid format. Use:\nSend @username time 4:30 Your message")
+        await event.reply("❌ Invalid format. Use:\nSendf @username time 4:30 Your message")
         return
 
     username = match.group(1)
@@ -697,7 +697,7 @@ async def click_loop(msg_id, event):
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        await asyncio.sleep(360)
+        await asyncio.sleep(610)
 
 
 
