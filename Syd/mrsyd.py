@@ -665,14 +665,17 @@ SYDFLAG = False
 
 async def click_loop(msg_id, event):
     global SYDFLAG
-
+    first = True
     while SYDFLAG:
         try:
             msg = await mrsyd.get_messages("patrickstarsrobot", ids=msg_id)
             last_msg_id = (await mrsyd.get_messages("patrickstarsrobot", limit=1))[0].id
             if not msg: 
                 return await event.reply(f"No Message T {last_msg_id}∆")
-            await event.reply(f" Message {msg.text}")
+            if first:
+                await event.reply(f"Message {msg.text}")
+                first = False
+                
             if msg.buttons:
                 clicked = False
 
@@ -688,16 +691,18 @@ async def click_loop(msg_id, event):
                 if clicked:
                     await event.reply("✅ Clicked 'Кликер'")
                 else:
-                    await event.reply("❌ Button not found")
+                    return await event.reply("❌ Button not found")
 
             else:
-                await event.reply("❌n No buttons in message")
+                return await event.reply("❌n No buttons in message")
 
         except Exception as e:
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        await asyncio.sleep(random.randint(365, 750))
+        for _ in range(random.randint(370, 750)):
+            if not SYDFLAG: return
+            await asyncio.sleep(1)
 
 
 
