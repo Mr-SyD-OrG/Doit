@@ -697,7 +697,7 @@ async def click_loop(msg_id, event):
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        await asyncio.sleep(610)
+        await asyncio.sleep(random.randint(365, 750))
 
 
 
@@ -800,3 +800,44 @@ async def auto_runner(event):
 
                 except Exception as e:
                     logging.error(f"Error processing {message_id}: {e}")
+
+
+import re
+@mrsyd.on(events.NewMessage(from_users=[7996790736], pattern=r"(?i)(🤖 ПРОВЕРКА НА|sydflag false|start auto)"))
+async def solve_robot_check(event):
+    message = event.message
+    try:
+        await asyncio.sleep(6)
+        if not message.text:
+            return False
+
+        text = message.text
+
+        # Find math expression like: 30 + 7
+        match = re.search(r'(\d+)\s*\+\s*(\d+)', text)
+
+        if not match:
+            return False
+
+        num1 = int(match.group(1))
+        num2 = int(match.group(2))
+
+        answer = str(num1 + num2)
+
+        # Search buttons
+        if not message.buttons:
+            return False
+
+        for row in message.buttons:
+            for btn in row:
+                if btn.text.strip() == answer:
+                    await btn.click()
+                    logging.info(f"Clicked answer button: {answer}")
+                    return True
+
+        logging.info("Answer button not found")
+        return False
+
+    except Exception as e:
+        logging.info(f"solve_robot_check error: {e}")
+        return False
