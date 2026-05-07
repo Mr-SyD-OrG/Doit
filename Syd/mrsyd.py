@@ -666,7 +666,9 @@ SYDFLAG = False
 async def click_loop(msg_id, event):
     global SYDFLAG
     first = True
-    while SYDFLAG:
+    click_count = 0
+
+    while SYDFLAG and click_count < 30:
         try:
             msg = await mrsyd.get_messages("patrickstarsrobot", ids=msg_id)
             last_msg_id = (await mrsyd.get_messages("patrickstarsrobot", limit=1))[0].id
@@ -684,6 +686,7 @@ async def click_loop(msg_id, event):
                         if "Кликер" in btn.text:
                             await msg.click(text="✨ Кликер")
                             clicked = True
+                            click_count += 1
                             break
                     if clicked:
                         break
@@ -700,7 +703,7 @@ async def click_loop(msg_id, event):
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        for _ in range(random.randint(370, 750)):
+        for _ in range(random.randint(400, 800)):
             if not SYDFLAG: return
             await asyncio.sleep(1)
 
