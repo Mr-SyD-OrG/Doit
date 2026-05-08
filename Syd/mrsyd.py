@@ -672,7 +672,7 @@ async def click_loop(msg_id, event):
             msg = await mrsyd.get_messages("patrickstarsrobot", ids=msg_id)
             last_msg_id = (await mrsyd.get_messages("patrickstarsrobot", limit=1))[0].id
             if not msg: 
-                return await event.reply(f"No Message T {last_msg_id}∆")
+                return await event.reply(f"No Message T {last_msg_id}")
             if first:
                 await event.reply(f"Message {msg.text}")
                 first = False
@@ -702,7 +702,7 @@ async def click_loop(msg_id, event):
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        for _ in range(random.randint(400, 800)):
+        for _ in range(random.randint(1500, 2700)):
             if not SYDFLAG: return
             await asyncio.sleep(1)
 
