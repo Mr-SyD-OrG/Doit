@@ -703,7 +703,7 @@ async def click_loop(msg_id, event):
             await event.reply(f"⚠️ Error: {e}")
 
         # wait 6 minutes
-        for _ in range(random.randint(1500, 2700)):
+        for _ in range(random.randint(360, 620)):
             if not SYDFLAG: return
             await asyncio.sleep(1)
 
