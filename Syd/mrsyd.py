@@ -591,7 +591,6 @@ from telethon.tl.types import KeyboardButtonWebView, KeyboardButtonUrl
 from playwright.async_api import async_playwright
 import asyncio
 
-bot_id = 7974361539
 
 import asyncio
 import random
@@ -602,12 +601,11 @@ from playwright.async_api import async_playwright
 
 PHOTO_MSG_IDS = set()
 SUBSCRIBE_MSG_IDS = set()
-
+GENERAL = False
 TURN = False
-
+ADMIN_ID = 123456789
 bot_id = 123456789  # replace
-
-
+ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
 # =========================
@@ -650,10 +648,18 @@ async def handle_button(btn, msg):
         traceback.print_exc()
 
 
+
+
 @mrsyd.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
-    global PHOTO_MSG_IDS, SUBSCRIBE_MSG_IDS, TURN
+
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+    global TURN
+    global GENERAL
+
     msg = event.message
+
     if TURN is True:
 
         # save photo message ids
@@ -675,12 +681,52 @@ async def save_ids(event):
 
             logging.info(f"Saved subscribe msg id: {msg.id}")
 
+    elif msg.raw_text and msg.buttons:
 
+        text = msg.raw_text.strip()
+
+        if text.startswith(
+            "💡 Получай Звёзды за простые задания! 👇\n\n🟢 Подпишись на канал и нажми «Подтвердить»"
+        ):
+
+            # =========================
+            # GENERAL TRUE
+            # =========================
+
+            if GENERAL is True:
+
+                logging.info("Detected subscribe task message")
+
+                for row in msg.buttons:
+                    for btn in row:
+
+                        if btn.text and "Пропустить" in btn.text:
+
+                            logging.info(
+                                f"Clicking skip button: {btn.text}"
+                            )
+
+                            await handle_button(btn, msg)
+
+                            await asyncio.sleep(3)
+
+                            return
+
+            # =========================
+            # GENERAL FALSE
+            # =========================
+
+            else:
+
+                await mrsyd.send_message(
+                    ADMIN_ID,
+                    f"Message ID: {msg.id}\n\n{text}"
+                )
 # =========================
 # MAIN COMMAND
 # =========================
 
-@mrsyd.on(events.NewMessage(pattern="catch it"))
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN
     global PHOTO_MSG_IDS
@@ -838,6 +884,143 @@ async def handlllller(event):
                     await asyncio.sleep(5)
 
 
+
+
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^press\s+\d+-\d+$"))
+async def press_button(event):
+    try:
+
+        text = event.raw_text.strip()
+
+        # extract row-column
+        match = re.search(r"press\s+(\d+)-(\d+)", text)
+
+        if not match:
+            await event.reply("Invalid format")
+            return
+
+        row = int(match.group(1)) - 1
+        column = int(match.group(2)) - 1
+
+        # get latest bot message
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=1
+        )
+
+        if not msgs:
+            await event.reply("No messages found")
+            return
+
+        msg = msgs[0]
+
+        if not msg.buttons:
+            await event.reply("Last message has no buttons")
+            return
+
+        # validate row
+        if row >= len(msg.buttons):
+            await event.reply("Invalid row")
+            return
+
+        # validate column
+        if column >= len(msg.buttons[row]):
+            await event.reply("Invalid column")
+            return
+
+        btn = msg.buttons[row][column]
+
+        await msg.click(row, column)
+
+        await event.reply(
+            f"Pressed button [{row+1}-{column+1}] : {btn.text}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
+
+
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
+async def last_message(event):
+
+    
+
+    try:
+
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=1
+        )
+
+        if not msgs:
+            await event.reply("No messages found")
+            return
+
+        msg = msgs[0]
+
+        text = msg.raw_text if msg.raw_text else "No text"
+
+        await event.reply(
+            f"Last Message\n\n"
+            f"ID: `{msg.id}`\n\n"
+            f"Text:\n{text}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
+
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
+async def balance_cmd(event):
+
+   
+
+    try:
+
+        # send command to bot
+        await mrsyd.send_message(
+            bot_id,
+            "🎁 Вывести Подарки"
+        )
+
+        # wait for bot response
+        await asyncio.sleep(10)
+
+        # get latest message from bot
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=1
+        )
+
+        if not msgs:
+            await event.reply("No response received")
+            return
+
+        last_msg = msgs[0]
+
+        text = last_msg.raw_text if last_msg.raw_text else "Empty message"
+
+        # send message id + text
+        await mrsyd.send_message(
+            event.chat_id,
+            f"Message ID: `{last_msg.id}`\n\n{text}"
+        )
+
+    except Exception as e:
+
+        logging.info(e)
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
 
 import asyncio
 import re
