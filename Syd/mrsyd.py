@@ -622,19 +622,144 @@ async def had_on_tigger(event):
     GENERAL = True
     await event.reply("GENERAL Set To True .")
 
+import random
+import asyncio
+from playwright.async_api import async_playwright
+
+playwright_instance = None
+browser = None
+context = None
+page = None
+
+
+# =========================================
+# START BROWSER ONCE
+# =========================================
+
+async def start_browser():
+
+    global playwright_instance
+    global browser
+    global context
+    global page
+
+    playwright_instance = await async_playwright().start()
+
+    browser = await playwright_instance.chromium.launch(
+        headless=True,  # False looks more human but slower
+        args=[
+            "--no-sandbox",
+            "--disable-dev-shm-usage"
+        ]
+    )
+
+    # create persistent-like context
+    context = await browser.new_context(
+        viewport={
+            "width": random.randint(1280, 1920),
+            "height": random.randint(720, 1080)
+        },
+        locale="en-US",
+        user_agent=random.choice([
+            # Chrome Windows
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+
+            # Chrome Android
+            "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+        ])
+    )
+
+    page = await context.new_page()
+
+    logging.info("Persistent browser started")
+
+
+# =========================================
+# HUMAN-LIKE OPEN
+# =========================================
+
 async def open_real(url):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])  # set True if needed
-        page = await browser.new_page()
 
-        logging.info("Opening in browser:", url)
+    global page
 
-        await page.goto(url, wait_until="domcontentloaded")
+    try:
 
-        # simulate real user presence
-        await page.wait_for_timeout(5000)
+        logging.info(f"Opening: {url}")
 
-        await browser.close()
+        # random pre-delay
+        await asyncio.sleep(
+            random.uniform(1.5, 4.2)
+        )
+
+        # open page
+        await page.goto(
+            url,
+            wait_until="domcontentloaded",
+            timeout=45000
+        )
+
+        # random reading time
+        await asyncio.sleep(
+            random.uniform(2.5, 7)
+        )
+
+        # slight random scroll
+        try:
+
+            scroll_amount = random.randint(200, 1200)
+
+            await page.mouse.wheel(0, scroll_amount)
+
+            await asyncio.sleep(
+                random.uniform(1, 3)
+            )
+
+        except:
+            pass
+
+        # occasional mouse move
+        try:
+
+            await page.mouse.move(
+                random.randint(100, 800),
+                random.randint(100, 600),
+                steps=random.randint(10, 30)
+            )
+
+        except:
+            pass
+
+        logging.info("Opened successfully")
+
+    except Exception as e:
+
+        logging.info(f"open_real error: {e}")
+
+
+# =========================================
+# OPTIONAL:
+# REFRESH CONTEXT EVERY 50 TASKS
+# =========================================
+
+TASK_COUNT = 0
+
+async def refresh_context_if_needed():
+
+    global TASK_COUNT
+    global context
+    global page
+
+    TASK_COUNT += 1
+
+    if TASK_COUNT % 50 == 0:
+
+        logging.info("Refreshing browser context")
+
+        await context.close()
+
+        context = await browser.new_context()
+
+        page = await context.new_page()
 
 
 # ---------- extract + open ----------
