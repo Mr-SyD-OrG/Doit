@@ -593,9 +593,25 @@ import asyncio
 
 bot_id = 7974361539
 
+import asyncio
+import random
+import logging
+from telethon import events
+from telethon.tl.types import KeyboardButtonUrl
+from playwright.async_api import async_playwright
+
+PHOTO_MSG_IDS = set()
+SUBSCRIBE_MSG_IDS = set()
+
+TURN = False
+
+bot_id = 123456789  # replace
 
 
-# ---------- open in real browser ----------
+# =========================
+# OPEN URL
+# =========================
+
 async def open_real(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])  # set True if needed
@@ -615,7 +631,7 @@ async def open_real(url):
 async def handle_button(btn, msg):
     try:
         logging.info("1")
-        bot_entity = await mrsyd.get_entity(7974361539)
+        bot_entity = await mrsyd.get_entity(bot_id)
         logging.info("2")
         await open_real(btn.url)
         logging.info("2.5")
@@ -632,6 +648,171 @@ async def handle_button(btn, msg):
         logging.info(e)
         import traceback
         traceback.print_exc()
+
+
+@mrsyd.on(events.NewMessage(from_users=bot_id))
+async def save_ids(event):
+    global PHOTO_MSG_IDS, SUBSCRIBE_MSG_IDS, TURN
+    msg = event.message
+    if TURN is True:
+
+        # save photo message ids
+        if msg.photo:
+
+            PHOTO_MSG_IDS.add(msg.id)
+
+            logging.info(f"Saved photo msg id: {msg.id}")
+
+        # save subscribe ids
+        if (
+            msg.raw_text and
+            msg.raw_text.startswith(
+                "💡 Получай Звёзды за простые задания! 👇\n\n1. Нажми «Подписаться», дождись"
+            )
+        ):
+
+            SUBSCRIBE_MSG_IDS.add(msg.id)
+
+            logging.info(f"Saved subscribe msg id: {msg.id}")
+
+
+# =========================
+# MAIN COMMAND
+# =========================
+
+@mrsyd.on(events.NewMessage(pattern="catch it"))
+async def catch_it(event):
+    global TURN
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+
+    TURN = True
+
+    PHOTO_MSG_IDS.clear()
+    SUBSCRIBE_MSG_IDS.clear()
+
+    await event.reply("Started collecting tasks")
+
+    # =========================================
+    # SEND "💎 Задания" FOR 55 MINUTES
+    # =========================================
+
+    start_time = asyncio.get_event_loop().time()
+
+    while (asyncio.get_event_loop().time() - start_time) < (55 * 60):
+
+        try:
+
+            await mrsyd.send_message(bot_id, "💎 Задания")
+            wait_time = random.randint(6, 10)
+            logging.info(f"Sleeping for {wait_time} seconds")
+            await asyncio.sleep(wait_time)
+        except Exception as e:
+            logging.info(e)
+            import traceback
+            traceback.print_exc()
+    TURN = False
+    logging.info("Finished collecting IDs")
+
+    # =========================================
+    # MERGE + SORT IDS
+    # =========================================
+
+    all_ids = sorted(
+        PHOTO_MSG_IDS.union(SUBSCRIBE_MSG_IDS)
+    )
+
+    logging.info(f"Total IDs found: {len(all_ids)}")
+
+    # =========================================
+    # PROCESS ALL IDS
+    # =========================================
+
+    for msg_id in all_ids:
+
+        try:
+
+            msg = await mrsyd.get_messages(bot_id, ids=msg_id)
+
+            if not msg:
+                continue
+
+            logging.info(f"Processing msg id: {msg_id}")
+
+            # =================================
+            # PHOTO MESSAGE
+            # =================================
+
+            if msg_id in PHOTO_MSG_IDS:
+
+                if msg.buttons:
+
+                    all_buttons = []
+
+                    for row in msg.buttons:
+                        for btn in row:
+                            all_buttons.append(btn)
+
+                    # first button
+                    if len(all_buttons) >= 1:
+
+                        btn1 = all_buttons[0]
+
+                        logging.info(
+                            f"Clicking first button: {btn1.text}"
+                        )
+
+                        await handle_button(btn1, msg)
+
+                        await asyncio.sleep(5)
+
+                    # second button
+                    if len(all_buttons) >= 2:
+
+                        btn2 = all_buttons[1]
+
+                        logging.info(
+                            f"Clicking second button: {btn2.text}"
+                        )
+
+                        await handle_button(btn2, msg)
+
+                        await asyncio.sleep(5)
+
+            # =================================
+            # SUBSCRIBE MESSAGE
+            # =================================
+
+            elif msg_id in SUBSCRIBE_MSG_IDS:
+
+                if msg.buttons:
+
+                    done = False
+
+                    for row in msg.buttons:
+                        for btn in row:
+                            if (
+                                btn.text and
+                                "Подтвердить" in btn.text
+                            ):
+                                logging.info(
+                                    f"Clicking confirm button: {btn.text}"
+                                )
+                                await handle_button(btn, msg)
+                                await asyncio.sleep(5)
+                                done = True
+                                break
+                        if done:
+                            break
+        except Exception as e:
+            logging.info(e)
+            import traceback
+            traceback.print_exc()
+    await event.reply("Finished all tasks")
+
+
+# ---------- open in real browser ----------
+
 
 
 # ---------- main handler ----------
