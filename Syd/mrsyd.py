@@ -610,6 +610,18 @@ ADMINS = [ADMIN_ID]
 # OPEN URL
 # =========================
 
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
+async def hand_offf_trigger(event):
+    global GENERAL
+    GENERAL = False
+    await event.reply("GENERAL Set To False .")
+    
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
+async def had_on_tigger(event):
+    global GENERAL
+    GENERAL = True
+    await event.reply("GENERAL Set To True .")
+
 async def open_real(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])  # set True if needed
@@ -668,7 +680,7 @@ async def save_ids(event):
             PHOTO_MSG_IDS.add(msg.id)
 
             logging.info(f"Saved photo msg id: {msg.id}")
-
+            return 
         # save subscribe ids
         if (
             msg.raw_text and
@@ -680,7 +692,7 @@ async def save_ids(event):
             SUBSCRIBE_MSG_IDS.add(msg.id)
 
             logging.info(f"Saved subscribe msg id: {msg.id}")
-
+            return
     elif msg.raw_text and msg.buttons:
 
         text = msg.raw_text.strip()
@@ -693,7 +705,7 @@ async def save_ids(event):
             # GENERAL TRUE
             # =========================
 
-            if GENERAL is True:
+            if GENERAL or TURN:
 
                 logging.info("Detected subscribe task message")
 
