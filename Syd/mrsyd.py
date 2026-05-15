@@ -794,7 +794,9 @@ async def last_message(event):
         
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
 async def balance_cmd(event):
+
     try:
+
         await mrsyd.send_message(
             bot_id,
             "🎁 Вывести Подарки"
@@ -815,12 +817,49 @@ async def balance_cmd(event):
 
         last_msg = msgs[0]
 
-        text = last_msg.raw_text if last_msg.raw_text else "Empty message"
+        text = (
+            last_msg.raw_text
+            if last_msg.raw_text
+            else "Empty message"
+        )
 
-        # send message id + text
+        # =====================================
+        # BUTTON INFO
+        # =====================================
+
+        buttons_text = ""
+
+        if last_msg.buttons:
+
+            for row_index, row in enumerate(
+                last_msg.buttons,
+                start=1
+            ):
+
+                for col_index, btn in enumerate(
+                    row,
+                    start=1
+                ):
+
+                    buttons_text += (
+                        f"\n[{row_index}, {col_index}] "
+                        f"{btn.text}"
+                    )
+
+        else:
+
+            buttons_text = "\nNo buttons"
+
+        # =====================================
+        # SEND RESULT
+        # =====================================
+
         await mrsyd.send_message(
             event.chat_id,
-            f"Message ID: `{last_msg.id}`\n\n{text}"
+            f"Message ID: `{last_msg.id}`\n\n"
+            f"Text:\n{text}\n\n"
+            f"Buttons:"
+            f"{buttons_text}"
         )
 
     except Exception as e:
@@ -833,6 +872,120 @@ async def balance_cmd(event):
         await event.reply(f"Error: {e}")
 
 
+
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^task$"))
+async def task_cmd(event):
+
+    try:
+
+        # =====================================
+        # SEND TASK COMMAND
+        # =====================================
+
+        await mrsyd.send_message(
+            bot_id,
+            "💎 Задания"
+        )
+
+        # wait for bot reply
+        await asyncio.sleep(10)
+
+        # =====================================
+        # GET LAST MESSAGE
+        # =====================================
+
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=1
+        )
+
+        if not msgs:
+
+            await event.reply(
+                "No response received"
+            )
+
+            return
+
+        msg = msgs[0]
+
+        # =====================================
+        # FORWARD IMAGE/MEDIA DIRECTLY
+        # =====================================
+
+        if msg.media:
+
+            await mrsyd.forward_messages(
+                event.chat_id,
+                msg
+            )
+
+        # =====================================
+        # TEXT
+        # =====================================
+
+        text = (
+            msg.raw_text
+            if msg.raw_text
+            else "No text"
+        )
+
+        # =====================================
+        # BUTTON INFO
+        # =====================================
+
+        buttons_info = ""
+
+        if msg.buttons:
+
+            for row_index, row in enumerate(
+                msg.buttons,
+                start=1
+            ):
+
+                for col_index, btn in enumerate(
+                    row,
+                    start=1
+                ):
+
+                    # URL button
+                    if isinstance(btn, KeyboardButtonUrl):
+
+                        buttons_info += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text} : {btn.url}"
+                        )
+
+                    # normal button
+                    else:
+
+                        buttons_info += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text}"
+                        )
+
+        else:
+
+            buttons_info = "\nNo buttons"
+
+        await mrsyd.send_message(
+            event.chat_id,
+            f"Message ID: `{msg.id}`\n\n"
+            f"Text:\n{text}\n\n"
+            f"Buttons:"
+            f"{buttons_info}"
+        )
+
+    except Exception as e:
+
+        logging.info(e)
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(
+            f"Error: {e}"
+      )
 
 from telethon.tl.functions.messages import ImportChatInviteRequest
 from telethon.tl.functions.channels import JoinChannelRequest
