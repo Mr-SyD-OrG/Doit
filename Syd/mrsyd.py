@@ -622,14 +622,20 @@ async def had_on_tigger(event):
     GENERAL = True
     await event.reply("GENERAL Set To True .")
 
+
+
+
 import random
 import asyncio
+import logging
 from playwright.async_api import async_playwright
 
 playwright_instance = None
 browser = None
 context = None
 page = None
+
+TASK_COUNT = 0
 
 
 # =========================================
@@ -646,14 +652,14 @@ async def start_browser():
     playwright_instance = await async_playwright().start()
 
     browser = await playwright_instance.chromium.launch(
-        headless=True,  # False looks more human but slower
+        headless=True,
         args=[
             "--no-sandbox",
             "--disable-dev-shm-usage"
         ]
     )
 
-    # create persistent-like context
+    # persistent-like context
     context = await browser.new_context(
         viewport={
             "width": random.randint(1280, 1920),
@@ -661,63 +667,64 @@ async def start_browser():
         },
         locale="en-US",
         user_agent=random.choice([
-            # Chrome Windows
+
+            # Windows Chrome
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
 
-            # Chrome Android
+            # Android Chrome
             "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
         ])
     )
 
+    # SINGLE PAGE
     page = await context.new_page()
 
     logging.info("Persistent browser started")
 
 
 # =========================================
-# HUMAN-LIKE OPEN
+# OPEN URL USING SAME PAGE
 # =========================================
 
 async def open_real(url):
 
     global page
+    global TASK_COUNT
 
     try:
 
+        TASK_COUNT += 1
+
         logging.info(f"Opening: {url}")
 
-        # random pre-delay
+        # random pre delay
         await asyncio.sleep(
             random.uniform(1.5, 4.2)
         )
 
-        # open page
+        # reuse SAME page
         await page.goto(
             url,
             wait_until="domcontentloaded",
-            timeout=45000
+            timeout=20000
         )
 
-        # random reading time
+        # human reading time
         await asyncio.sleep(
             random.uniform(2.5, 7)
         )
 
-        # slight random scroll
+        # random scroll
         try:
-
-            scroll_amount = random.randint(200, 1200)
-
-            await page.mouse.wheel(0, scroll_amount)
-
-            await asyncio.sleep(
-                random.uniform(1, 3)
-            )
+            if random.random() < 0.7:
+                scroll_amount = random.randint(200, 1200)
+                await page.mouse.wheel(0, scroll_amount)
+                await asyncio.sleep(random.uniform(1, 3))
 
         except:
             pass
 
-        # occasional mouse move
+        # random mouse move
         try:
 
             await page.mouse.move(
@@ -731,60 +738,50 @@ async def open_real(url):
 
         logging.info("Opened successfully")
 
+        # =====================================
+        # REFRESH CONTEXT EVERY 50 TASKS
+        # =====================================
+
+        if TASK_COUNT % 50 == 0:
+
+            logging.info("Refreshing context")
+
+            try:
+
+                # CLOSE OLD PAGE
+                await page.close()
+
+            except:
+                pass
+
+            try:
+
+                await context.close()
+
+            except:
+                pass
+
+            # CREATE NEW CONTEXT
+            context_new = await browser.new_context(
+                viewport={
+                    "width": random.randint(1280, 1920),
+                    "height": random.randint(720, 1080)
+                },
+                locale="en-US"
+            )
+
+            globals()["context"] = context_new
+
+            # CREATE NEW SINGLE PAGE
+            page_new = await context.new_page()
+
+            globals()["page"] = page_new
+
+            logging.info("Context refreshed")
+
     except Exception as e:
 
         logging.info(f"open_real error: {e}")
-
-
-# =========================================
-# OPTIONAL:
-# REFRESH CONTEXT EVERY 50 TASKS
-# =========================================
-
-TASK_COUNT = 0
-
-async def refresh_context_if_needed():
-
-    global TASK_COUNT
-    global context
-    global page
-
-    TASK_COUNT += 1
-
-    if TASK_COUNT % 50 == 0:
-
-        logging.info("Refreshing browser context")
-
-        await context.close()
-
-        context = await browser.new_context()
-
-        page = await context.new_page()
-
-
-# ---------- extract + open ----------
-async def handle_button(btn, msg):
-    try:
-        logging.info("1")
-        bot_entity = await mrsyd.get_entity(bot_id)
-        logging.info("2")
-        await open_real(btn.url)
-        logging.info("2.5")
-        if isinstance(btn, KeyboardButtonUrl):
-            print("3")
-            url = btn.url
-            logging.info("URL found:", url)
-            await open_real(url)
-        else:
-            logging.info("4")
-            await msg.click(text=btn.text)
-
-    except Exception as e:
-        logging.info(e)
-        import traceback
-        traceback.print_exc()
-
-
 
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
