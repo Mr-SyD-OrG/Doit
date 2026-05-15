@@ -603,8 +603,8 @@ PHOTO_MSG_IDS = set()
 SUBSCRIBE_MSG_IDS = set()
 GENERAL = False
 TURN = False
-ADMIN_ID = 123456789
-bot_id = 123456789  # replace
+ADMIN_ID = 1733124290
+bot_id = 8006795826  # replace
 ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
@@ -956,47 +956,48 @@ async def press_button(event):
         await event.reply(f"Error: {e}")
 
 
+
+from telethon.tl.types import KeyboardButtonUrl
+
+
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
 async def last_message(event):
-
-    
-
     try:
-
         msgs = await mrsyd.get_messages(
             bot_id,
             limit=1
         )
-
         if not msgs:
             await event.reply("No messages found")
             return
-
         msg = msgs[0]
-
         text = msg.raw_text if msg.raw_text else "No text"
+        button_text = ""
+
+        if msg.buttons:
+            for row_index, row in enumerate(msg.buttons, start=1):
+                for col_index, btn in enumerate(row, start=1):
+                    if isinstance(btn, KeyboardButtonUrl):
+                        button_text += (
+                            f"\n{btn.text} : {btn.url} "
+                            f"({row_index}, {col_index})"
+                        )
 
         await event.reply(
             f"Last Message\n\n"
             f"ID: `{msg.id}`\n\n"
-            f"Text:\n{text}"
+            f"Text:\n{text}\n\n"
+            f"URL Buttons:"
+            f"{button_text if button_text else ' None'}"
         )
-
     except Exception as e:
-
         import traceback
         traceback.print_exc()
-
         await event.reply(f"Error: {e}")
-
+        
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
 async def balance_cmd(event):
-
-   
-
     try:
-
-        # send command to bot
         await mrsyd.send_message(
             bot_id,
             "🎁 Вывести Подарки"
@@ -1033,6 +1034,232 @@ async def balance_cmd(event):
         traceback.print_exc()
 
         await event.reply(f"Error: {e}")
+
+
+
+from telethon.tl.functions.messages import ImportChatInviteRequest
+from telethon.tl.functions.channels import JoinChannelRequest
+from telethon.tl.functions.messages import StartBotRequest
+from telethon.errors import (
+    UserAlreadyParticipantError,
+    InviteHashExpiredError,
+    InviteHashInvalidError
+)
+
+
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^open\s+(.+)"
+))
+async def open_link(event):
+
+    try:
+
+        text = event.raw_text.strip()
+
+        match = re.match(r"^open\s+(.+)", text)
+
+        if not match:
+            return
+
+        link = match.group(1).strip()
+
+        await event.reply(f"Processing:\n{link}")
+
+        # =========================================
+        # CLEAN LINK
+        # =========================================
+
+        link = link.replace("https://", "")
+        link = link.replace("http://", "")
+
+        # =========================================
+        # INVITE LINK
+        # =========================================
+
+        # t.me/+xxxx
+        # telegram.me/+xxxx
+        # t.me/joinchat/xxxx
+
+        if (
+            "t.me/+" in link or
+            "telegram.me/+" in link or
+            "joinchat/" in link
+        ):
+
+            invite_hash = None
+
+            if "joinchat/" in link:
+                invite_hash = link.split("joinchat/")[1]
+
+            elif "+" in link:
+                invite_hash = link.split("+")[1]
+
+            try:
+
+                result = await mrsyd(
+                    ImportChatInviteRequest(invite_hash)
+                )
+
+                await event.reply(
+                    f"Joined invite successfully"
+                )
+
+            except UserAlreadyParticipantError:
+
+                await event.reply(
+                    "Already joined"
+                )
+
+            except (
+                InviteHashExpiredError,
+                InviteHashInvalidError
+            ):
+
+                await event.reply(
+                    "Invalid or expired invite"
+                )
+
+            except Exception as e:
+
+                await event.reply(
+                    f"Invite error:\n{e}"
+                )
+
+            return
+
+        # =========================================
+        # NORMAL USERNAME LINKS
+        # =========================================
+
+        # t.me/username
+        # t.me/bot?start=abc
+        # t.me/bot/app
+        # t.me/channel
+
+        if "t.me/" in link:
+
+            path = link.split("t.me/")[1]
+
+            # remove trailing /
+            path = path.strip("/")
+
+            # =====================================
+            # BOT START LINK
+            # =====================================
+
+            # example:
+            # t.me/TestBot?start=abc123
+
+            if "?start=" in path:
+
+                bot_username = path.split("?start=")[0]
+
+                start_param = path.split("?start=")[1]
+
+                entity = await mrsyd.get_entity(
+                    bot_username
+                )
+
+                await mrsyd.send_message(
+                    bot_username,
+                    f"/start {start_param}"
+                )
+
+                await event.reply(
+                    f"Started bot:\n"
+                    f"@{bot_username}\n\n"
+                    f"Parameter:\n{start_param}"
+                )
+
+                return
+
+            # =====================================
+            # WEBAPP LINKS
+            # =====================================
+
+            # t.me/bot/app
+            # t.me/bot/app?startapp=xxx
+
+            elif "/" in path:
+
+                parts = path.split("/")
+
+                username = parts[0]
+
+                await event.reply(
+                    f"Detected possible webapp:\n"
+                    f"@{username}"
+                )
+
+                try:
+
+                    await mrsyd.send_message(
+                        username,
+                        "/start"
+                    )
+
+                except:
+                    pass
+
+                return
+
+            # =====================================
+            # NORMAL CHANNEL/GROUP/BOT
+            # =====================================
+
+            else:
+
+                username = path
+
+                try:
+
+                    await mrsyd(
+                        JoinChannelRequest(username)
+                    )
+
+                    await event.reply(
+                        f"Joined:\n@{username}"
+                    )
+
+                except UserAlreadyParticipantError:
+
+                    await event.reply(
+                        f"Already joined:\n@{username}"
+                    )
+
+                except Exception:
+
+                    # maybe bot/private user
+
+                    try:
+
+                        await mrsyd.send_message(
+                            username,
+                            "/start"
+                        )
+
+                        await event.reply(
+                            f"Started bot/user:\n@{username}"
+                        )
+
+                    except Exception as e:
+
+                        await event.reply(
+                            f"Failed:\n{e}"
+                        )
+
+                return
+
+        await event.reply("Unsupported link")
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error:\n{e}")
 
 import asyncio
 import re
