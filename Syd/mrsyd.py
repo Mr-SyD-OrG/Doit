@@ -752,6 +752,102 @@ async def press_button(event):
 
         await event.reply(f"Error: {e}")
 
+import re
+from telethon import events
+
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^getpress\s+\d+\s+\d+-\d+$"
+))
+async def getpress_button(event):
+
+    try:
+
+        text = event.raw_text.strip()
+
+        # =====================================
+        # EXTRACT MESSAGE ID + ROW/COLUMN
+        # =====================================
+
+        match = re.search(
+            r"^getpress\s+(\d+)\s+(\d+)-(\d+)$",
+            text
+        )
+
+        if not match:
+
+            await event.reply("Invalid format")
+
+            return
+
+        message_id = int(match.group(1))
+
+        row = int(match.group(2)) - 1
+        column = int(match.group(3)) - 1
+
+        # =====================================
+        # GET MESSAGE
+        # =====================================
+
+        msg = await mrsyd.get_messages(
+            bot_id,
+            ids=message_id
+        )
+
+        if not msg:
+
+            await event.reply("Message not found")
+
+            return
+
+        # =====================================
+        # CHECK BUTTONS
+        # =====================================
+
+        if not msg.buttons:
+
+            await event.reply(
+                "Message has no buttons"
+            )
+
+            return
+
+        # validate row
+        if row >= len(msg.buttons):
+
+            await event.reply("Invalid row")
+
+            return
+
+        # validate column
+        if column >= len(msg.buttons[row]):
+
+            await event.reply("Invalid column")
+
+            return
+
+        # =====================================
+        # PRESS BUTTON
+        # =====================================
+
+        btn = msg.buttons[row][column]
+
+        await msg.click(row, column)
+
+        await event.reply(
+            f"Pressed button\n\n"
+            f"Message ID: `{message_id}`\n"
+            f"Position: [{row+1}-{column+1}]\n"
+            f"Text: {btn.text}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
 
 
 from telethon.tl.types import KeyboardButtonUrl
