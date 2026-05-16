@@ -1291,9 +1291,7 @@ async def status_cmd(event):
         )
 
         if not msgs:
-
             await event.reply("No messages found")
-
             return
 
         result = "Last 8 Messages\n\n"
