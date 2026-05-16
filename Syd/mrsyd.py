@@ -957,6 +957,7 @@ async def get_message(event):
         # =====================================
         # GET MESSAGE
         # =====================================
+        entity = await mrsyd.get_entity(bot_id)
 
         msg = await mrsyd.get_messages(
             bot_id,
