@@ -540,8 +540,8 @@ async def catch_it(event):
 
     TURN = True
 
-    PHOTO_MSG_IDS.clear()
-    SUBSCRIBE_MSG_IDS.clear()
+    #PHOTO_MSG_IDS.clear()
+   # SUBSCRIBE_MSG_IDS.clear()
 
     await event.reply("Started collecting tasks")
 
