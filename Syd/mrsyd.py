@@ -55,10 +55,6 @@ async def handle_admn_message(event):
         await event.reply(f"❌ Failed to send message to @{username}\nError: {e}")
 
 
-
-    
-    
-
     
 
             
