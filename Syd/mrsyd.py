@@ -278,6 +278,7 @@ PHOTO_MSG_IDS = set()
 SUBSCRIBE_MSG_IDS = set()
 GENERAL = False
 TURN = False
+STOPP = True
 ADMIN_ID = 1733124290
 bot_id = 8006795826  # replace
 ADMINS = [ADMIN_ID]
@@ -296,6 +297,12 @@ async def had_on_tigger(event):
     global GENERAL
     GENERAL = True
     await event.reply("GENERAL Set To True .")
+
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"break"))
+async def had_on_tigger(event):
+    global STOPP
+    STOPP = False
+    await event.reply("STOPPinggggg")
 
 
 
@@ -489,7 +496,7 @@ async def save_ids(event):
             SUBSCRIBE_MSG_IDS.add(msg.id)
 
             logging.info(f"Saved subscribe msg id: {msg.id}")
-            return
+            return 
     elif msg.raw_text and msg.buttons:
 
         text = msg.raw_text.strip()
@@ -537,7 +544,7 @@ async def save_ids(event):
 
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
-    global TURN
+    global TURN, STOPP
     global PHOTO_MSG_IDS
     global SUBSCRIBE_MSG_IDS
 
@@ -554,7 +561,7 @@ async def catch_it(event):
 
     start_time = asyncio.get_event_loop().time()
 
-    while (asyncio.get_event_loop().time() - start_time) < (40 * 60):
+    while ((asyncio.get_event_loop().time() - start_time) < (40 * 60) and STOPP is True):
 
         try:
 
@@ -566,7 +573,9 @@ async def catch_it(event):
             logging.info(e)
             import traceback
             traceback.print_exc()
+    await asyncio.sleep(3)
     TURN = False
+    STOPP = True
     logging.info("Finished collecting IDs")
 
     # =========================================
@@ -668,7 +677,56 @@ async def catch_it(event):
 
 # ---------- open in real browser ----------
 
+# =====================================
+# CLEAR IDS
+# =====================================
 
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^clear$"
+))
+async def clear_ids(event):
+
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+
+    photo_count = len(PHOTO_MSG_IDS)
+    subscribe_count = len(SUBSCRIBE_MSG_IDS)
+
+    PHOTO_MSG_IDS.clear()
+    SUBSCRIBE_MSG_IDS.clear()
+
+    await event.reply(
+        f"Cleared IDs\n\n"
+        f"Photo IDs removed: {photo_count}\n"
+        f"Subscribe IDs removed: {subscribe_count}"
+    )
+
+
+# =====================================
+# SEE COUNTS
+# =====================================
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^seecount$"
+))
+async def see_count(event):
+
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+
+    photo_count = len(PHOTO_MSG_IDS)
+    subscribe_count = len(SUBSCRIBE_MSG_IDS)
+
+    total = photo_count + subscribe_count
+
+    await event.reply(
+        f"Stored ID Counts\n\n"
+        f"Photo IDs: {photo_count}\n"
+        f"Subscribe IDs: {subscribe_count}\n"
+        f"Total IDs: {total}"
+    )
 
 # ---------- main handler ----------
 #@mrsyd.on(events.NewMessage(from_users=bot_id))
