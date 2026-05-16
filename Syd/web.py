@@ -2,6 +2,9 @@ import asyncio
 import random
 import logging
 
+
+#logging.basicConfig(level=logging.INFO)
+
 from playwright.async_api import async_playwright
 
 
