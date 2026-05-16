@@ -1253,7 +1253,65 @@ async def balance_cmd(event):
 
         await event.reply(f"Error: {e}")
 
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^status$"
+))
+async def status_cmd(event):
 
+    try:
+
+        # =====================================
+        # GET LAST 8 MESSAGES
+        # =====================================
+
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=8
+        )
+
+        if not msgs:
+
+            await event.reply("No messages found")
+
+            return
+
+        result = "Last 8 Messages\n\n"
+
+        # oldest first
+        msgs = list(reversed(msgs))
+
+        for msg in msgs:
+
+            text = (
+                msg.raw_text
+                if msg.raw_text
+                else "No text"
+            )
+
+            # limit huge messages
+            if len(text) > 300:
+
+                text = text[:300] + "..."
+
+            result += (
+                f"ID: `{msg.id}`\n"
+                f"{text}\n\n"
+                f"====================\n\n"
+            )
+
+        # =====================================
+        # SEND RESULT
+        # =====================================
+
+        await event.reply(result)
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
 
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^task$"))
 async def task_cmd(event):
@@ -1330,8 +1388,8 @@ async def task_cmd(event):
                     start=1
                 ):
 
-                    # URL button
-                    if isinstance(btn, KeyboardButtonUrl):
+                    # detect url using btn.url
+                    if getattr(btn, "url", None):
 
                         buttons_info += (
                             f"\n[{row_index}, {col_index}] "
@@ -1350,6 +1408,10 @@ async def task_cmd(event):
 
             buttons_info = "\nNo buttons"
 
+        # =====================================
+        # SEND DETAILS
+        # =====================================
+
         await mrsyd.send_message(
             event.chat_id,
             f"Message ID: `{msg.id}`\n\n"
@@ -1367,7 +1429,7 @@ async def task_cmd(event):
 
         await event.reply(
             f"Error: {e}"
-      )
+        )
 
 from telethon.tl.functions.messages import ImportChatInviteRequest
 from telethon.tl.functions.channels import JoinChannelRequest
