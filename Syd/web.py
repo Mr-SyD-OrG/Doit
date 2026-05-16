@@ -171,8 +171,8 @@ async def open_real(url):
         # open page
         await page.goto(
             url,
-            wait_until="domcontentloaded",
-            timeout=20000
+            wait_until="commit",
+            timeout=10000
         )
 
         # reading time
