@@ -33,7 +33,7 @@ async def start_bot():
     load_plugins()
     appp = web.AppRunner(await web_server())
     await appp.setup()
-    bind_address = "bumpy-nicoline-forwad-09fa2203.koyeb.app"
+    bind_address = "0.0.0.0"
     await web.TCPSite(appp, bind_address, 8080).start()
    # await asyncio.Event().wait()
     await mrsyd.run_until_disconnected()
