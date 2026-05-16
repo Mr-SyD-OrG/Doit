@@ -498,14 +498,7 @@ async def save_ids(event):
 
         text = msg.raw_text.strip()
 
-        if text.startswith(
-            "💡 Получай Звёзды за простые задания! 👇\n\n🟢 Подпишись на канал и нажми «Подтвердить»"
-        ):
-
-            # =========================
-            # GENERAL TRUE
-            # =========================
-
+        if ("💡 Получай Звёзды за простые задания!" in text and "🟢 Подпишись на канал" in text):
             if GENERAL or TURN:
 
                 logging.info("Detected subscribe task message")
