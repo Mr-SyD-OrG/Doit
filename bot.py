@@ -27,14 +27,14 @@ def load_plugins():
 async def start_bot():
     await mrsyd.start()
   #  await app.start() # Userbot requires phone number login
-    print("Userbot is running...")
+    #print("Userbot is running...")
 
     # Load plugins manually from Syd/
     load_plugins()
     appp = web.AppRunner(await web_server())
     await appp.setup()
-    bind_address = "0.0.0.0"
+    bind_address = "bumpy-nicoline-forwad-09fa2203.koyeb.app"
     await web.TCPSite(appp, bind_address, 8080).start()
-    await asyncio.Event().wait()
-   # await mrsyd.run_until_disconnected()
+   # await asyncio.Event().wait()
+    await mrsyd.run_until_disconnected()
 
