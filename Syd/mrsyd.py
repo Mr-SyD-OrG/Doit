@@ -463,6 +463,26 @@ async def open_real(url):
 
         logging.info(f"open_real error: {e}")
 
+async def handle_button(btn, msg):
+    try:
+        logging.info("1")
+        bot_entity = await mrsyd.get_entity(bot_id)
+        logging.info("2")
+        await open_real(btn.url)
+        logging.info("2.5")
+      #  if isinstance(btn, KeyboardButtonUrl):
+         #   print("3")
+     #       url = btn.url
+      #      logging.info("URL found:", url)
+     #       await open_real(url)
+    #    else:
+           # logging.info("4")
+         #   await msg.click(text=btn.text)
+
+    except Exception as e:
+        logging.info(e)
+        import traceback
+        traceback.print_exc()
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
