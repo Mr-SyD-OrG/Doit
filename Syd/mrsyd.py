@@ -907,9 +907,88 @@ async def getpress_button(event):
 
 from telethon.tl.types import KeyboardButtonUrl
 
-
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
 async def last_message(event):
+
+    try:
+
+        msgs = await mrsyd.get_messages(
+            bot_id,
+            limit=1
+        )
+
+        if not msgs:
+
+            await event.reply("No messages found")
+
+            return
+
+        msg = msgs[0]
+
+        text = (
+            msg.raw_text
+            if msg.raw_text
+            else "No text"
+        )
+
+        # =====================================
+        # BUTTON INFO
+        # =====================================
+
+        button_text = ""
+
+        if msg.buttons:
+
+            for row_index, row in enumerate(
+                msg.buttons,
+                start=1
+            ):
+
+                for col_index, btn in enumerate(
+                    row,
+                    start=1
+                ):
+
+                    # detect url using btn.url
+                    if getattr(btn, "url", None):
+
+                        button_text += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text} : {btn.url}"
+                        )
+
+                    else:
+
+                        button_text += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text}"
+                        )
+
+        else:
+
+            button_text = "\nNone"
+
+        # =====================================
+        # REPLY
+        # =====================================
+
+        await event.reply(
+            f"Last Message\n\n"
+            f"ID: `{msg.id}`\n\n"
+            f"Text:\n{text}\n\n"
+            f"Buttons:"
+            f"{button_text}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
+      
+#@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
+async def lsssast_message(event):
 
     try:
 
