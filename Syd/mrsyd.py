@@ -7,7 +7,6 @@ from telethon.tl.types import PeerChannel
 import logging
 
 
-
 logging.basicConfig(level=logging.INFO)
 
 
@@ -369,7 +368,6 @@ async def start_browser():
 # =========================================
 
 async def open_real(url):
-
     global page
     global TASK_COUNT
 
@@ -468,7 +466,6 @@ async def open_real(url):
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
-
     global PHOTO_MSG_IDS
     global SUBSCRIBE_MSG_IDS
     global TURN
