@@ -759,37 +759,195 @@ from telethon.tl.types import KeyboardButtonUrl
 
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
 async def last_message(event):
+
     try:
+
         msgs = await mrsyd.get_messages(
             bot_id,
             limit=1
         )
+
         if not msgs:
+
             await event.reply("No messages found")
+
             return
+
         msg = msgs[0]
-        text = msg.raw_text if msg.raw_text else "No text"
+
+        text = (
+            msg.raw_text
+            if msg.raw_text
+            else "No text"
+        )
+
+        # =====================================
+        # BUTTON INFO
+        # =====================================
+
         button_text = ""
 
         if msg.buttons:
-            for row_index, row in enumerate(msg.buttons, start=1):
-                for col_index, btn in enumerate(row, start=1):
+
+            for row_index, row in enumerate(
+                msg.buttons,
+                start=1
+            ):
+
+                for col_index, btn in enumerate(
+                    row,
+                    start=1
+                ):
+
+                    # URL BUTTON
                     if isinstance(btn, KeyboardButtonUrl):
+
                         button_text += (
-                            f"\n{btn.text} : {btn.url} "
-                            f"({row_index}, {col_index})"
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text} : {btn.url}"
                         )
+
+                    # NORMAL BUTTON
+                    else:
+
+                        button_text += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text}"
+                        )
+
+        else:
+
+            button_text = "\nNone"
+
+        # =====================================
+        # REPLY
+        # =====================================
 
         await event.reply(
             f"Last Message\n\n"
             f"ID: `{msg.id}`\n\n"
             f"Text:\n{text}\n\n"
-            f"URL Buttons:"
-            f"{button_text if button_text else ' None'}"
+            f"Buttons:"
+            f"{button_text}"
         )
+
     except Exception as e:
+
         import traceback
         traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^get\s+\d+$"
+))
+async def get_message(event):
+
+    try:
+
+        text_input = event.raw_text.strip()
+
+        match = re.search(r"^get\s+(\d+)$", text_input)
+
+        if not match:
+
+            await event.reply("Invalid format")
+
+            return
+
+        message_id = int(match.group(1))
+
+        # =====================================
+        # GET MESSAGE
+        # =====================================
+
+        msg = await mrsyd.get_messages(
+            bot_id,
+            ids=message_id
+        )
+
+        if not msg:
+
+            await event.reply("Message not found")
+
+            return
+
+        # =====================================
+        # MESSAGE TEXT
+        # =====================================
+
+        text = (
+            msg.raw_text
+            if msg.raw_text
+            else "No text"
+        )
+
+        # =====================================
+        # BUTTON INFO
+        # =====================================
+
+        button_text = ""
+
+        if msg.buttons:
+
+            for row_index, row in enumerate(
+                msg.buttons,
+                start=1
+            ):
+
+                for col_index, btn in enumerate(
+                    row,
+                    start=1
+                ):
+
+                    # URL BUTTON
+                    if isinstance(btn, KeyboardButtonUrl):
+
+                        button_text += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text} : {btn.url}"
+                        )
+
+                    # NORMAL BUTTON
+                    else:
+
+                        button_text += (
+                            f"\n[{row_index}, {col_index}] "
+                            f"{btn.text}"
+                        )
+
+        else:
+
+            button_text = "\nNone"
+
+        # =====================================
+        # FORWARD MEDIA IF EXISTS
+        # =====================================
+
+        if msg.media:
+
+            await mrsyd.forward_messages(
+                event.chat_id,
+                msg
+            )
+
+        # =====================================
+        # SEND DETAILS
+        # =====================================
+
+        await event.reply(
+            f"Message ID: `{msg.id}`\n\n"
+            f"Text:\n{text}\n\n"
+            f"Buttons:"
+            f"{button_text}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
         await event.reply(f"Error: {e}")
         
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
