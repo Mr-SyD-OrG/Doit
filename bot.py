@@ -34,7 +34,7 @@ async def start_bot():
     appp = web.AppRunner(await web_server())
     await appp.setup()
     bind_address = "0.0.0.0"
-    await web.TCPSite(appp, bind_address, 8080).start()
+    await web.TCPSite(appp, bind_address, 8000).start()
 
     await mrsyd.run_until_disconnected()
 
