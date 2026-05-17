@@ -614,7 +614,7 @@ async def catch_it(event):
             import traceback
             traceback.print_exc()
     await asyncio.sleep(3)
-    TURN = False
+    
     STOPP = True
     logging.info("Finished collecting IDs")
 
@@ -639,6 +639,8 @@ async def catch_it(event):
             msg = await mrsyd.get_messages(bot_id, ids=msg_id)
 
             if not msg:
+                PHOTO_MSG_IDS.discard(msg_id)
+                SUBSCRIBE_MSG_IDS.discard(msg_id)
                 continue
 
             logging.info(f"Processing msg id: {msg_id}")
@@ -708,10 +710,15 @@ async def catch_it(event):
                                 break
                         if done:
                             break
+                          
+            SUBSCRIBE_MSG_IDS.discard(msg_id)
+            PHOTO_MSG_IDS.discard(msg_id)
         except Exception as e:
             logging.info(e)
             import traceback
             traceback.print_exc()
+
+    TURN = False
     await event.reply("Finished all tasks")
 
 
