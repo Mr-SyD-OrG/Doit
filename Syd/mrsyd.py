@@ -1044,7 +1044,7 @@ async def solve_robot_check(event):
         # CASE 2 -> FARM CONTINUE
         # =========================================================
 
-        elif text.startswith(("💫 Для продолжения фарма", "✨ Новое задание!")):
+        elif text and re.search(r'💫.*Для продолжения фарма|✨.*Новое задание!', text):
             if not message.buttons:
                 return
 
