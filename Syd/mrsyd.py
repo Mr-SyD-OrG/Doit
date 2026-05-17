@@ -863,7 +863,7 @@ async def auto_runner(event):
 
             # send /start
             await mrsyd.send_message(
-                bot_id,
+                7996790736,
                 "/start"
             )
 
@@ -874,7 +874,7 @@ async def auto_runner(event):
 
             # check only last 4 messages
             messages = await mrsyd.get_messages(
-                bot_id,
+                7996790736,
                 limit=4
             )
 
