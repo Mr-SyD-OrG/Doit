@@ -165,7 +165,7 @@ async def open_real(url):
 
         # random delay before open
         await asyncio.sleep(
-            random.uniform(0.1, 0.8)
+            random.uniform(0.12, 0.78)
         )
 
         # open page
@@ -177,7 +177,7 @@ async def open_real(url):
 
         # reading time
         await asyncio.sleep(
-            random.uniform(0.1, 0.2)
+            random.uniform(0.05, 0.2)
         )
 
         # ================================
