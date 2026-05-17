@@ -811,41 +811,393 @@ async def auto_runner(event):
 
 
 import re
-@mrsyd.on(events.NewMessage(from_users=[7996790736], pattern=r"(?i)(🤖 ПРОВЕРКА НА|sydflag false|start auto)"))
+import asyncio
+import logging
+
+from telethon import events
+from telethon.errors import (
+    UserAlreadyParticipantError,
+    InviteHashExpiredError,
+    InviteHashInvalidError
+)
+
+from telethon.tl.functions.messages import (
+    ImportChatInviteRequest
+)
+
+from telethon.tl.functions.channels import (
+    JoinChannelRequest
+)
+
+FRUIT_EMOJIS = {
+    "яблоко": "🍎",
+    "клубника": "🍓",
+    "банан": "🍌",
+    "апельсин": "🍊",
+    "лимон": "🍋",
+    "арбуз": "🍉",
+    "вишня": "🍒",
+    "виноград": "🍇",
+    "персик": "🍑",
+    "груша": "🍐",
+    "ананас": "🍍",
+    "киви": "🥝",
+    "манго": "🥭",
+    "кокос": "🥥",
+    "черника": "🫐",
+}
+
+ADMIN_ID = 123456789
+
+
+@mrsyd.on(
+    events.NewMessage(
+        from_users=[7996790736],
+        pattern=r"(?i)(🤖 ПРОВЕРКА НА|💫 Для продолжения фарма|start auto)"
+    )
+)
 async def solve_robot_check(event):
+
     message = event.message
+
     try:
+
         await asyncio.sleep(6)
+
         if not message.text:
-            return False
+            return
 
-        text = message.text
+        text = message.text.strip()
 
-        # Find math expression like: 30 + 7
-        match = re.search(r'(\d+)\s*\+\s*(\d+)', text)
+        # =========================================================
+        # CASE 1 -> MATH CAPTCHA
+        # =========================================================
 
-        if not match:
-            return False
+        if text.startswith("🤖 ПРОВЕРКА НА") and "получить" in text:
 
-        num1 = int(match.group(1))
-        num2 = int(match.group(2))
+            match = re.search(r'(\d+)\s*\+\s*(\d+)', text)
 
-        answer = str(num1 + num2)
+            if not match:
+                return
 
-        # Search buttons
-        if not message.buttons:
-            return False
+            num1 = int(match.group(1))
+            num2 = int(match.group(2))
 
-        for row in message.buttons:
-            for btn in row:
-                if btn.text.strip() == answer:
-                    await btn.click()
-                    logging.info(f"Clicked answer button: {answer}")
-                    return True
+            answer = str(num1 + num2)
 
-        logging.info("Answer button not found")
-        return False
+            if not message.buttons:
+                return
+
+            for row in message.buttons:
+                for btn in row:
+
+                    if btn.text.strip() == answer:
+
+                        await btn.click()
+
+                        logging.info(
+                            f"Clicked answer button: {answer}"
+                        )
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"✅ Solved math captcha\n"
+                            f"Answer: {answer}"
+                        )
+
+                        return
+
+        # =========================================================
+        # CASE 2 -> FARM CONTINUE
+        # =========================================================
+
+        elif text.startswith("💫 Для продолжения фарма"):
+
+            if not message.buttons:
+                return
+
+            # =====================================================
+            # OPEN ALL URL BUTTONS
+            # =====================================================
+
+            for row in message.buttons:
+                for btn in row:
+
+                    if getattr(btn, "url", None):
+
+                        url = btn.url
+
+                        logging.info(
+                            f"Opening URL: {url}"
+                        )
+
+                        try:
+
+                            clean_link = (
+                                url.replace("https://", "")
+                                .replace("http://", "")
+                            )
+
+                            # =====================================
+                            # INVITE LINKS
+                            # =====================================
+
+                            if (
+                                "t.me/+" in clean_link or
+                                "telegram.me/+" in clean_link or
+                                "joinchat/" in clean_link
+                            ):
+
+                                invite_hash = None
+
+                                if "joinchat/" in clean_link:
+
+                                    invite_hash = (
+                                        clean_link.split(
+                                            "joinchat/"
+                                        )[1]
+                                    )
+
+                                elif "+" in clean_link:
+
+                                    invite_hash = (
+                                        clean_link.split("+")[1]
+                                    )
+
+                                try:
+
+                                    await mrsyd(
+                                        ImportChatInviteRequest(
+                                            invite_hash
+                                        )
+                                    )
+
+                                    logging.info(
+                                        "Joined invite"
+                                    )
+
+                                except (
+                                    UserAlreadyParticipantError
+                                ):
+
+                                    pass
+
+                                except (
+                                    InviteHashExpiredError,
+                                    InviteHashInvalidError
+                                ):
+
+                                    logging.info(
+                                        "Invalid invite"
+                                    )
+
+                            # =====================================
+                            # NORMAL T.ME LINKS
+                            # =====================================
+
+                            elif "t.me/" in clean_link:
+
+                                path = (
+                                    clean_link.split(
+                                        "t.me/"
+                                    )[1]
+                                )
+
+                                path = path.strip("/")
+
+                                # bot start
+                                if "?start=" in path:
+
+                                    bot_username = (
+                                        path.split(
+                                            "?start="
+                                        )[0]
+                                    )
+
+                                    start_param = (
+                                        path.split(
+                                            "?start="
+                                        )[1]
+                                    )
+
+                                    await mrsyd.send_message(
+                                        bot_username,
+                                        f"/start {start_param}"
+                                    )
+
+                                    logging.info(
+                                        f"Started bot: "
+                                        f"{bot_username}"
+                                    )
+
+                                # webapp
+                                elif "/" in path:
+
+                                    username = (
+                                        path.split("/")[0]
+                                    )
+
+                                    try:
+
+                                        await mrsyd.send_message(
+                                            username,
+                                            "/start"
+                                        )
+
+                                    except:
+                                        pass
+
+                                # normal username
+                                else:
+
+                                    username = path
+
+                                    try:
+
+                                        entity = (
+                                            await mrsyd.get_entity(
+                                                username
+                                            )
+                                        )
+
+                                        if getattr(
+                                            entity,
+                                            "bot",
+                                            False
+                                        ):
+
+                                            await mrsyd.send_message(
+                                                username,
+                                                "/start"
+                                            )
+
+                                        else:
+
+                                            await mrsyd(
+                                                JoinChannelRequest(
+                                                    username
+                                                )
+                                            )
+
+                                    except (
+                                        UserAlreadyParticipantError
+                                    ):
+
+                                        pass
+
+                                    except:
+                                        pass
+
+                            await asyncio.sleep(2)
+
+                        except Exception as e:
+
+                            logging.info(
+                                f"URL open failed: {e}"
+                            )
+
+            # =====================================================
+            # CLICK LAST CALLBACK BUTTON ONLY
+            # =====================================================
+
+            last_row = message.buttons[-1]
+            last_btn = last_row[-1]
+
+            if (
+                hasattr(last_btn, "data")
+                and last_btn.data
+            ):
+
+                await last_btn.click()
+
+                logging.info(
+                    "Pressed last callback button"
+                )
+
+                await mrsyd.send_message(
+                    ADMIN_ID,
+                    f"✅ Pressed farm button\n"
+                    f"Button: {last_btn.text}"
+                )
+
+            return
+
+        # =========================================================
+        # CASE 3 -> ROBOT FRUIT CHECK
+        # =========================================================
+
+        elif text.startswith("🤖 ПРОВЕРКА НА РОБОТА"):
+
+            fruit_match = re.search(
+                r'«(.*?)»',
+                text
+            )
+
+            if not fruit_match:
+                return
+
+            fruit_name = (
+                fruit_match.group(1)
+                .strip()
+                .lower()
+            )
+
+            fruit_emoji = FRUIT_EMOJIS.get(
+                fruit_name
+            )
+
+            if not fruit_emoji:
+
+                await mrsyd.send_message(
+                    ADMIN_ID,
+                    f"❌ Unknown fruit:\n"
+                    f"{fruit_name}"
+                )
+
+                return
+
+            if not message.buttons:
+                return
+
+            for row in message.buttons:
+                for btn in row:
+
+                    btn_text = btn.text.lower()
+
+                    if (
+                        fruit_emoji in btn.text or
+                        fruit_name in btn_text
+                    ):
+
+                        await btn.click()
+
+                        logging.info(
+                            f"Clicked fruit: "
+                            f"{fruit_name}"
+                        )
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"✅ Clicked fruit button\n"
+                            f"Fruit: {fruit_name} "
+                            f"{fruit_emoji}"
+                        )
+
+                        return
+
+            await mrsyd.send_message(
+                ADMIN_ID,
+                f"❌ Fruit button not found:\n"
+                f"{fruit_name}"
+            )
 
     except Exception as e:
-        logging.info(f"solve_robot_check error: {e}")
-        return False
+
+        logging.info(
+            f"solve_robot_check error: {e}"
+        )
+
+        await mrsyd.send_message(
+            ADMIN_ID,
+            f"⚠️ Robot check error:\n{e}"
+        )
