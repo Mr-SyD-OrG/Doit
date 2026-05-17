@@ -947,10 +947,6 @@ async def auto_runner(event):
     # ===
                 
 
-import re
-import asyncio
-import logging
-
 from telethon import events
 from telethon.errors import (
     UserAlreadyParticipantError,
@@ -994,8 +990,8 @@ ADMIN_ID = 1733124290
     )
 )
 async def solve_robot_check(event):
-
     message = event.message
+    logging.info(message)
 
     try:
 
