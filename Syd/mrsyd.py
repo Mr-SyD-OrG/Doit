@@ -1279,6 +1279,7 @@ async def solve_robot_check(event):
             )
             logging.info(f"#{fruit_name}")
             fruit_name = re.sub(r'[\u200b\u200c\u200d\ufeff\xa0]', '', fruit_name)
+            logging.info(f"#{fruit_name}")
             fruit_emoji = FRUIT_EMOJIS.get(
                 fruit_name
             )
