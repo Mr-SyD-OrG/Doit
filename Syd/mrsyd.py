@@ -1990,7 +1990,7 @@ async def auto_runner(event):
             )
 
             for m in messages:
-                await event.reply(f"•{m.text}")
+             #   await event.reply(f"•{m.text}")
                 if m.text and re.search(r'Получи\s+свою\s+личную\s+ссылку', m.text):
                     target_msg_id = m.id
                     break
