@@ -2093,10 +2093,6 @@ FRUIT_EMOJIS = {
     )
 )
 async def solve_robot_check(event):
-    await mrsyd.send_message(
-                            ADMIN_ID,
-                            f"✅ n"
-    )
     message = event.message
     logging.info(message)
 
