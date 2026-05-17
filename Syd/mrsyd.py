@@ -1710,6 +1710,103 @@ async def open_link(event):
 
         await event.reply(f"Error:\n{e}")
 
+import json
+
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^restore$"
+))
+async def restore_ids(event):
+
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+
+    try:
+
+        if not event.is_reply:
+
+            await event.reply(
+                "Reply to backup file"
+            )
+
+            return
+
+        reply = await event.get_reply_message()
+
+        if not reply.file:
+
+            await event.reply(
+                "Reply must contain file"
+            )
+
+            return
+
+        # download file
+        path = await reply.download_media()
+
+        # load json
+        with open(path, "r") as f:
+
+            data = json.load(f)
+
+        PHOTO_MSG_IDS = set(
+            data.get("photo", [])
+        )
+
+        SUBSCRIBE_MSG_IDS = set(
+            data.get("subscribe", [])
+        )
+
+        await event.reply(
+            f"Backup restored\n\n"
+            f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
+            f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
+
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^backup$"
+))
+async def backup_ids(event):
+
+    try:
+
+        data = {
+            "photo": list(PHOTO_MSG_IDS),
+            "subscribe": list(SUBSCRIBE_MSG_IDS)
+        }
+
+        file_name = "ids_backup.json"
+
+        with open(file_name, "w") as f:
+
+            json.dump(data, f)
+
+        await mrsyd.send_file(
+            event.chat_id,
+            file_name,
+            caption=(
+                f"Backup created\n\n"
+                f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
+                f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
+            )
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(f"Error: {e}")
 import asyncio
 import re
 import asyncio
