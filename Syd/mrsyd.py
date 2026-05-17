@@ -986,7 +986,7 @@ ADMIN_ID = 1733124290
 @mrsyd.on(
     events.NewMessage(
         from_users=[7996790736],
-        pattern=r"(?i)(🤖 ПРОВЕРКА НА|💫 Для продолжения фарма|start auto)"
+        pattern=r"(?i)(🤖 ПРОВЕРКА НА|💫 Для продолжения фарма|✨ Новое задание)"
     )
 )
 async def solve_robot_check(event):
@@ -1048,8 +1048,7 @@ async def solve_robot_check(event):
         # CASE 2 -> FARM CONTINUE
         # =========================================================
 
-        elif text.startswith("💫 Для продолжения фарма"):
-
+        elif text.startswith(("💫 Для продолжения фарма", "✨ Новое задание!")):
             if not message.buttons:
                 return
 
@@ -1278,7 +1277,8 @@ async def solve_robot_check(event):
                 .strip()
                 .lower()
             )
-
+            logging.info(f"#{fruit_name}")
+            fruit_name = re.sub(r'[\u200b\u200c\u200d\ufeff\xa0]', '', fruit_name)
             fruit_emoji = FRUIT_EMOJIS.get(
                 fruit_name
             )
