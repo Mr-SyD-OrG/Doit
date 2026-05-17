@@ -1657,6 +1657,12 @@ async def open_link(event):
                 username = path
 
                 try:
+                    entity = await mrsyd.get_entity(username)
+                    if getattr(entity, "bot", False):
+
+                        await mrsyd.send_message(username, "/start")
+                        await event.reply(f"🤖 Started bot:\n@{username}")
+                        return
 
                     await mrsyd(
                         JoinChannelRequest(username)
