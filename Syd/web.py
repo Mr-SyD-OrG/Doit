@@ -165,19 +165,19 @@ async def open_real(url):
 
         # random delay before open
         await asyncio.sleep(
-            random.uniform(1.5, 4.2)
+            random.uniform(0.2, 1.2)
         )
 
         # open page
         await page.goto(
             url,
             wait_until="commit",
-            timeout=10000
+            timeout=2000
         )
 
         # reading time
         await asyncio.sleep(
-            random.uniform(2.5, 7)
+            random.uniform(0.1, 3)
         )
 
         # ================================
@@ -204,7 +204,7 @@ async def open_real(url):
                 )
 
                 await asyncio.sleep(
-                    random.uniform(1, 3)
+                    random.uniform(0.001, 1)
                 )
 
             else:
@@ -248,8 +248,8 @@ async def open_real(url):
             if TASK_COUNT % 25 == 0:
 
                 pause_time = random.uniform(
-                    20,
-                    60
+                    2,
+                    6
                 )
 
                 logging.info(
