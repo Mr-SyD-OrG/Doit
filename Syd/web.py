@@ -177,7 +177,7 @@ async def open_real(url):
 
         # reading time
         await asyncio.sleep(
-            random.uniform(0.1, 3)
+            random.uniform(0.1, 2.9)
         )
 
         # ================================
@@ -187,7 +187,7 @@ async def open_real(url):
         try:
 
             # 70% chance to scroll
-            if random.random() < 0.7:
+            if random.random() < 0.4:
 
                 scroll_amount = random.randint(
                     200,
@@ -204,7 +204,7 @@ async def open_real(url):
                 )
 
                 await asyncio.sleep(
-                    random.uniform(0.001, 1)
+                    random.uniform(0.001, 0.8)
                 )
 
             else:
@@ -224,7 +224,7 @@ async def open_real(url):
         try:
 
             # 60% chance
-            if random.random() < 0.6:
+            if random.random() < 0.2:
 
                 await page.mouse.move(
                     random.randint(100, 800),
@@ -249,7 +249,7 @@ async def open_real(url):
 
                 pause_time = random.uniform(
                     2,
-                    6
+                    4
                 )
 
                 logging.info(
