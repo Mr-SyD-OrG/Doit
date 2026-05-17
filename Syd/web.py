@@ -245,8 +245,7 @@ async def open_real(url):
         try:
 
             # every ~25 tasks sometimes pause
-            if TASK_COUNT % 25 == 0:
-
+            if TASK_COUNT % random.randint(20, 35) == 0:
                 pause_time = random.uniform(
                     1,
                     4
