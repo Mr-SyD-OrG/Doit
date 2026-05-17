@@ -880,17 +880,13 @@ async def auto_runner(event):
 
             for m in messages:
                 await event.reply(f"•{m.text}")
-                if (
-                    m.text
-                    and m.text.startswith(
-                        "1️⃣ Получи свою личную ссылку — жми «⭐️ Заработать звезды»"
-                    )
-                ):
+                if m.text and re.search(r'Получи\s+свою\s+личную\s+ссылку', m.text):
                     target_msg_id = m.id
                     break
 
             # not found
             if not target_msg_id:
+                SYDFLAG = False
                 return await event.reply(
                     "❌ Target process message not found in last 4 messages"
                 )
