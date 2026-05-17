@@ -662,8 +662,133 @@ import re
 import asyncio
 
 SYDFLAG = False
+import asyncio
+import random
+import logging
+from datetime import datetime
+import pytz
+
+IST = pytz.timezone("Asia/Kolkata")
+
+async def wait_until_6am():
+    while True:
+
+        now = datetime.now(IST)
+
+        # run only after 6 AM
+        if now.hour >= 6:
+            return
+
+        await asyncio.sleep(30)
+
 
 async def click_loop(msg_id, event):
+    global SYDFLAG
+
+    while SYDFLAG:
+
+        # wait until 6 AM IST
+        await wait_until_6am()
+
+        click_count = 0
+        first = True
+
+        await event.reply("▶️ Starting today's clicking session")
+
+        # 30 clicks daily
+        while SYDFLAG and click_count < 30:
+
+            try:
+                msg = await mrsyd.get_messages(
+                    "patrickstarsrobot",
+                    ids=msg_id
+                )
+
+                last_msg_id = (
+                    await mrsyd.get_messages(
+                        "patrickstarsrobot",
+                        limit=1
+                    )
+                )[0].id
+
+                if not msg:
+                    return await event.reply(
+                        f"No Message {last_msg_id}"
+                    )
+
+                if first:
+                    await event.reply(
+                        f"Message {msg.text}"
+                    )
+                    first = False
+
+                if msg.buttons:
+
+                    clicked = False
+
+                    for row in msg.buttons:
+                        for btn in row:
+
+                            if "Кликер" in btn.text:
+
+                                await msg.click(
+                                    text="✨ Кликер"
+                                )
+
+                                click_count += 1
+                                clicked = True
+
+                                logging.info(
+                                    f"✅ Clicked {click_count}/30"
+                                )
+
+                                break
+
+                        if clicked:
+                            break
+
+                    if not clicked:
+                        return await event.reply(
+                            "❌ Button not found"
+                        )
+
+                else:
+                    return await event.reply(
+                        "❌ No buttons in message"
+                    )
+
+            except Exception as e:
+                await event.reply(f"⚠️ Error: {e}")
+
+            # random wait
+            for _ in range(random.randint(620, 1400)):
+
+                if not SYDFLAG:
+                    await event.reply(f"Stopped: {count}")
+                    return
+
+                await asyncio.sleep(1)
+
+        await event.reply(
+            "✅ Finished today's 30 clicks"
+        )
+
+        # wait for next day
+        while True:
+
+            if not SYDFLAG:
+                await event.reply(f"Stopped")
+                return
+
+            now = datetime.now(IST)
+
+            # next day after midnight resets loop
+            if now.hour < 6:
+                break
+
+            await asyncio.sleep(60)
+            
+async def click_looop(msg_id, event):
     global SYDFLAG
     first = True
     click_count = 0
@@ -711,104 +836,116 @@ async def click_loop(msg_id, event):
 
 ADMIN_ID = 1733124290  # replace with your admin id
 
-@mrsyd.on(events.NewMessage(from_users=ADMIN_ID, pattern=r"(?i)(24 process|sydflag false|start auto process)"))
+@mrsyd.on(
+    events.NewMessage(
+        from_users=ADMIN_ID,
+        pattern=r"(?i)(24 process|sydflag false|start auto process)"
+    )
+)
 async def auto_runner(event):
+
     global SYDFLAG
 
     text = event.raw_text.strip()
 
-    # START LOOP
-    if text.startswith("24 process"):
+    # =====================================================
+    # START 24 PROCESS
+    # =====================================================
+    if text.lower() == "24 process":
+
         try:
-            msg_id = int(text.split()[2])
+            if SYDFLAG: return await event.reply("a process already running")
             SYDFLAG = True
 
-            await event.reply("🚀 Started clicking every 6 minutes")
+            await event.reply(
+                "🔍 Searching process message..."
+            )
 
-            # run loop in background
-            asyncio.create_task(click_loop(msg_id, event))
-            return 
+            # send /start
+            await mrsyd.send_message(
+                bot_id,
+                "/start"
+            )
+
+            # wait 20 sec
+            await asyncio.sleep(20)
+
+            target_msg_id = None
+
+            # check only last 4 messages
+            messages = await mrsyd.get_messages(
+                bot_id,
+                limit=4
+            )
+
+            for m in messages:
+
+                if (
+                    m.text
+                    and m.text.startswith(
+                        "1️⃣ Получи свою личную ссылку — жми «⭐️ Заработать звезды»"
+                    )
+                ):
+                    target_msg_id = m.id
+                    break
+
+            # not found
+            if not target_msg_id:
+                return await event.reply(
+                    "❌ Target process message not found in last 4 messages"
+                )
+
+            await event.reply(
+                f"✅ Found target message: {target_msg_id}"
+            )
+
+            # start loop
+            asyncio.create_task(
+                click_loop(target_msg_id, event)
+            )
+
+            return
+
         except Exception as e:
             await event.reply(f"⚠️ Error: {e}")
-            return 
+            return
 
+    # =====================================================
+    # MANUAL START WITH ID
+    # =====================================================
+    elif text.startswith("24 process "):
+        try:
+            if SYDFLAG: return await event.reply("a process already running")
+                
+            msg_id = int(text.split()[2])
+            SYDFLAG = True
+            await event.reply(
+                "🚀 Started clicking process"
+            )
+            asyncio.create_task(
+                click_loop(msg_id, event)
+            )
+            return
+
+        except Exception as e:
+            await event.reply(f"⚠️ Error: {e}")
+            return
+
+    # =====================================================
     # STOP LOOP
+    # =====================================================
     elif text.lower() == "sydflag false":
+
         SYDFLAG = False
-        await event.reply("🛑 SYDFLAG set to False. Stopping loop.")
+
+        await event.reply(
+            "🛑 SYDFLAG set to False. Stopping loop."
+        )
+
         return
-        
-    msg = event.message
 
-    if msg.text and "start auto process" in msg.text.lower():
-        logging.info("Auto process triggered")
-
-        start_id = None
-        last_id = None
-
-        # --- SEND 300 MESSAGES ---
-        for i in range(30):
-            try:
-                sent = await mrsyd.send_message(bot_id, "💎 Задания")
-
-                if start_id is None:
-                    start_id = sent.id
-
-                last_id = sent.id
-
-                logging.info(f"Sent {i+1}/300 → id {sent.id}")
-
-                await asyncio.sleep(10)
-
-            except Exception as e:
-                logging.error(f"Send failed at {i}: {e}")
-                await asyncio.sleep(60)
-
-        # --- DEFINE RANGE ---
-        if start_id and last_id:
-            end_id = last_id + 3
-
-            logging.info(f"Auto range: {start_id} → {end_id}")
-
-            # --- PROCESS LOOP ---
-            for message_id in range(start_id, end_id + 1):
-                try:
-                    target_msg = await mrsyd.get_messages(bot_id, ids=message_id)
-
-                    if not target_msg:
-                        continue
-
-                    # reuse your logic style
-                    if target_msg.buttons:
-                        for row in target_msg.buttons:
-                            for btn in row:
-                                if not btn.text:
-                                    continue
-
-                                # PHOTO FLOW
-                                if target_msg.photo and any(t in btn.text for t in ["Открыть", "Вперёд!", "Посмотреть", "Присоединяйся!", "Играть!", "Забрать награду!"]):
-                                    logging.info(f"[AUTO PHOTO] {btn.text}")
-                                    await handle_button(btn, target_msg)
-                                    await asyncio.sleep(3)
-                                    break
-
-                                # NORMAL BUTTON FLOW
-                               # if any(t in btn.text for t in ["Открыть", "Вперёд!", "Посмотреть", "Присоединяйся!", "Играть!", "Забрать награду!"]):
-                                    #logging.info(f"[AUTO TEXT] {btn.text}")
-                                 #   await target_msg.click(text=btn.text)
-                                    #await asyncio.sleep(3)
-                                #    break
-
-                                # CONFIRM FLOW
-                                if "Подтвердить" in btn.text:
-                                    logging.info(f"[AUTO CONFIRM] {btn.text}")
-                                    await target_msg.click(text=btn.text)
-                                    await asyncio.sleep(2)
-                                    break
-
-                except Exception as e:
-                    logging.error(f"Error processing {message_id}: {e}")
-
+    # ===
+                
 
 import re
 import asyncio
