@@ -879,7 +879,7 @@ async def auto_runner(event):
             )
 
             for m in messages:
-
+                await event.reply(f"•{m.text}")
                 if (
                     m.text
                     and m.text.startswith(
