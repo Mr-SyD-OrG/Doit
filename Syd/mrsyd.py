@@ -2139,12 +2139,7 @@ async def solve_robot_check(event):
                             f"Clicked answer button: {answer}"
                         )
 
-                        await mrsyd.send_message(
-                            ADMIN_ID,
-                            f"✅ Solved math captcha\n"
-                            f"Answer: {answer}"
-                        )
-
+                        
                         return
 
         # =========================================================
