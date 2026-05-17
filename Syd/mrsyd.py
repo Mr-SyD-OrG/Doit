@@ -670,7 +670,7 @@ async def catch_it(event):
 
                         await handle_button(btn1, msg)
 
-                        await asyncio.sleep(5)
+                        await asyncio.sleep(random.uniform(0.1, 0.8))
 
                     # second button
                     if len(all_buttons) >= 2:
@@ -682,9 +682,7 @@ async def catch_it(event):
                         )
 
                         await handle_button(btn2, msg)
-
-                        await asyncio.sleep(5)
-
+                        await asyncio.sleep(random.uniform(0.1, 0.8))
             # =================================
             # SUBSCRIBE MESSAGE
             # =================================
@@ -705,7 +703,7 @@ async def catch_it(event):
                                     f"Clicking confirm button: {btn.text}"
                                 )
                                 await handle_button(btn, msg)
-                                await asyncio.sleep(5)
+                                await asyncio.sleep(random.uniform(0.1, 1))
                                 done = True
                                 break
                         if done:
