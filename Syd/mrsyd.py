@@ -984,7 +984,7 @@ FRUIT_EMOJIS = {
     "черника": "🫐",
 }
 
-ADMIN_ID = 123456789
+ADMIN_ID = 1733124290
 
 
 @mrsyd.on(
