@@ -7,6 +7,7 @@ import random
 from telethon.tl.types import PeerChannel
 import logging
 
+
 logging.basicConfig(level=logging.INFO)
 client = mrsyd
 
