@@ -273,7 +273,7 @@ GENERAL = False
 TURN = False
 STOPP = True
 ADMIN_ID = 1733124290
-bot_id = 8097888032  # replace
+bot_id = 8682541830  # replace
 ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
@@ -600,21 +600,33 @@ async def catch_it(event):
 
     start_time = asyncio.get_event_loop().time()
 
-    while ((asyncio.get_event_loop().time() - start_time) < (40 * 60) and STOPP is True):
+    while (
+        (asyncio.get_event_loop().time() - start_time)
+        < (40 * 60)
+        and STOPP is True
+    ):
 
         try:
 
             await mrsyd.send_message(bot_id, "💎 Задания")
+
             wait_time = random.randint(10, 14)
-            logging.info(f"Sleeping for {wait_time} seconds")
+
+            logging.info(
+                f"Sleeping for {wait_time} seconds"
+            )
+
             await asyncio.sleep(wait_time)
+
         except Exception as e:
             logging.info(e)
             import traceback
             traceback.print_exc()
+
     await asyncio.sleep(3)
-    
+
     STOPP = True
+
     logging.info("Finished collecting IDs")
 
     # =========================================
@@ -635,14 +647,19 @@ async def catch_it(event):
 
         try:
 
-            msg = await mrsyd.get_messages(bot_id, ids=msg_id)
+            msg = await mrsyd.get_messages(
+                bot_id,
+                ids=msg_id
+            )
 
             if not msg:
                 PHOTO_MSG_IDS.discard(msg_id)
                 SUBSCRIBE_MSG_IDS.discard(msg_id)
                 continue
 
-            logging.info(f"Processing msg id: {msg_id}")
+            logging.info(
+                f"Processing msg id: {msg_id}"
+            )
 
             # =================================
             # PHOTO MESSAGE
@@ -658,30 +675,65 @@ async def catch_it(event):
                         for btn in row:
                             all_buttons.append(btn)
 
-                    # first button
-                    if len(all_buttons) >= 1:
+                    check_btn = None
+                    other_buttons = []
 
-                        btn1 = all_buttons[0]
+                    # =================================
+                    # SEPARATE CHECK BUTTON
+                    # =================================
+
+                    for btn in all_buttons:
+
+                        text = (
+                            btn.text or ""
+                        ).lower()
+
+                        # ignore skip buttons
+                        if "skip" in text:
+                            other_buttons.append(btn)
+                            continue
+
+                        # detect check button
+                        if "check" in text:
+                            check_btn = btn
+                        else:
+                            other_buttons.append(btn)
+
+                    # =================================
+                    # PROCESS NORMAL/LINK BUTTONS FIRST
+                    # =================================
+
+                    for btn in other_buttons:
 
                         logging.info(
-                            f"Clicking first button: {btn1.text}"
+                            f"Clicking button: {btn.text}"
                         )
 
-                        await handle_button(btn1, msg)
+                        await handle_button(btn, msg)
 
-                        await asyncio.sleep(random.uniform(0.1, 0.8))
+                        await asyncio.sleep(
+                            random.uniform(0.1, 0.8)
+                        )
 
-                    # second button
-                    if len(all_buttons) >= 2:
+                    # =================================
+                    # PRESS CHECK BUTTON LAST
+                    # =================================
 
-                        btn2 = all_buttons[1]
+                    if check_btn:
 
                         logging.info(
-                            f"Clicking second button: {btn2.text}"
+                            f"Clicking check button: {check_btn.text}"
                         )
 
-                        await handle_button(btn2, msg)
-                        await asyncio.sleep(random.uniform(0.1, 0.8))
+                        await handle_button(
+                            check_btn,
+                            msg
+                        )
+
+                        await asyncio.sleep(
+                            random.uniform(0.1, 0.8)
+                        )
+
             # =================================
             # SUBSCRIBE MESSAGE
             # =================================
@@ -694,28 +746,46 @@ async def catch_it(event):
 
                     for row in msg.buttons:
                         for btn in row:
+
                             if (
-                                btn.text and
-                                "Подтвердить" in btn.text
+                                btn.text
+                                and "Подтвердить"
+                                in btn.text
                             ):
+
                                 logging.info(
                                     f"Clicking confirm button: {btn.text}"
                                 )
-                                await handle_button(btn, msg)
-                                await asyncio.sleep(random.uniform(0.1, 1))
+
+                                await handle_button(
+                                    btn,
+                                    msg
+                                )
+
+                                await asyncio.sleep(
+                                    random.uniform(
+                                        0.1,
+                                        1
+                                    )
+                                )
+
                                 done = True
                                 break
+
                         if done:
                             break
-                          
+
             SUBSCRIBE_MSG_IDS.discard(msg_id)
             PHOTO_MSG_IDS.discard(msg_id)
+
         except Exception as e:
             logging.info(e)
+
             import traceback
             traceback.print_exc()
 
     TURN = False
+
     await event.reply("Finished all tasks")
 
 
@@ -1235,7 +1305,7 @@ async def balance_cmd(event):
 
         await mrsyd.send_message(
             bot_id,
-            "🎁 Вывести Подарки"
+            "Withdraw stars"
         )
 
         # wait for bot response
@@ -1376,7 +1446,7 @@ async def task_cmd(event):
 
         await mrsyd.send_message(
             bot_id,
-            "💎 Задания"
+            "Tasks"
         )
 
         # wait for bot reply
