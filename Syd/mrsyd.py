@@ -1787,17 +1787,17 @@ async def restore_ids(event):
         SUBSCRIBE_MSG_IDS = set(
             data.get("subscribe", [])
         )
-        for msg_id in PHOTO_MSG_IDS:
-            try:
-                msg = await mrsyd.get_messages(
-                    bot_id,
-                    ids=msg_id
-                )
-                await msg.click(3, 1)
-            except Exception as e:
-                import traceback
-                traceback.print_exc()
-                await event.reply(f"Error: {e}")
+       # for msg_id in PHOTO_MSG_IDS:
+           # try:
+            #    msg = await mrsyd.get_messages(
+           #         bot_id,
+         #           ids=msg_id
+           #     )
+           #     await msg.click(3, 1)
+         #   except Exception as e:
+       #         import traceback
+           #     traceback.print_exc()
+              #  await event.reply(f"Error: {e}")
                  
 
         await event.reply(
