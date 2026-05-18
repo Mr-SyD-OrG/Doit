@@ -8,7 +8,6 @@ from telethon.tl.types import PeerChannel
 import logging
 
 logging.basicConfig(level=logging.INFO)
-
 client = mrsyd
 
 from datetime import datetime, timedelta
