@@ -14,9 +14,7 @@ client = mrsyd
 
 from datetime import datetime, timedelta
 from telethon.tl.types import PeerUser
-from pytz import timezone
-
-  # Replace with your actual admin
+from pytz import timezone 
 IST = timezone('Asia/Kolkata')
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
