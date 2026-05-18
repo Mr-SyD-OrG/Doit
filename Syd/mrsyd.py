@@ -274,7 +274,7 @@ GENERAL = False
 TURN = False
 STOPP = True
 ADMIN_ID = 1733124290
-bot_id = 8006795826  # replace
+bot_id = 8097888032  # replace
 ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
