@@ -580,8 +580,7 @@ async def save_ids(event):
                 )
 # =========================
 # MAIN COMMAND
-# =========================
-
+# ====================
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
@@ -720,73 +719,61 @@ async def catch_it(event):
                     # PRESS CHECK BUTTON LAST
                     # =================================
 
-                    if check_btn:
+                        if check_btn:
 
-                        logging.info(
-                            f"Clicking check button: {check_btn.text}"
-                        )
+                            await asyncio.sleep(
+                                random.uniform(1.5, 3)
+                            )
 
-                        await handle_button(
-                            check_btn,
-                            msg
-                        )
+                        # refetch fresh message
+                            fresh_msg = await mrsyd.get_messages(
+                                bot_id,
+                                ids=msg.id
+                            )
 
-                        await asyncio.sleep(
-                            random.uniform(0.1, 0.8)
-                        )
+                            if fresh_msg and fresh_msg.buttons:
 
-            # =================================
-            # SUBSCRIBE MESSAGE
-            # =================================
+                                 logging.info(
+                                    f"Clicking check button: {check_btn.text}"
+                                 )
 
-            elif msg_id in SUBSCRIBE_MSG_IDS:
+                                 try:
 
-                if msg.buttons:
+                                     await fresh_msg.click(
+                                         text=check_btn.text
+                                     )
 
-                    done = False
+                                 except Exception as e:
+                                     await fresh_msg.click(3, 1)
+                              
+                                    logging.info(
+                                        f"Check button failed: {e}"
+                                    )
 
-                    for row in msg.buttons:
-                        for btn in row:
+                                    import traceback
+                                    traceback.print_exc()
 
-                            if (
-                                btn.text
-                                and "Подтвердить"
-                                in btn.text
-                            ):
+                             else:
 
                                 logging.info(
-                                    f"Clicking confirm button: {btn.text}"
+                                    "Fresh message/buttons not found"
                                 )
 
-                                await handle_button(
-                                    btn,
-                                    msg
-                                )
-
-                                await asyncio.sleep(
-                                    random.uniform(
-                                        0.1,
-                                        1
-                                    )
-                                )
-
-                                done = True
-                                break
-
-                        if done:
+                             await asyncio.sleep(
+                                random.uniform(0.1, 0.8)
+                             )
+                      if done:
                             break
-
+ 
+ 
             SUBSCRIBE_MSG_IDS.discard(msg_id)
             PHOTO_MSG_IDS.discard(msg_id)
 
         except Exception as e:
             logging.info(e)
-
             import traceback
             traceback.print_exc()
-
     TURN = False
-
     await event.reply("Finished all tasks")
 
 
@@ -1831,6 +1818,18 @@ async def restore_ids(event):
         SUBSCRIBE_MSG_IDS = set(
             data.get("subscribe", [])
         )
+        for msg_id in PHOTO_MSG_IDS:
+            try:
+                msg = await mrsyd.get_messages(
+                    bot_id,
+                    ids=msg_id
+                )
+                await msg.click(3, 1)
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                await event.reply(f"Error: {e}")
+                 
 
         await event.reply(
             f"Backup restored\n\n"
