@@ -2500,3 +2500,37 @@ async def solve_robot_check(event):
             ADMIN_ID,
             f"⚠️ Robot check error:\n{e}"
         )
+
+
+@mrsyd.on(
+    events.NewMessage(
+        from_users=ADMIN_ID,
+        pattern=r"^share\s+(@?\S+)\s+([\s\S]+)"
+    )
+)
+async def sharre_text(event):
+
+    try:
+
+        username = event.pattern_match.group(1)
+        text = event.pattern_match.group(2)
+
+        await mrsyd.send_message(
+            username,
+            text
+        )
+
+        await event.reply(
+            f"Sent message to {username}"
+        )
+
+    except Exception as e:
+
+        logging.info(e)
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(
+            f"Failed: {e}"
+        )
