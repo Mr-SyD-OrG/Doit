@@ -671,7 +671,7 @@ async def catch_it(event):
 
                             try:
                                 try:
-                                    await fresh_msg.click(3, 1)
+                                    await fresh_msg.click(2, 0)
 
                                 except Exception:
                                     await fresh_msg.click(text=check_btn.text)
