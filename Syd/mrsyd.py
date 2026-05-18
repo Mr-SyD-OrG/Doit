@@ -515,7 +515,7 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
-@@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
+@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
     global PHOTO_MSG_IDS
