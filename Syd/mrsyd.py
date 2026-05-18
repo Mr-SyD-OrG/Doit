@@ -672,29 +672,19 @@ async def catch_it(event):
                             )
 
                             try:
-
-                                await fresh_msg.click(
-                                    text=check_btn.text
-                                )
-
-                            except Exception as e:
-
                                 try:
-
                                     await fresh_msg.click(3, 1)
 
-                                except:
-                                    pass
-
+                                except Exception:
+                                    await fresh_msg.click(text=check_btn.text)
+                            except Exception as e:
                                 logging.info(
                                     f"Check button failed: {e}"
                                 )
-
-                                import traceback
-                                traceback.print_exc()
+                              #  import traceback
+                             #   traceback.print_exc()
 
                         else:
-
                             logging.info(
                                 "Fresh message/buttons not found"
                             )
