@@ -514,74 +514,7 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
-@mrsyd.on(events.NewMessage(from_users=bot_id))
-async def save_ids(event):
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
-    global TURN
-    global GENERAL
-
-    msg = event.message
-
-    if TURN is True:
-
-        # save photo message ids
-        if msg.photo:
-
-            PHOTO_MSG_IDS.add(msg.id)
-
-            logging.info(f"Saved photo msg id: {msg.id}")
-            return 
-        # save subscribe ids
-        if (
-            msg.raw_text and
-            msg.raw_text.startswith(
-                "💡 Получай Звёзды за простые задания! 👇\n\n1. Нажми «Подписаться», дождись"
-            )
-        ):
-
-            SUBSCRIBE_MSG_IDS.add(msg.id)
-
-            logging.info(f"Saved subscribe msg id: {msg.id}")
-            return 
-    elif msg.raw_text and msg.buttons:
-
-        text = msg.raw_text.strip()
-
-        if ("🤑" in text and "get +0.30" in text.lower() and "subscribe" in text.lower() and "check" in text.lower()):
-            if GENERAL or TURN:
-
-                logging.info("Detected subscribe task message")
-
-                for row in msg.buttons:
-                    for btn in row:
-
-                        if btn.text and "Пропустить" in btn.text:
-
-                            logging.info(
-                                f"Clicking skip button: {btn.text}"
-                            )
-
-                            await handle_button(btn, msg)
-
-                            await asyncio.sleep(3)
-
-                            return
-
-            # =========================
-            # GENERAL FALSE
-            # =========================
-
-            else:
-
-                await mrsyd.send_message(
-                    ADMIN_ID,
-                    f"Message ID: {msg.id}\n\n{text}"
-                )
-# =========================
-# MAIN COMMAND
-# ====================
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
+@@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
     global PHOTO_MSG_IDS
@@ -719,53 +652,97 @@ async def catch_it(event):
                     # PRESS CHECK BUTTON LAST
                     # =================================
 
-                        if check_btn:
+                    if check_btn:
 
-                            await asyncio.sleep(
-                                random.uniform(1.5, 3)
-                            )
+                        await asyncio.sleep(
+                            random.uniform(1.5, 3)
+                        )
 
                         # refetch fresh message
-                            fresh_msg = await mrsyd.get_messages(
-                                bot_id,
-                                ids=msg.id
+                        fresh_msg = await mrsyd.get_messages(
+                            bot_id,
+                            ids=msg_id
+                        )
+
+                        if fresh_msg and fresh_msg.buttons:
+
+                            logging.info(
+                                f"Clicking check button: {check_btn.text}"
                             )
 
-                            if fresh_msg and fresh_msg.buttons:
+                            try:
 
-                                 logging.info(
-                                    f"Clicking check button: {check_btn.text}"
-                                 )
-
-                                 try:
-
-                                     await fresh_msg.click(
-                                         text=check_btn.text
-                                     )
-
-                                 except Exception as e:
-                                     await fresh_msg.click(3, 1)
-                              
-                                    logging.info(
-                                        f"Check button failed: {e}"
-                                    )
-
-                                    import traceback
-                                    traceback.print_exc()
-
-                             else:
-
-                                logging.info(
-                                    "Fresh message/buttons not found"
+                                await fresh_msg.click(
+                                    text=check_btn.text
                                 )
 
-                             await asyncio.sleep(
-                                random.uniform(0.1, 0.8)
-                             )
-                      if done:
+                            except Exception as e:
+
+                                try:
+
+                                    await fresh_msg.click(3, 1)
+
+                                except:
+                                    pass
+
+                                logging.info(
+                                    f"Check button failed: {e}"
+                                )
+
+                                import traceback
+                                traceback.print_exc()
+
+                        else:
+
+                            logging.info(
+                                "Fresh message/buttons not found"
+                            )
+
+                        await asyncio.sleep(
+                            random.uniform(0.1, 0.8)
+                        )
+
+            # =================================
+            # SUBSCRIBE MESSAGE
+            # =================================
+
+            elif msg_id in SUBSCRIBE_MSG_IDS:
+
+                if msg.buttons:
+
+                    done = False
+
+                    for row in msg.buttons:
+                        for btn in row:
+
+                            if (
+                                btn.text
+                                and "Подтвердить"
+                                in btn.text
+                            ):
+
+                                logging.info(
+                                    f"Clicking confirm button: {btn.text}"
+                                )
+
+                                await handle_button(
+                                    btn,
+                                    msg
+                                )
+
+                                await asyncio.sleep(
+                                    random.uniform(
+                                        0.1,
+                                        1
+                                    )
+                                )
+
+                                done = True
+                                break
+
+                        if done:
                             break
- 
- 
+
             SUBSCRIBE_MSG_IDS.discard(msg_id)
             PHOTO_MSG_IDS.discard(msg_id)
 
@@ -773,9 +750,10 @@ async def catch_it(event):
             logging.info(e)
             import traceback
             traceback.print_exc()
-    TURN = False
-    await event.reply("Finished all tasks")
 
+    TURN = False
+
+    await event.reply("Finished all tasks")
 
 # ---------- open in real browser ----------
 
