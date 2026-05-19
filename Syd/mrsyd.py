@@ -606,14 +606,14 @@ async def catch_it(event):
         try:
 
             await mrsyd.send_message(bot_id, "💎 Задания")
-            wait_time = random.randint(10, 14)
+            wait_time = random.randint(6, 10)
             logging.info(f"Sleeping for {wait_time} seconds")
             await asyncio.sleep(wait_time)
         except Exception as e:
             logging.info(e)
             import traceback
             traceback.print_exc()
-    await asyncio.sleep(3)
+    await asyncio.sleep(1.5)
     
     STOPP = True
     logging.info("Finished collecting IDs")
@@ -670,7 +670,7 @@ async def catch_it(event):
 
                         await handle_button(btn1, msg)
 
-                        await asyncio.sleep(random.uniform(0.1, 0.8))
+                        await asyncio.sleep(random.uniform(0.01, 0.4))
 
                     # second button
                     if len(all_buttons) >= 2:
@@ -682,7 +682,7 @@ async def catch_it(event):
                         )
 
                         await handle_button(btn2, msg)
-                        await asyncio.sleep(random.uniform(0.1, 0.8))
+                        await asyncio.sleep(random.uniform(0.01, 0.48))
             # =================================
             # SUBSCRIBE MESSAGE
             # =================================
@@ -704,7 +704,7 @@ async def catch_it(event):
                                 )
                                 await asyncio.sleep(random.uniform(0.1, 1))
                                 await handle_button(btn, msg)
-                                await asyncio.sleep(random.uniform(0.1, 1))
+                                await asyncio.sleep(random.uniform(0.01, 0.2))
                                 done = True
                                 break
                         if done:
