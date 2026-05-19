@@ -702,6 +702,7 @@ async def catch_it(event):
                                 logging.info(
                                     f"Clicking confirm button: {btn.text}"
                                 )
+                                await asyncio.sleep(random.uniform(0.1, 1))
                                 await handle_button(btn, msg)
                                 await asyncio.sleep(random.uniform(0.1, 1))
                                 done = True
