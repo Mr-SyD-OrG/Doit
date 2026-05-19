@@ -513,6 +513,73 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
+
+
+@mrsyd.on(events.NewMessage(from_users=bot_id))
+async def save_ids(event):
+    global PHOTO_MSG_IDS
+    global SUBSCRIBE_MSG_IDS
+    global TURN
+    global GENERAL
+
+    msg = event.message
+
+    if TURN is True:
+
+        # save photo message ids
+        if msg.photo:
+
+            PHOTO_MSG_IDS.add(msg.id)
+
+            logging.info(f"Saved photo msg id: {msg.id}")
+            return 
+        # save subscribe ids
+        if (
+            msg.raw_text and
+            msg.raw_text.startswith(
+                "💡 Получай Звёзды за простые задания! 👇\n\n1. Нажми «Подписаться», дождись"
+            )
+        ):
+
+            SUBSCRIBE_MSG_IDS.add(msg.id)
+
+            logging.info(f"Saved subscribe msg id: {msg.id}")
+            return 
+    elif msg.raw_text and msg.buttons:
+
+        text = msg.raw_text.strip()
+
+        if ("🤑" in text and "get +0.30" in text.lower() and "subscribe" in text.lower() and "check" in text.lower()):
+            if GENERAL or TURN:
+
+                logging.info("Detected subscribe task message")
+
+                for row in msg.buttons:
+                    for btn in row:
+
+                        if btn.text and "Skip" in btn.text:
+
+                            logging.info(
+                                f"Clicking skip button: {btn.text}"
+                            )
+
+                            await handle_button(btn, msg)
+
+                            await asyncio.sleep(3)
+
+                            return
+
+            # =========================
+            # GENERAL FALSE
+            # =========================
+
+            else:
+
+                await mrsyd.send_message(
+                    ADMIN_ID,
+                    f"Message ID: {msg.id}\n\n{text}"
+                )
+
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
