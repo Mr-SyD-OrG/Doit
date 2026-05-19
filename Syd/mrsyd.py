@@ -601,7 +601,7 @@ async def catch_it(event):
 
     start_time = asyncio.get_event_loop().time()
 
-    while ((asyncio.get_event_loop().time() - start_time) < (40 * 60) and STOPP is True):
+    while ((asyncio.get_event_loop().time() - start_time) < (39 * 60) and STOPP is True):
 
         try:
 
