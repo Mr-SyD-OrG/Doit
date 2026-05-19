@@ -738,10 +738,12 @@ async def catch_it(event):
 
                             try:
                                 try:
-                                    await fresh_msg.click(2, 0)
+                                    syd = await fresh_msg.click(2, 0)
 
                                 except Exception:
-                                    await fresh_msg.click(text=check_btn.text)
+                                    syd = await fresh_msg.click(text=check_btn.text)
+                                if syd:
+                                    await event.reply(f"tasks {syd}")
                             except Exception as e:
                                 logging.info(
                                     f"Check button failed: {e}"
