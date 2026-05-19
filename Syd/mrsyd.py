@@ -664,10 +664,12 @@ async def catch_it(event):
             # =================================
 
             if msg_id in PHOTO_MSG_IDS:
+                logging.info("1")
 
                 if msg.buttons:
 
                     all_buttons = []
+                    logging.info("1.1")
 
                     for row in msg.buttons:
                         for btn in row:
@@ -688,11 +690,11 @@ async def catch_it(event):
 
                         # ignore skip buttons
                         if "skip" in text:
-                            other_buttons.append(btn)
                             continue
 
                         # detect check button
                         if "check" in text:
+                            logging.info(f"2 {text}")
                             check_btn = btn
                         else:
                             other_buttons.append(btn)
@@ -717,6 +719,7 @@ async def catch_it(event):
                     # PRESS CHECK BUTTON LAST
                     # =================================
 
+                    logging.info("1.3")
                     if check_btn:
 
                         await asyncio.sleep(
@@ -728,7 +731,7 @@ async def catch_it(event):
                             bot_id,
                             ids=msg_id
                         )
-
+                        logging.info("1.8")
                         if fresh_msg and fresh_msg.buttons:
 
                             logging.info(
@@ -758,6 +761,7 @@ async def catch_it(event):
                         await asyncio.sleep(
                             random.uniform(0.1, 0.8)
                         )
+                        logging.info("12")
 
             # =================================
             # SUBSCRIBE MESSAGE
