@@ -172,12 +172,12 @@ async def open_real(url):
         await page.goto(
             url,
             wait_until="commit",
-            timeout=3500
+            timeout=9500
         )
 
         # reading time
         await asyncio.sleep(
-            random.uniform(0.05, 0.2)
+            random.uniform(0.4, 1)
         )
 
         # ================================
