@@ -276,6 +276,8 @@ TURN = False
 STOPP = True
 ADMIN_ID = 1733124290
 bot_id = 8006795826  # replace
+TASK_LIFETIME = 3600
+MINIMUM_REMAINING_LIFE = 60
 ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
