@@ -165,7 +165,7 @@ async def open_real(url):
 
         # random delay before open
         await asyncio.sleep(
-            random.uniform(0.12, 0.58)
+            random.uniform(0.012, 0.28)
         )
 
         # open page
@@ -177,7 +177,7 @@ async def open_real(url):
 
         # reading time
         await asyncio.sleep(
-            random.uniform(0.4, 0.8)
+            random.uniform(0.4, 0.5)
         )
 
         # ================================
@@ -187,7 +187,7 @@ async def open_real(url):
         try:
 
             # 70% chance to scroll
-            if random.random() < 0.1:
+            if random.random() < 0.08:
 
                 scroll_amount = random.randint(
                     200,
@@ -224,7 +224,7 @@ async def open_real(url):
         try:
 
             # 60% chance
-            if random.random() < 0.2:
+            if random.random() < 0.05:
 
                 await page.mouse.move(
                     random.randint(100, 800),
@@ -245,10 +245,10 @@ async def open_real(url):
         try:
 
             # every ~25 tasks sometimes pause
-            if TASK_COUNT % random.randint(20, 35) == 0:
+            if TASK_COUNT % random.randint(50, 65) == 0:
                 pause_time = random.uniform(
                     0.5,
-                    4
+                    3
                 )
 
                 logging.info(
@@ -268,7 +268,7 @@ async def open_real(url):
         # REFRESH CONTEXT EVERY 50 TASKS
         # ================================
 
-        if TASK_COUNT % 50 == 0:
+        if TASK_COUNT % 150 == 0:
 
             await refresh_context()
 
