@@ -264,12 +264,13 @@ import asyncio
 import asyncio
 import random
 import logging
+import time
 from telethon import events
 from telethon.tl.types import KeyboardButtonUrl
 from playwright.async_api import async_playwright
 
-PHOTO_MSG_IDS = set()
-SUBSCRIBE_MSG_IDS = set()
+PHOTO_TASKS = {}
+SUBSCRIBE_TASKS = {}
 GENERAL = False
 TURN = False
 STOPP = True
@@ -516,8 +517,8 @@ async def handle_button(btn, msg):
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
     global TURN
     global GENERAL
 
@@ -527,11 +528,23 @@ async def save_ids(event):
 
         # save photo message ids
         if msg.photo:
+            urls = []
+            if msg.buttons:
+                for row in msg.buttons:
+                    for btn in row:
+                        if getattr(btn, "url", None):
+                            urls.append(btn.url)
+            if urls:
 
-            PHOTO_MSG_IDS.add(msg.id)
+                PHOTO_TASKS[msg.id] = {
+                    "urls": urls[:2],
+                    "arrived": time.time()
+                }
 
-            logging.info(f"Saved photo msg id: {msg.id}")
-            return 
+                logging.info(
+                    f"Saved photo task: {msg.id}"
+                )
+            return
         # save subscribe ids
         if (
             msg.raw_text and
@@ -540,7 +553,9 @@ async def save_ids(event):
             )
         ):
 
-            SUBSCRIBE_MSG_IDS.add(msg.id)
+            SUBSCRIBE_TASKS[msg.id] = {
+                "arrived": time.time()
+            }
 
             logging.info(f"Saved subscribe msg id: {msg.id}")
             return 
@@ -585,8 +600,8 @@ async def save_ids(event):
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
 
     TURN = True
 
@@ -623,7 +638,9 @@ async def catch_it(event):
     # =========================================
 
     all_ids = sorted(
-        PHOTO_MSG_IDS.union(SUBSCRIBE_MSG_IDS)
+        set(PHOTO_TASKS.keys()).union(
+            SUBSCRIBE_TASKS.keys()
+        )
     )
 
     logging.info(f"Total IDs found: {len(all_ids)}")
@@ -633,61 +650,99 @@ async def catch_it(event):
     # =========================================
 
     for msg_id in all_ids:
-
+        current_time = time.time()
         try:
+            if msg_id in PHOTO_TASKS:
+                task = PHOTO_TASKS.get(msg_id)
 
-            msg = await mrsyd.get_messages(bot_id, ids=msg_id)
+                if not task:
+                    continue
 
-            if not msg:
-                PHOTO_MSG_IDS.discard(msg_id)
-                SUBSCRIBE_MSG_IDS.discard(msg_id)
-                continue
+                age = (
+                    current_time - task["arrived"]
+                )
 
-            logging.info(f"Processing msg id: {msg_id}")
+                remaining = (
+                    TASK_LIFETIME - age
+                )
 
-            # =================================
-            # PHOTO MESSAGE
-            # =================================
+                if remaining < MINIMUM_REMAINING_LIFE:
 
-            if msg_id in PHOTO_MSG_IDS:
+                    logging.info(
+                        f"Skipped expired photo task: {msg_id}"
+                    )
 
-                if msg.buttons:
+                    PHOTO_TASKS.pop(
+                        msg_id,
+                        None
+                    )
 
-                    all_buttons = []
+                    continue
 
-                    for row in msg.buttons:
-                        for btn in row:
-                            all_buttons.append(btn)
+                urls = task["urls"]
 
-                    # first button
-                    if len(all_buttons) >= 1:
+                logging.info(
+                    f"Processing photo task: {msg_id}"
+                )
 
-                        btn1 = all_buttons[0]
+                for url in urls:
 
-                        logging.info(
-                            f"Clicking first button: {btn1.text}"
+                    await open_real(url)
+                    logging.info(url)
+
+                    await asyncio.sleep(
+                        random.uniform(
+                            0.01,
+                            0.08
                         )
+                    )
 
-                        await handle_button(btn1, msg)
+                PHOTO_TASKS.pop(
+                    msg_id,
+                    None
+                )
 
-                        await asyncio.sleep(random.uniform(0.01, 0.4))
+            elif msg_id in SUBSCRIBE_TASKS:
 
-                    # second button
-                    if len(all_buttons) >= 2:
+                task = SUBSCRIBE_TASKS.get(msg_id)
 
-                        btn2 = all_buttons[1]
+                if not task:
+                    continue
 
-                        logging.info(
-                            f"Clicking second button: {btn2.text}"
-                        )
+                age = (
+                    current_time - task["arrived"]
+                )
 
-                        await handle_button(btn2, msg)
-                        await asyncio.sleep(random.uniform(0.01, 0.48))
-            # =================================
-            # SUBSCRIBE MESSAGE
-            # =================================
+                remaining = (
+                    TASK_LIFETIME - age
+                )
 
-            elif msg_id in SUBSCRIBE_MSG_IDS:
+                if remaining < MINIMUM_REMAINING_LIFE:
+
+                    logging.info(
+                        f"Skipped expired subscribe task: {msg_id}"
+                    )
+
+                    SUBSCRIBE_TASKS.pop(
+                        msg_id,
+                        None
+                    )
+
+                    continue
+
+                msg = await mrsyd.get_messages(
+                    bot_id,
+                    ids=msg_id
+                )
+
+                if not msg:
+
+                    SUBSCRIBE_TASKS.pop(
+                        msg_id,
+                        None
+                    )
+
+                    continue
 
                 if msg.buttons:
 
@@ -702,7 +757,7 @@ async def catch_it(event):
                                 logging.info(
                                     f"Clicking confirm button: {btn.text}"
                                 )
-                                await asyncio.sleep(random.uniform(0.1, 1))
+                                await asyncio.sleep(random.uniform(0.1, 0.9))
                                 await handle_button(btn, msg)
                                 await asyncio.sleep(random.uniform(0.01, 0.2))
                                 done = True
@@ -710,8 +765,10 @@ async def catch_it(event):
                         if done:
                             break
                           
-            SUBSCRIBE_MSG_IDS.discard(msg_id)
-            PHOTO_MSG_IDS.discard(msg_id)
+            SUBSCRIBE_TASKS.pop(
+                    msg_id,
+                    None
+            )
         except Exception as e:
             logging.info(e)
             import traceback
@@ -733,21 +790,20 @@ async def catch_it(event):
 ))
 async def clear_ids(event):
 
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
 
-    photo_count = len(PHOTO_MSG_IDS)
-    subscribe_count = len(SUBSCRIBE_MSG_IDS)
+    photo_count = len(PHOTO_TASKS)
+    subscribe_count = len(SUBSCRIBE_TASKS)
 
-    PHOTO_MSG_IDS.clear()
-    SUBSCRIBE_MSG_IDS.clear()
+    PHOTO_TASKS.clear()
+    SUBSCRIBE_TASKS.clear()
 
     await event.reply(
-        f"Cleared IDs\n\n"
-        f"Photo IDs removed: {photo_count}\n"
-        f"Subscribe IDs removed: {subscribe_count}"
+        f"Cleared tasks\n\n"
+        f"Photo tasks removed: {photo_count}\n"
+        f"Subscribe tasks removed: {subscribe_count}"
     )
-
 
 # =====================================
 # SEE COUNTS
@@ -759,11 +815,11 @@ async def clear_ids(event):
 ))
 async def see_count(event):
 
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
 
-    photo_count = len(PHOTO_MSG_IDS)
-    subscribe_count = len(SUBSCRIBE_MSG_IDS)
+    photo_count = len(PHOTO_TASKS)
+    subscribe_count = len(SUBSCRIBE_TASKS)
 
     total = photo_count + subscribe_count
 
@@ -1717,6 +1773,59 @@ async def open_link(event):
 
 import json
 
+# =========================================
+# BACKUP
+# =========================================
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^backup$"
+))
+async def backup_ids(event):
+
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
+
+    try:
+
+        data = {
+            "photo_tasks": PHOTO_TASKS,
+            "subscribe_tasks": SUBSCRIBE_TASKS
+        }
+
+        file_name = "tasks_backup.json"
+
+        with open(file_name, "w", encoding="utf-8") as f:
+
+            json.dump(
+                data,
+                f,
+                ensure_ascii=False,
+                indent=2
+            )
+
+        await mrsyd.send_file(
+            event.chat_id,
+            file_name,
+            caption=(
+                f"Backup created\n\n"
+                f"Photo tasks: {len(PHOTO_TASKS)}\n"
+                f"Subscribe tasks: {len(SUBSCRIBE_TASKS)}"
+            )
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(
+            f"Error: {e}"
+        )
+
+# =========================================
+# RESTORE
+# =========================================
 
 @mrsyd.on(events.NewMessage(
     from_users=ADMINS,
@@ -1724,8 +1833,8 @@ import json
 ))
 async def restore_ids(event):
 
-    global PHOTO_MSG_IDS
-    global SUBSCRIBE_MSG_IDS
+    global PHOTO_TASKS
+    global SUBSCRIBE_TASKS
 
     try:
 
@@ -1747,26 +1856,33 @@ async def restore_ids(event):
 
             return
 
-        # download file
         path = await reply.download_media()
 
-        # load json
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
 
             data = json.load(f)
 
-        PHOTO_MSG_IDS = set(
-            data.get("photo", [])
-        )
+        # convert string keys back to int
+        PHOTO_TASKS = {
+            int(k): v
+            for k, v in data.get(
+                "photo_tasks",
+                {}
+            ).items()
+        }
 
-        SUBSCRIBE_MSG_IDS = set(
-            data.get("subscribe", [])
-        )
+        SUBSCRIBE_TASKS = {
+            int(k): v
+            for k, v in data.get(
+                "subscribe_tasks",
+                {}
+            ).items()
+        }
 
         await event.reply(
             f"Backup restored\n\n"
-            f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
-            f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
+            f"Photo tasks: {len(PHOTO_TASKS)}\n"
+            f"Subscribe tasks: {len(SUBSCRIBE_TASKS)}"
         )
 
     except Exception as e:
@@ -1774,45 +1890,9 @@ async def restore_ids(event):
         import traceback
         traceback.print_exc()
 
-        await event.reply(f"Error: {e}")
-
-
-@mrsyd.on(events.NewMessage(
-    from_users=ADMINS,
-    pattern=r"^backup$"
-))
-async def backup_ids(event):
-
-    try:
-
-        data = {
-            "photo": list(PHOTO_MSG_IDS),
-            "subscribe": list(SUBSCRIBE_MSG_IDS)
-        }
-
-        file_name = "ids_backup.json"
-
-        with open(file_name, "w") as f:
-
-            json.dump(data, f)
-
-        await mrsyd.send_file(
-            event.chat_id,
-            file_name,
-            caption=(
-                f"Backup created\n\n"
-                f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
-                f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
-            )
+        await event.reply(
+            f"Error: {e}"
         )
-
-    except Exception as e:
-
-        import traceback
-        traceback.print_exc()
-
-        await event.reply(f"Error: {e}")
-
 
 
 import re
