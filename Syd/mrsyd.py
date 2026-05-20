@@ -1774,6 +1774,43 @@ async def open_link(event):
 
         await event.reply(f"Error:\n{e}")
 
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^delphoto (\d+)$"
+))
+async def delete_photo_task(event):
+
+    global PHOTO_TASKS
+
+    try:
+
+        msg_id = int(
+            event.pattern_match.group(1)
+        )
+
+        if msg_id not in PHOTO_TASKS:
+
+            await event.reply(
+                f"Photo task not found: {msg_id}"
+            )
+
+            return
+
+        PHOTO_TASKS.pop(msg_id, None)
+
+        await event.reply(
+            f"Removed photo task: {msg_id}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(
+            f"Error: {e}"
+        )
 import json
 
 # =========================================
