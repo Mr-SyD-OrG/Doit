@@ -2001,7 +2001,7 @@ async def click_loop(msg_id, event):
             for _ in range(random.randint(620, 1400)):
 
                 if not SYDFLAG:
-                    await event.reply(f"Stopped: {count}")
+                    await event.reply(f"Stopped: {click_count}")
                     return
 
                 await asyncio.sleep(1)
