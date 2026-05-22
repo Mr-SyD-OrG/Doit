@@ -1960,7 +1960,7 @@ async def wait_until_6am():
         await asyncio.sleep(30)
 
 
-async def click_loop(msg_id, event):
+async def click_loop(msg_id, event, ttl=30):
     global SYDFLAG
 
     while SYDFLAG:
@@ -1974,7 +1974,7 @@ async def click_loop(msg_id, event):
         await event.reply("▶️ Starting today's clicking session")
 
         # 30 clicks daily
-        while SYDFLAG and click_count < 30:
+        while SYDFLAG and click_count < ttl:
 
             try:
                 msg = await mrsyd.get_messages(
@@ -1990,9 +1990,11 @@ async def click_loop(msg_id, event):
                 )[0].id
 
                 if not msg:
-                    return await event.reply(
+                    await event.reply(
                         f"No Message {last_msg_id}"
                     )
+                    SYDFLAG = False
+                    await auto_runner(event, ttl - click_count)
 
                 if first:
                     await event.reply(
@@ -2075,7 +2077,7 @@ async def click_loop(msg_id, event):
         pattern=r"(?i)(24 process|sydflag false|start auto process)"
     )
 )
-async def auto_runner(event):
+async def auto_runner(event, syd=None):
 
     global SYDFLAG
 
@@ -2129,13 +2131,14 @@ async def auto_runner(event):
             )
 
             # start loop
-            asyncio.create_task(
-                click_loop(target_msg_id, event)
-            )
-
+            if syd:
+                asyncio.create_task(click_loop(target_msg_id, event, syd))
+            else:
+                asyncio.create_task(click_loop(target_msg_id, event)
             return
 
         except Exception as e:
+            SYDFLAG = False
             await event.reply(f"⚠️ Error: {e}")
             return
 
