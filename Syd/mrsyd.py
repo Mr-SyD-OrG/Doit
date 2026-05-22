@@ -2041,12 +2041,19 @@ async def click_loop(msg_id, event, ttl=30):
                 await event.reply(f"⚠️ Error: {e}")
 
             # random wait
-            for _ in range(random.randint(620, 1400)):
-
+            now = datetime.now(IST)
+            if now.hour < 13:
+                wait_time = random.randint(620, 1400)
+            elif now.hour < 18:
+                wait_time = random.randint(420, 700)
+            elif now.hour < 22:
+                wait_time = random.randint(370, 400)
+            else:
+                wait_time = random.randint(370, 400)
+            for _ in range(wait_time):
                 if not SYDFLAG:
                     await event.reply(f"Stopped: {click_count}")
                     return
-
                 await asyncio.sleep(1)
 
         await event.reply(
@@ -2134,7 +2141,7 @@ async def auto_runner(event, syd=None):
             if syd:
                 asyncio.create_task(click_loop(target_msg_id, event, syd))
             else:
-                asyncio.create_task(click_loop(target_msg_id, event)
+                asyncio.create_task(click_loop(target_msg_id, event))
             return
 
         except Exception as e:
