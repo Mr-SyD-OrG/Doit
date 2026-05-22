@@ -2327,35 +2327,51 @@ async def solve_robot_check(event):
                                 f"URL open failed: {e}"
                             )
 
-            # =====================================================
-            # CLICK LAST CALLBACK BUTTON ONLY
-            # =====================================================
+       
 
-            last_row = message.buttons[-1]
-            last_btn = last_row[-1]
+            for row in message.buttons:
 
-            if (
-                hasattr(last_btn, "data")
-                and last_btn.data
-            ):
+                for btn in row:
+                    if not (
+                        hasattr(btn, "data")
+                        and btn.data
+                    ):
+                        continue
 
-                await last_btn.click()
+                    btn_text = (btn.text or "").strip()
 
-                logging.info(
-                    "Pressed last callback button"
-                )
+                    # FIRST PRIORITY
+                    if "Подтвердить подписку" in btn_text:
 
-                await mrsyd.send_message(
-                    ADMIN_ID,
-                    f"✅ Pressed farm button\n"
-                    f"Button: {last_btn.text}"
-                )
+                        await btn.click()
 
+                        logging.info(
+                            "Pressed confirm subscription button"
+                        )
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"✅ Pressed confirm button\n"
+                            f"Button: {btn_text}"
+                        )
+
+                        
+
+                    
+                    elif "Я выполнил (а)" in btn_text:
+                        await asyncio.sleep(30)
+                        await btn.click()
+
+                        logging.info(
+                            "Pressed completed button"
+                        )
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"✅ Pressed completed button\n"
+                            f"Button: {btn_text}"
+                        )
             return
-
-        # =========================================================
-        # CASE 3 -> ROBOT FRUIT CHECK
-        # =========================================================
 
         elif text.startswith("🤖 ПРОВЕРКА НА РОБОТА"):
 
