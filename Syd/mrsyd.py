@@ -1994,7 +1994,8 @@ async def click_loop(msg_id, event, ttl=30):
                         f"No Message {last_msg_id}"
                     )
                     SYDFLAG = False
-                    await auto_runner(event, ttl - click_count)
+                    return await auto_runner(event, ttl - click_count)
+                    
 
                 if first:
                     await event.reply(
