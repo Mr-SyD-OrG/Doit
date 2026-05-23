@@ -6,18 +6,14 @@ from .web import open_real
 import random
 from telethon.tl.types import PeerChannel
 import logging
+from datetime import datetime, timedelta
+from telethon.tl.types import PeerUser
+from pytz import timezone
 
 logging.basicConfig(level=logging.INFO)
 
 client = mrsyd
 
-
-
-from datetime import datetime, timedelta
-from telethon.tl.types import PeerUser
-from pytz import timezone
-
-  # Replace with your actual admin
 IST = timezone('Asia/Kolkata')
 
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
