@@ -487,10 +487,6 @@ async def handle_buttonss(btn, msg):
 async def handle_button(btn, msg):
 
     try:
-
-        logging.info("Handling button")
-
-        # URL BUTTON
         if getattr(btn, "url", None):
 
             logging.info(
@@ -633,10 +629,6 @@ async def catch_it(event):
     STOPP = True
     logging.info("Finished collecting IDs")
 
-    # =========================================
-    # MERGE + SORT IDS
-    # =========================================
-
     all_ids = sorted(
         set(PHOTO_TASKS.keys()).union(
             SUBSCRIBE_TASKS.keys()
@@ -757,9 +749,9 @@ async def catch_it(event):
                                 logging.info(
                                     f"Clicking confirm button: {btn.text}"
                                 )
-                                await asyncio.sleep(random.uniform(0.1, 0.9))
+                                await asyncio.sleep(random.uniform(0.1, 0.4))
                                 await handle_button(btn, msg)
-                                await asyncio.sleep(random.uniform(0.01, 0.2))
+                                await asyncio.sleep(random.uniform(0.01, 0.1))
                                 done = True
                                 break
                         if done:
