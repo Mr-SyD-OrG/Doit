@@ -2013,7 +2013,7 @@ async def check_subscribe_ids(event):
                 pressed += 1
 
                 await asyncio.sleep(
-                    random.uniform(1.5, 3.5)
+                    random.uniform(5, 8.5)
                 )
 
             except Exception as e:
