@@ -612,12 +612,12 @@ async def catch_it(event):
 
     start_time = asyncio.get_event_loop().time()
 
-    while ((asyncio.get_event_loop().time() - start_time) < (39 * 60) and STOPP is True):
+    while ((asyncio.get_event_loop().time() - start_time) < (38 * 60) and STOPP is True):
 
         try:
 
             await mrsyd.send_message(bot_id, "💎 Задания")
-            wait_time = random.randint(6, 10)
+            wait_time = random.uniform(4.5, 9)
             logging.info(f"Sleeping for {wait_time} seconds")
             await asyncio.sleep(wait_time)
         except Exception as e:
@@ -627,6 +627,10 @@ async def catch_it(event):
     await asyncio.sleep(1.5)
     
     STOPP = True
+    try: 
+        await backup_ids(event)
+    except:
+        pass
     logging.info("Finished collecting IDs")
 
     all_ids = sorted(
@@ -1912,6 +1916,119 @@ async def restore_ids(event):
             f"Backup restored\n\n"
             f"Photo tasks: {len(PHOTO_TASKS)}\n"
             f"Subscribe tasks: {len(SUBSCRIBE_TASKS)}"
+        )
+
+    except Exception as e:
+
+        import traceback
+        traceback.print_exc()
+
+        await event.reply(
+            f"Error: {e}"
+        )
+
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^check sub$"
+))
+async def check_subscribe_ids(event):
+
+    global SUBSCRIBE_TASKS
+
+    try:
+
+        if not event.is_reply:
+
+            await event.reply(
+                "Reply to file containing subscribe ids"
+            )
+
+            return
+
+        reply = await event.get_reply_message()
+
+        if not reply.file:
+
+            await event.reply(
+                "Reply must contain file"
+            )
+
+            return
+
+        path = await reply.download_media()
+
+        with open(path, "r", encoding="utf-8") as f:
+
+            data = json.load(f)
+
+        # supports both list and dict
+        if isinstance(data, dict):
+
+            ids = list(
+                map(
+                    int,
+                    data.get(
+                        "subscribe_tasks",
+                        {}
+                    ).keys()
+                )
+            )
+
+        else:
+
+            ids = list(
+                map(int, data)
+            )
+
+        pressed = 0
+        failed = 0
+        removed = 0
+
+        for msg_id in ids:
+
+            try:
+
+                msg = await mrsyd.get_messages(
+                    bot_id,
+                    ids=msg_id
+                )
+
+                if not msg:
+
+                    SUBSCRIBE_TASKS.pop(
+                        msg_id,
+                        None
+                    )
+
+                    removed += 1
+                    continue
+
+                if not msg.buttons:
+
+                    continue
+
+                # press first button
+                await msg.click(0)
+
+                pressed += 1
+
+                await asyncio.sleep(
+                    random.uniform(1.5, 3.5)
+                )
+
+            except Exception as e:
+
+                failed += 1
+
+                logging.info(
+                    f"{msg_id} failed: {e}"
+                )
+
+        await event.reply(
+            f"Finished checking subscribe ids\n\n"
+            f"Pressed: {pressed}\n"
+            f"Removed: {removed}\n"
+            f"Failed: {failed}"
         )
 
     except Exception as e:
