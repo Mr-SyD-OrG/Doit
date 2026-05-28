@@ -650,12 +650,12 @@ async def catch_it(event):
 
     start_time = asyncio.get_event_loop().time()
 
-    while ((asyncio.get_event_loop().time() - start_time) < (38 * 60) and STOPP is True):
+    while ((asyncio.get_event_loop().time() - start_time) < (39 * 60) and STOPP is True):
 
         try:
 
             await mrsyd.send_message(bot_id, "💎 Задания")
-            wait_time = random.uniform(4.5, 9)
+            wait_time = random.uniform(7, 11)
             logging.info(f"Sleeping for {wait_time} seconds")
             await asyncio.sleep(wait_time)
         except Exception as e:
