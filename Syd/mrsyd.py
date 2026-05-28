@@ -2090,7 +2090,156 @@ ADMIN_ID = 1733124290
 
 IST = pytz.timezone("Asia/Kolkata")
 
+last_daily_run = None
+
+
+async def daily_profile_check(event):
+
+    try:
+        await mrsyd.send_message(
+            "patrickstarsrobot",
+            "/start"
+        )
+
+        await asyncio.sleep(10)
+
+        target_msg_id = None
+
+        # get recent messages
+        messages = await mrsyd.get_messages(
+            "patrickstarsrobot",
+            limit=15
+        )
+
+        for m in messages:
+
+            if (
+                m.text and
+                re.search(
+                    r'Получи\s+свою\s+личную\s+ссылку',
+                    m.text
+                )
+            ):
+
+                target_msg_id = m.id
+                break
+
+        if not target_msg_id:
+
+            return await event.reply(
+                "❌ Start message not found"
+            )
+
+        msg = await mrsyd.get_messages(
+            "patrickstarsrobot",
+            ids=target_msg_id
+        )
+
+        if not msg.buttons:
+
+            return await event.reply(
+                "❌ No buttons in start message"
+            )
+
+        clicked = False
+
+        # click profile button
+        for row in msg.buttons:
+            for btn in row:
+
+                if "Профиль" in btn.text:
+
+                    await msg.click(
+                        text=btn.text
+                    )
+
+                    clicked = True
+                    break
+
+            if clicked:
+                break
+
+        if not clicked:
+
+            return await event.reply(
+                "❌ Профиль button not found"
+            )
+
+        await asyncio.sleep(5)
+
+        # check latest 2 messages
+        messages = await mrsyd.get_messages(
+            "patrickstarsrobot",
+            limit=2
+        )
+
+        latest = None
+
+        for m in messages:
+
+            clean_text = (
+                m.text
+                .replace("**", "")
+                .replace("__", "")
+                .strip()
+            ) if m.text else ""
+
+            if clean_text.startswith("✨ Профиль"):
+
+                latest = m
+                break
+
+        if not latest:
+
+            return await event.reply(
+                "❌ Profile message not found"
+            )
+
+        if not latest.buttons:
+
+            return await event.reply(
+                "❌ No buttons in profile message"
+            )
+
+        clicked = False
+
+        # click Ежедневка button
+        for row in latest.buttons:
+            for btn in row:
+
+                if "Ежедневка" in btn.text:
+
+                    await latest.click(
+                        text=btn.text
+                    )
+
+                    clicked = True
+                    break
+
+            if clicked:
+                break
+
+        if clicked:
+
+            await event.reply(
+                "✅ Daily reward claimed"
+            )
+
+        else:
+
+            await event.reply(
+                "❌ Ежедневка button not found"
+            )
+
+    except Exception as e:
+
+        await event.reply(
+            f"⚠️ Daily task error: {e}"
+        )
+
+
 async def wait_until_6am():
+
     while True:
 
         now = datetime.now(IST)
@@ -2104,12 +2253,19 @@ async def wait_until_6am():
 
 async def click_loop(msg_id, event, ttl=30):
     global SYDFLAG
+    global last_daily_run
 
     while SYDFLAG:
-
-        # wait until 6 AM IST
         await wait_until_6am()
-
+        now = datetime.now(IST)
+        today = now.date()
+        if (
+            now.hour >= 6 and
+            last_daily_run != today
+        ):
+            await daily_profile_check(event)
+            last_daily_run = today
+        
         click_count = 0
         first = True
 
