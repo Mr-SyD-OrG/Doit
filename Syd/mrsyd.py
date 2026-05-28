@@ -4,6 +4,7 @@ import re
 from bot import mrsyd
 from .web import open_real
 import random
+from info import VSYD
 from telethon.tl.types import PeerChannel
 import logging
 from datetime import datetime, timedelta
@@ -2261,7 +2262,8 @@ async def click_loop(msg_id, event, ttl=30):
         today = now.date()
         if (
             now.hour >= 6 and
-            last_daily_run != today
+            last_daily_run != today and
+            VSYD
         ):
             await daily_profile_check(event)
             last_daily_run = today
