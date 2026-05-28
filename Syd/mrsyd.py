@@ -2582,7 +2582,7 @@ async def solve_robot_check(event):
 
     try:
 
-        await asyncio.sleep(6)
+        await asyncio.sleep(8)
 
         if not message.text:
             return
