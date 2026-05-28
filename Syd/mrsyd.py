@@ -683,7 +683,9 @@ async def catch_it(event):
     # PROCESS ALL IDS
     # =========================================
     droppedp = 0
+    totalp = len(PHOTO_TASKS)
     droppeds = 0
+    totals = len(SUBSCRIBE_TASKS)
 
     for msg_id in all_ids:
         current_time = time.time()
@@ -807,7 +809,7 @@ async def catch_it(event):
                     msg_id,
                     None
             )
-            await event.reply(f"Finished all tasks\n Total(p): {}\nDropped(p): {}\nTotal(s): {}\nDropped(s): {}")
+            await event.reply(f"Finished all tasks\n Total(p): {totalp}\nDropped(p): {droppedp}\nTotal(s): {totals}\nDropped(s): {droppeds}")
         except Exception as e:
             logging.info(e)
             import traceback
