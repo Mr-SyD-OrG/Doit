@@ -16,6 +16,7 @@ API_ID = environ.get('API_URL', "")
 API_HASH = environ.get('API_URI', "")
 TELETHON_SESSION = environ.get('TELETHON_SESSION', "")
 PHONE_NUMBER = environ.get('NUMB', "")
+VSYD = environ.get("VSYD", "True").lower() == "true"
 SOURCE_CHAT_ID = -1002295881345  # Replace with source chat ID
 DESTINATION_CHAT_ID = -1002377676305
 auth_channel = environ.get('AUTH_CHANNEL', '')
