@@ -2380,7 +2380,7 @@ async def click_loop(msg_id, event, ttl=30):
 @mrsyd.on(
     events.NewMessage(
         from_users=ADMIN_ID,
-        pattern=r"(?i)(24 process|sydflag false|start auto process)"
+        pattern=r"(?i)(24 process|sydflag false|24 syd)"
     )
 )
 async def auto_runner(event, syd=None):
