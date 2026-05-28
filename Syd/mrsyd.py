@@ -56,7 +56,42 @@ async def handle_admn_message(event):
 
 
     
+@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
+async def handle_send_message(event):
+    text = event.message.raw_text.strip()
 
+    # Format: send @username Your message
+    match = re.match(
+        r'^send\s+@?(\w{5,32})\s+(.+)',
+        text,
+        re.IGNORECASE
+    )
+
+    if not match:
+        await event.reply(
+            "❌ Invalid format.\nUse:\nsend @username Your message"
+        )
+        return
+
+    username = match.group(1)
+    message_text = match.group(2).strip()
+
+    try:
+        user = await event.client.get_entity(username)
+
+        await event.client.send_message(
+            user,
+            message_text
+        )
+
+        await event.reply(
+            f"✅ Sent message to @{username}"
+        )
+
+    except Exception as e:
+        await event.reply(
+            f"❌ Failed to send message to @{username}\nError: {e}"
+        )
             
 
 SYD_CCHANNELS = [
