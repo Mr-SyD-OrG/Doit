@@ -18,7 +18,6 @@ client = mrsyd
 IST = timezone('Asia/Kolkata')
 
 
-
 @mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
 async def handle_admn_message(event):
     text = event.message.raw_text.strip()
