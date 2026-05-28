@@ -2469,6 +2469,59 @@ async def auto_runner(event, syd=None):
             await event.reply(f"⚠️ Error: {e}")
             return
 
+    elif text.startswith("24 syd "):
+        try:
+            if SYDFLAG: return await event.reply("a process already running")
+            SYDFLAG = True
+            csyd = int(text.split()[2])
+
+            await event.reply(
+                "🔍 Searching process message..."
+            )
+
+            # send /start
+            await mrsyd.send_message(
+                7996790736,
+                "/start"
+            )
+
+            # wait 20 sec
+            await asyncio.sleep(20)
+
+            target_msg_id = None
+
+            # check only last 4 messages
+            messages = await mrsyd.get_messages(
+                7996790736,
+                limit=4
+            )
+
+            for m in messages:
+             #   await event.reply(f"•{m.text}")
+                if m.text and re.search(r'Получи\s+свою\s+личную\s+ссылку', m.text):
+                    target_msg_id = m.id
+                    break
+
+            # not found
+            if not target_msg_id:
+                SYDFLAG = False
+                return await event.reply(
+                    "❌ Target process message not found in last 4 messages"
+                )
+
+            await event.reply(
+                f"✅ Found target message: {target_msg_id}"
+            )
+
+           
+            asyncio.create_task(click_loop(target_msg_id, event, csyd))
+            return
+
+        except Exception as e:
+            SYDFLAG = False
+            await event.reply(f"⚠️ Error: {e}")
+            return
+
     # =====================================================
     # STOP LOOP
     # =====================================================
