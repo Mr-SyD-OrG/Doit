@@ -549,6 +549,28 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
+# Global queue
+URL_QUEUE = asyncio.Queue()
+
+
+async def url_worker():
+    while True:
+        url = await URL_QUEUE.get()
+
+        try:
+            logging.info(f"Opening queued url: {url}")
+
+            await open_real(url)
+
+        except Exception:
+            logging.exception(
+                "url_worker failed"
+            )
+
+        finally:
+            URL_QUEUE.task_done()
+
+
 @mrsyd.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
     global PHOTO_TASKS
@@ -559,27 +581,36 @@ async def save_ids(event):
     msg = event.message
 
     if TURN is True:
-
-        # save photo message ids
         if msg.photo:
+
             urls = []
+
             if msg.buttons:
                 for row in msg.buttons:
                     for btn in row:
                         if getattr(btn, "url", None):
                             urls.append(btn.url)
-            if urls:
 
+            if len(urls) >= 2:
+
+                # Queue first url
+                await URL_QUEUE.put(urls[0])
+
+                # Save only second url
                 PHOTO_TASKS[msg.id] = {
-                    "urls": urls[:2],
+                    "url": urls[1],
                     "arrived": time.time()
                 }
 
                 logging.info(
                     f"Saved photo task: {msg.id}"
                 )
+
             return
-        # save subscribe ids
+
+        # =========================
+        # SUBSCRIBE TASK
+        # =========================
         if (
             msg.raw_text and
             msg.raw_text.startswith(
@@ -591,35 +622,47 @@ async def save_ids(event):
                 "arrived": time.time()
             }
 
-            logging.info(f"Saved subscribe msg id: {msg.id}")
-            return 
+            logging.info(
+                f"Saved subscribe msg id: {msg.id}"
+            )
+
+            return
+
     elif msg.raw_text and msg.buttons:
 
         text = msg.raw_text.strip()
 
-        if ("💡 Получай" in text and "🟢 Подпишись на" in text):
+        if (
+            "💡 Получай" in text and
+            "🟢 Подпишись на" in text
+        ):
+
             if GENERAL or TURN:
 
-                logging.info("Detected subscribe task message")
+                logging.info(
+                    "Detected subscribe task message"
+                )
 
                 for row in msg.buttons:
                     for btn in row:
 
-                        if btn.text and "Пропустить" in btn.text:
+                        if (
+                            btn.text and
+                            "Пропустить" in btn.text
+                        ):
 
                             logging.info(
                                 f"Clicking skip button: {btn.text}"
                             )
 
-                            await handle_button(btn, msg)
+                            await handle_button(
+                                btn,
+                                msg
+                            )
 
                             await asyncio.sleep(3)
 
                             return
-
-            # =========================
-            # GENERAL FALSE
-            # =========================
 
             else:
 
@@ -627,9 +670,6 @@ async def save_ids(event):
                     ADMIN_ID,
                     f"Message ID: {msg.id}\n\n{text}"
                 )
-# =========================
-# MAIN COMMAND
-# =========================
 
 @mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
@@ -824,7 +864,101 @@ async def catch_it(event):
 # =====================================
 # CLEAR IDS
 # =====================================
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^urlcount$"
+))
+async def url_count(event):
 
+    await event.reply(
+        f"URLs in queue: {URL_QUEUE.qsize()}"
+    )
+    
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^urlbackup$"
+))
+async def backup_urls(event):
+
+    try:
+
+        urls = list(URL_QUEUE._queue)
+
+        if not urls:
+
+            await event.reply(
+                "URL queue is empty."
+            )
+            return
+
+        filename = "url_backup.txt"
+
+        with open(filename, "w", encoding="utf-8") as f:
+
+            for url in urls:
+                f.write(f"{url}\n")
+
+        await mrsyd.send_file(
+            event.chat_id,
+            filename,
+            caption=f"Backed up {len(urls)} URLs."
+        )
+
+        os.remove(filename)
+
+    except Exception as e:
+
+        await event.reply(
+            f"Backup failed:\n{e}"
+        )
+@mrsyd.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^urlrestore$"
+))
+async def restore_urls(event):
+
+    try:
+
+        if not event.is_reply:
+
+            await event.reply(
+                "Reply to a url backup file."
+            )
+            return
+
+        reply = await event.get_reply_message()
+
+        file_path = await reply.download_media()
+
+        restored = 0
+
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            for line in f:
+
+                url = line.strip()
+
+                if url:
+
+                    await URL_QUEUE.put(url)
+
+                    restored += 1
+
+        os.remove(file_path)
+
+        await event.reply(
+            f"Restored {restored} URLs."
+        )
+
+    except Exception as e:
+
+        await event.reply(
+            f"Restore failed:\n{e}"
+                  )
 @mrsyd.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^clear$"
