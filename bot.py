@@ -5,7 +5,7 @@ from info import API_ID, API_HASH, PHONE_NUMBER, SOURCE_CHAT_ID
 import glob
 from aiohttp import web
 from Syd.web_support import web_server
-from Syd.web import start_browser
+from Syd.web import start_browser, url_worker
 import importlib.util
 import os, asyncio
 from pyrogram import Client
@@ -28,6 +28,7 @@ def load_plugins():
 async def start_bot():
     await mrsyd.start()
     await start_browser()
+    asyncio.create_task(url_worker())
   #  await app.start() # Userbot requires phone number login
     #print("Userbot is running...")
 
