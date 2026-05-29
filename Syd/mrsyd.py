@@ -2,7 +2,7 @@ from telethon import events
 import asyncio
 import re
 from bot import mrsyd
-from .web import open_real
+from .web import open_real, url_worker, URL_QUEUE
 import random
 from info import VSYD
 from telethon.tl.types import PeerChannel
@@ -550,25 +550,7 @@ async def handle_button(btn, msg):
         traceback.print_exc()
 
 # Global queue
-URL_QUEUE = asyncio.Queue()
 
-
-async def url_worker():
-    while True:
-        url = await URL_QUEUE.get()
-
-        try:
-            logging.info(f"Opening queued url: {url}")
-
-            await open_real(url)
-
-        except Exception:
-            logging.exception(
-                "url_worker failed"
-            )
-
-        finally:
-            URL_QUEUE.task_done()
 
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
