@@ -278,3 +278,24 @@ async def open_real(url):
 
         import traceback
         traceback.print_exc()
+
+
+URL_QUEUE = asyncio.Queue()
+
+
+async def url_worker():
+    while True:
+        url = await URL_QUEUE.get()
+
+        try:
+            logging.info(f"Opening queued url: {url}")
+
+            await open_real(url)
+
+        except Exception:
+            logging.exception(
+                "url_worker failed"
+            )
+
+        finally:
+            URL_QUEUE.task_done()
