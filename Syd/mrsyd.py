@@ -615,11 +615,15 @@ async def save_ids(event):
         text = msg.raw_text.strip()
 
         if (
-            "💡 Получай" in text and
-            "🟢 Подпишись на" in text
+            "💡" in text and
+            "Получай" in text and
+            "🟢" in text and
+            "+0.25⭐️" in text and
+            "Подпишись" in text
         ):
 
             if GENERAL or TURN:
+                await mrsyd.send_message(ADMIN_ID, "Task Skip entering")
                 for row in msg.buttons:
                     for btn in row:
 
@@ -627,16 +631,11 @@ async def save_ids(event):
                             btn.text and
                             "Пропустить" in btn.text
                         ):
-
-                            logging.info(
-                                f"Clicking skip button: {btn.text}"
-                            )
-
                             await handle_button(
                                 btn,
                                 msg
                             )
-
+                            await mrsyd.send_message(ADMIN_ID, "Task Skip ✅")
                             await asyncio.sleep(3)
 
                             return
