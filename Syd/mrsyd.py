@@ -620,11 +620,6 @@ async def save_ids(event):
         ):
 
             if GENERAL or TURN:
-
-                logging.info(
-                    "Detected subscribe task message"
-                )
-
                 for row in msg.buttons:
                     for btn in row:
 
