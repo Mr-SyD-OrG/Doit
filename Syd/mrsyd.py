@@ -610,7 +610,7 @@ async def save_ids(event):
 
             return
 
-    elif msg.raw_text and msg.buttons:
+    if msg.raw_text and msg.buttons:
 
         text = msg.raw_text.strip()
 
