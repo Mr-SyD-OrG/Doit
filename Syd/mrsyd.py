@@ -2321,7 +2321,7 @@ async def click_loop(msg_id, event, ttl=30):
 
                             if "Кликер" in btn.text:
 
-                                await msg.click(
+                                psyd = await msg.click(
                                     text="✨ Кликер"
                                 )
 
@@ -2329,7 +2329,7 @@ async def click_loop(msg_id, event, ttl=30):
                                 clicked = True
 
                                 logging.info(
-                                    f"✅ Clicked {click_count}/30"
+                                    f"✅ Clicked {click_count}/30 {psyd}"
                                 )
 
                                 break
