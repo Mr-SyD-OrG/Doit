@@ -809,14 +809,16 @@ async def catch_it(event):
                     msg_id,
                     None
             )
-            await event.reply(f"Finished all tasks\n Total(p): {totalp}\nDropped(p): {droppedp}\nTotal(s): {totals}\nDropped(s): {droppeds}")
+            
         except Exception as e:
             logging.info(e)
             import traceback
             traceback.print_exc()
 
     TURN = False
-    await event.reply("Finished all tasks")
+    await event.reply(f"Finished all tasks\n Total(p): {totalp}\nDropped(p): {droppedp}\nTotal(s): {totals}\nDropped(s): {droppeds}")
+        
+#    await event.reply("Finished all tasks")
 
 
 # ---------- open in real browser ----------
