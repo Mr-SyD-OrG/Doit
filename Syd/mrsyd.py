@@ -2383,7 +2383,11 @@ async def click_loop(msg_id, event, ttl=30):
             if now.hour < 6:
                 break
 
-            await asyncio.sleep(60)
+            for _ in range(60):
+                if not SYDFLAG:
+                    await event.reply(f"Stopped: {click_count}")
+                    return
+                await asyncio.sleep(1)
 
 
 
