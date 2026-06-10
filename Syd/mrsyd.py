@@ -2327,6 +2327,7 @@ async def click_loop(msg_id, event, ttl=30):
 
                                 click_count += 1
                                 clicked = True
+                                if "Ты слишком" in psyd: await event.reply(f"Approached Limit \n {psyd}")
 
                                 logging.info(
                                     f"✅ Clicked {click_count}/30 {psyd}"
