@@ -272,7 +272,7 @@ GENERAL = False
 TURN = False
 STOPP = True
 ADMIN_ID = 1733124290
-bot_id = 8682541830  # replace
+bot_id = 7591165018  # replace
 ADMINS = [ADMIN_ID]
 # =========================
 # OPEN URL
@@ -548,7 +548,7 @@ async def save_ids(event):
 
         text = msg.raw_text.strip()
 
-        if ("🤑" in text and "get +0.30" in text.lower() and "subscribe" in text.lower() and "check" in text.lower()):
+        if ("+0.99" in text and "супер-задание" in text.lower()):
             if GENERAL or TURN:
 
                 logging.info("Detected subscribe task message")
@@ -556,7 +556,7 @@ async def save_ids(event):
                 for row in msg.buttons:
                     for btn in row:
 
-                        if btn.text and "Skip" in btn.text:
+                        if btn.text and "Пропустить" in btn.text:
 
                             logging.info(
                                 f"Clicking skip button: {btn.text}"
@@ -606,7 +606,7 @@ async def catch_it(event):
 
         try:
 
-            await mrsyd.send_message(bot_id, "Tasks")
+            await mrsyd.send_message(bot_id, "Задания")
 
             wait_time = random.randint(10, 14)
 
@@ -689,11 +689,11 @@ async def catch_it(event):
                         ).lower()
 
                         # ignore skip buttons
-                        if "skip" in text:
+                        if "Пропустить" in text:
                             continue
 
                         # detect check button
-                        if "check" in text:
+                        if "Проверить" in text:
                             logging.info(f"2 {text}")
                             check_btn = btn
                         else:
