@@ -1833,9 +1833,6 @@ async def open_link(event):
 
         await event.reply(f"Error:\n{e}")
 
-import json
-
-
 @mrsyd.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^restore$"
@@ -1844,6 +1841,7 @@ async def restore_ids(event):
 
     global PHOTO_MSG_IDS
     global SUBSCRIBE_MSG_IDS
+    global TASK_TIMES
 
     try:
 
@@ -1880,23 +1878,17 @@ async def restore_ids(event):
         SUBSCRIBE_MSG_IDS = set(
             data.get("subscribe", [])
         )
-       # for msg_id in PHOTO_MSG_IDS:
-           # try:
-            #    msg = await mrsyd.get_messages(
-           #         bot_id,
-         #           ids=msg_id
-           #     )
-           #     await msg.click(3, 1)
-         #   except Exception as e:
-       #         import traceback
-           #     traceback.print_exc()
-              #  await event.reply(f"Error: {e}")
-                 
+
+        TASK_TIMES = {
+            int(k): v
+            for k, v in data.get("task_times", {}).items()
+        }
 
         await event.reply(
             f"Backup restored\n\n"
             f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
-            f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
+            f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}\n"
+            f"Task Times: {len(TASK_TIMES)}"
         )
 
     except Exception as e:
@@ -1917,7 +1909,8 @@ async def backup_ids(event):
 
         data = {
             "photo": list(PHOTO_MSG_IDS),
-            "subscribe": list(SUBSCRIBE_MSG_IDS)
+            "subscribe": list(SUBSCRIBE_MSG_IDS),
+            "task_times": TASK_TIMES
         }
 
         file_name = "ids_backup.json"
@@ -1932,7 +1925,8 @@ async def backup_ids(event):
             caption=(
                 f"Backup created\n\n"
                 f"Photo IDs: {len(PHOTO_MSG_IDS)}\n"
-                f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}"
+                f"Subscribe IDs: {len(SUBSCRIBE_MSG_IDS)}\n"
+                f"Task Times: {len(TASK_TIMES)}"
             )
         )
 
