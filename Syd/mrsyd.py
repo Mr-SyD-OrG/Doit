@@ -512,6 +512,9 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
+import time
+
+TASK_TIMES = {}
 
 
 @mrsyd.on(events.NewMessage(from_users=bot_id))
@@ -529,6 +532,7 @@ async def save_ids(event):
         if msg.photo:
 
             PHOTO_MSG_IDS.add(msg.id)
+            TASK_TIMES[msg.id] = {"arrived": time.time()}
 
             logging.info(f"Saved photo msg id: {msg.id}")
             return 
@@ -640,10 +644,24 @@ async def catch_it(event):
     # =========================================
     # PROCESS ALL IDS
     # =========================================
+    droppedp = 0
+    totalp = len(PHOTO_MSG_IDS)
 
     for msg_id in all_ids:
 
         try:
+            arrived = TASK_TIMES.get(msg_id, {}).get("arrived")
+
+            if not arrived:
+                continue
+
+            elapsed = time.time() - arrived
+
+        # Skip if less than 2 minutes remain before expiry
+            if elapsed >= 58 * 60:
+                logging.info(f"Skipping msg {msg_id}: only {max(0, 3600 - elapsed):.0f}s remaining")
+                droppedp += 1
+                continue
 
             msg = await mrsyd.get_messages(
                 bot_id,
@@ -653,6 +671,7 @@ async def catch_it(event):
             if not msg:
                 PHOTO_MSG_IDS.discard(msg_id)
                 SUBSCRIBE_MSG_IDS.discard(msg_id)
+                TASK_TIMES.pop(msg_id, None)
                 continue
 
             logging.info(
@@ -761,7 +780,8 @@ async def catch_it(event):
                         await asyncio.sleep(
                             random.uniform(0.1, 0.8)
                         )
-                        logging.info("12")
+                        
+                        
 
             # =================================
             # SUBSCRIBE MESSAGE
@@ -806,6 +826,7 @@ async def catch_it(event):
 
             SUBSCRIBE_MSG_IDS.discard(msg_id)
             PHOTO_MSG_IDS.discard(msg_id)
+            TASK_TIMES.pop(msg_id, None)
 
         except Exception as e:
             logging.info(e)
@@ -813,6 +834,8 @@ async def catch_it(event):
             traceback.print_exc()
 
     TURN = False
+    await event.reply(f"Finished all tasks\n Total(p): {totalp}\nDropped(p): {droppedp}")
+    
 
     await event.reply("Finished all tasks")
 
