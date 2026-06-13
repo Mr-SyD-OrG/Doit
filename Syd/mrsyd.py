@@ -1,7 +1,7 @@
 from telethon import events
 import asyncio
 import re
-from bot import mrsydtg
+from bot import mrsyd1, mrsyd2
 from .web import open_real
 import random
 from info import VSYD
@@ -14,12 +14,12 @@ from pytz import timezone
 logging.basicConfig(level=logging.INFO)
 
 
-for mrsyd in mrsydtg:
 
 IST = timezone('Asia/Kolkata')
 
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
+@mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
+@mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
 async def handle_admn_message(event):
     text = event.message.raw_text.strip()
 
@@ -57,7 +57,8 @@ async def handle_admn_message(event):
 
 
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
+@mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
+@mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
 async def handle_send_message(event):
     text = event.message.raw_text.strip()
 
@@ -319,19 +320,22 @@ ADMINS = [ADMIN_ID]
 # OPEN URL
 # =========================
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
+@mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
+@mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"stop"))
 async def hand_offf_trigger(event):
     global GENERAL
     GENERAL = False
     await event.reply("GENERAL Set To False .")
     
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
+@mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
+@mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"start"))
 async def had_on_tigger(event):
     global GENERAL
     GENERAL = True
     await event.reply("GENERAL Set To True .")
 
-@mrsyd.on(events.NewMessage(from_users=[1733124290], pattern=r"break"))
+@mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"break"))
+@mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"break"))
 async def had_on_tigger(event):
     global STOPP
     STOPP = False
@@ -549,7 +553,8 @@ async def handle_button(btn, msg):
         import traceback
         traceback.print_exc()
 
-@mrsyd.on(events.NewMessage(from_users=bot_id))
+@mrsyd1.on(events.NewMessage(from_users=bot_id))
+@mrsyd2.on(events.NewMessage(from_users=bot_id))
 async def save_ids(event):
     global PHOTO_TASKS
     global SUBSCRIBE_TASKS
@@ -631,7 +636,8 @@ async def save_ids(event):
 # MAIN COMMAND
 # =========================
 
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
+@mrsyd1.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
+@mrsyd2.on(events.NewMessage(from_users=ADMINS, pattern="catch it"))
 async def catch_it(event):
     global TURN, STOPP
     global PHOTO_TASKS
@@ -827,7 +833,11 @@ async def catch_it(event):
 # CLEAR IDS
 # =====================================
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^clear$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^clear$"
 ))
@@ -852,7 +862,11 @@ async def clear_ids(event):
 # SEE COUNTS
 # =====================================
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^seecount$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^seecount$"
 ))
@@ -898,7 +912,8 @@ async def handlllller(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^press\s+\d+-\d+$"))
+@mrsyd1.on(events.NewMessage(from_users=ADMINS, pattern=r"^press\s+\d+-\d+$"))
+@mrsyd2.on(events.NewMessage(from_users=ADMINS, pattern=r"^press\s+\d+-\d+$"))
 async def press_button(event):
     try:
 
@@ -959,7 +974,11 @@ import re
 from telethon import events
 
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^getpress\s+\d+\s+\d+-\d+$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^getpress\s+\d+\s+\d+-\d+$"
 ))
@@ -1055,7 +1074,8 @@ async def getpress_button(event):
 
 from telethon.tl.types import KeyboardButtonUrl
 
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
+@mrsyd1.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
+@mrsyd2.on(events.NewMessage(from_users=ADMINS, pattern=r"^last"))
 async def last_message(event):
 
     try:
@@ -1216,7 +1236,11 @@ async def lsssast_message(event):
 
         await event.reply(f"Error: {e}")
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^get\s+\d+$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^get\s+\d+$"
 ))
@@ -1329,7 +1353,8 @@ async def get_message(event):
 
         await event.reply(f"Error: {e}")
         
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
+@mrsyd1.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
+@mrsyd2.on(events.NewMessage(from_users=ADMINS, pattern="balance"))
 async def balance_cmd(event):
 
     try:
@@ -1408,7 +1433,11 @@ async def balance_cmd(event):
 
         await event.reply(f"Error: {e}")
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^status$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^status$"
 ))
@@ -1466,7 +1495,8 @@ async def status_cmd(event):
 
         await event.reply(f"Error: {e}")
 
-@mrsyd.on(events.NewMessage(from_users=ADMINS, pattern=r"^task$"))
+@mrsyd1.on(events.NewMessage(from_users=ADMINS, pattern=r"^task$"))
+@mrsyd2.on(events.NewMessage(from_users=ADMINS, pattern=r"^task$"))
 async def task_cmd(event):
 
     try:
@@ -1595,7 +1625,11 @@ from telethon.errors import (
 
 
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^open\s+(.+)"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^open\s+(.+)"
 ))
@@ -1815,7 +1849,11 @@ async def open_link(event):
         await event.reply(f"Error:\n{e}")
 
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^delphoto (\d+)$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^delphoto (\d+)$"
 ))
@@ -1857,7 +1895,11 @@ import json
 # BACKUP
 # =========================================
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^backup$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^backup$"
 ))
@@ -1907,7 +1949,11 @@ async def backup_ids(event):
 # RESTORE
 # =========================================
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^restore$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^restore$"
 ))
@@ -1974,7 +2020,11 @@ async def restore_ids(event):
             f"Error: {e}"
         )
 
-@mrsyd.on(events.NewMessage(
+@mrsyd1.on(events.NewMessage(
+    from_users=ADMINS,
+    pattern=r"^check sub$"
+))
+@mrsyd2.on(events.NewMessage(
     from_users=ADMINS,
     pattern=r"^check sub$"
 ))
@@ -2393,7 +2443,13 @@ async def click_loop(msg_id, event, ttl=30):
 
 
 
-@mrsyd.on(
+@mrsyd1.on(
+    events.NewMessage(
+        from_users=ADMIN_ID,
+        pattern=r"(?i)(24 process|sydflag false|24 syd)"
+    )
+)
+@mrsyd2.on(
     events.NewMessage(
         from_users=ADMIN_ID,
         pattern=r"(?i)(24 process|sydflag false|24 syd)"
@@ -2586,7 +2642,13 @@ FRUIT_EMOJIS = {
 }
 
 
-@mrsyd.on(
+@mrsyd1.on(
+    events.NewMessage(
+        from_users=[7996790736],
+        pattern=r"(?i)(🤖 ПРОВЕРКА НА|💫 Для продолжения фарма|✨ Новое задание)"
+    )
+)
+@mrsyd2.on(
     events.NewMessage(
         from_users=[7996790736],
         pattern=r"(?i)(🤖 ПРОВЕРКА НА|💫 Для продолжения фарма|✨ Новое задание)"
