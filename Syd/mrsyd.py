@@ -1,7 +1,7 @@
 from telethon import events
 import asyncio
 import re
-from bot import mrsyd
+from bot import mrsydtg
 from .web import open_real
 import random
 from info import VSYD
@@ -14,7 +14,7 @@ from pytz import timezone
 logging.basicConfig(level=logging.INFO)
 
 
-client = mrsyd
+for mrsyd in mrsydtg:
 
 IST = timezone('Asia/Kolkata')
 
