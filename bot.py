@@ -43,4 +43,4 @@ async def start_bot():
     await mrsyd1.run_until_disconnected()
     await mrsyd2.run_until_disconnected()
 
-mrsydtg = [mrsyd1, mrsyd2]
+
