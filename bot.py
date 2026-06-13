@@ -12,7 +12,8 @@ from pyrogram import Client
 #from pyrogram.types import StringSession
 
 # Create Telegram client
-mrsyd = TelegramClient(StringSession(PHONE_NUMBER), API_ID, API_HASH)
+mrsyd1 = TelegramClient(StringSession(PHONE_NUMBER1), API_ID1, API_HASH2)
+mrsyd2 = TelegramClient(StringSession(PHONE_NUMBER2), API_ID2, API_HASH2)
 
 # Function to dynamically load plugins from the 'Syd' directory
 def load_plugins():
@@ -26,7 +27,8 @@ def load_plugins():
         print(f"Loaded plugin: {module_name}")
 
 async def start_bot():
-    await mrsyd.start()
+    await mrsyd1.start()
+    await mrsyd2.start()
     await start_browser()
   #  await app.start() # Userbot requires phone number login
     #print("Userbot is running...")
@@ -38,5 +40,7 @@ async def start_bot():
     bind_address = "0.0.0.0"
     await web.TCPSite(appp, bind_address, 8080).start()
    # await asyncio.Event().wait()
-    await mrsyd.run_until_disconnected()
+    await mrsyd1.run_until_disconnected()
+    await mrsyd2.run_until_disconnected()
 
+mrsyd = [mrsyd1, mrsyd2]
