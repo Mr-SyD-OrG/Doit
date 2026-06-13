@@ -21,6 +21,7 @@ IST = timezone('Asia/Kolkata')
 @mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
 @mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"sendf"))
 async def handle_admn_message(event):
+    mrsyd = event.client
     text = event.message.raw_text.strip()
 
     # Match pattern: Send @username time 4:30 Message here
@@ -60,6 +61,7 @@ async def handle_admn_message(event):
 @mrsyd2.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
 @mrsyd1.on(events.NewMessage(from_users=[1733124290], pattern=r"^send\s"))
 async def handle_send_message(event):
+    mrsyd = event.client
     text = event.message.raw_text.strip()
 
     # Format: send @username Your message
@@ -562,6 +564,7 @@ async def save_ids(event):
     global GENERAL
 
     msg = event.message
+    mrsyd = event.client
 
     if TURN is True:
 
@@ -642,6 +645,7 @@ async def catch_it(event):
     global TURN, STOPP
     global PHOTO_TASKS
     global SUBSCRIBE_TASKS
+    mrsyd = event.client
 
     TURN = True
 
@@ -845,7 +849,7 @@ async def clear_ids(event):
 
     global PHOTO_TASKS
     global SUBSCRIBE_TASKS
-
+    mrsyd = event.client
     photo_count = len(PHOTO_TASKS)
     subscribe_count = len(SUBSCRIBE_TASKS)
 
@@ -877,6 +881,7 @@ async def see_count(event):
 
     photo_count = len(PHOTO_TASKS)
     subscribe_count = len(SUBSCRIBE_TASKS)
+    mrsyd = event.client
 
     total = photo_count + subscribe_count
 
@@ -918,6 +923,7 @@ async def press_button(event):
     try:
 
         text = event.raw_text.strip()
+        mrsyd = event.client
 
         # extract row-column
         match = re.search(r"press\s+(\d+)-(\d+)", text)
@@ -987,6 +993,7 @@ async def getpress_button(event):
     try:
 
         text = event.raw_text.strip()
+        mrsyd = event.client
 
         # =====================================
         # EXTRACT MESSAGE ID + ROW/COLUMN
@@ -1079,6 +1086,7 @@ from telethon.tl.types import KeyboardButtonUrl
 async def last_message(event):
 
     try:
+        mrsyd = event.client
 
         msgs = await mrsyd.get_messages(
             bot_id,
@@ -1159,6 +1167,7 @@ async def last_message(event):
 async def lsssast_message(event):
 
     try:
+        
 
         msgs = await mrsyd.get_messages(
             bot_id,
@@ -1247,6 +1256,7 @@ async def lsssast_message(event):
 async def get_message(event):
 
     try:
+        mrsyd = event.client
 
         text_input = event.raw_text.strip()
 
@@ -1358,6 +1368,7 @@ async def get_message(event):
 async def balance_cmd(event):
 
     try:
+        mrsyd = event.client
 
         await mrsyd.send_message(
             bot_id,
@@ -1444,6 +1455,7 @@ async def balance_cmd(event):
 async def status_cmd(event):
 
     try:
+        mrsyd = event.client
 
         # =====================================
         # GET LAST 8 MESSAGES
@@ -1500,6 +1512,7 @@ async def status_cmd(event):
 async def task_cmd(event):
 
     try:
+        mrsyd = event.client
 
         # =====================================
         # SEND TASK COMMAND
@@ -1636,9 +1649,8 @@ from telethon.errors import (
 async def open_link(event):
 
     try:
-
+        mrsyd = event.client
         text = event.raw_text.strip()
-
         match = re.match(r"^open\s+(.+)", text)
 
         if not match:
@@ -1860,6 +1872,7 @@ async def open_link(event):
 async def delete_photo_task(event):
 
     global PHOTO_TASKS
+    mrsyd = event.client
 
     try:
 
@@ -1907,6 +1920,7 @@ async def backup_ids(event):
 
     global PHOTO_TASKS
     global SUBSCRIBE_TASKS
+    mrsyd = event.client
 
     try:
 
@@ -1961,6 +1975,7 @@ async def restore_ids(event):
 
     global PHOTO_TASKS
     global SUBSCRIBE_TASKS
+    mrsyd = event.client
 
     try:
 
@@ -2031,6 +2046,7 @@ async def restore_ids(event):
 async def check_subscribe_ids(event):
 
     global SUBSCRIBE_TASKS
+    mrsyd = event.client
 
     try:
 
@@ -2458,6 +2474,7 @@ async def click_loop(msg_id, event, ttl=30):
 async def auto_runner(event, syd=None):
 
     global SYDFLAG
+    mrsyd = event.client
 
     text = event.raw_text.strip()
 
@@ -2655,6 +2672,7 @@ FRUIT_EMOJIS = {
     )
 )
 async def solve_robot_check(event):
+    mrsyd = event.client
     message = event.message
     logging.info(message)
 
