@@ -2326,8 +2326,13 @@ async def click_loop(msg_id, event, ttl=30):
 
                                 click_count += 1
                                 clicked = True
-                                if psyd.message and "Ты слишком" in psyd.message: await event.reply(f"Approached Limit \n {psyd}\n 🌱: {click_count}")
+                                if psyd.message and "Ты слишком" in psyd.message: 
+                                    await event.reply(f"Approached Limit \n\n {psyd}\n 🌱: {click_count}")
+                                    await asyncio.sleep(45*60)
 
+                                if psyd.message and "✅" not in psyd.message: 
+                                    await event.reply(f"Check Acc: \n\n {psyd}\n\n 🌱: {click_count}")
+                            
                                 logging.info(
                                     f"✅ Clicked {click_count}/30 {psyd}"
                                 )
