@@ -13,7 +13,6 @@ from pytz import timezone
 
 logging.basicConfig(level=logging.INFO)
 
-
 client = mrsyd
 
 IST = timezone('Asia/Kolkata')
