@@ -655,7 +655,7 @@ async def catch_it(event):
         try:
 
             await mrsyd.send_message(bot_id, "💎 Задания")
-            wait_time = random.uniform(7, 11)
+            wait_time = random.uniform(4, 8)
             logging.info(f"Sleeping for {wait_time} seconds")
             await asyncio.sleep(wait_time)
         except Exception as e:
