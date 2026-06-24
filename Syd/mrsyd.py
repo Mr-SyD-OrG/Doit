@@ -2372,8 +2372,9 @@ async def click_loop(msg_id, event, ttl=30):
                 await asyncio.sleep(1)
 
         await event.reply(
-            "✅ Finished today's 30 clicks"
+            f"✅ Finished today's {click_count} clicks"
         )
+        click_count = 0
 
         # wait for next day
         while True:
