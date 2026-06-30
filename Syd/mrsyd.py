@@ -2260,7 +2260,7 @@ async def wait_until_6am():
         await asyncio.sleep(30)
 
 
-async def click_loop(msg_id, event, ttl=30):
+async def click_loop(msg_id, event, click_count=0):
     global SYDFLAG
     global last_daily_run
 
@@ -2275,7 +2275,8 @@ async def click_loop(msg_id, event, ttl=30):
         ):
             await daily_profile_check(event)
             last_daily_run = today
-        
+            
+        ttl=30
         click_count = 0
         first = True
 
@@ -2302,7 +2303,7 @@ async def click_loop(msg_id, event, ttl=30):
                         f"No Message {last_msg_id}"
                     )
                     SYDFLAG = False
-                    return await auto_runner(event, ttl - click_count)
+                    return await auto_runner(event, click_count)
                     
 
                 if first:
@@ -2371,6 +2372,10 @@ async def click_loop(msg_id, event, ttl=30):
                     return
                 await asyncio.sleep(1)
 
+            now = datetime.now(IST)
+            if now.hour < 6:
+                break
+    
         await event.reply(
             f"✅ Finished today's {click_count} clicks"
         )
@@ -2580,6 +2585,7 @@ FRUIT_EMOJIS = {
     "лимон": "🍋",
     "арбуз": "🍉",
     "вишня": "🍒",
+    "помидор": "🍅",
     "виноград": "🍇",
     "персик": "🍑",
     "груша": "🍐",
