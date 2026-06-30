@@ -2254,7 +2254,7 @@ async def wait_until_6am():
         now = datetime.now(IST)
 
         # run only after 6 AM
-        if now.hour >= 6:
+        if now.hour >= 8:
             return
 
         await asyncio.sleep(30)
@@ -2373,7 +2373,7 @@ async def click_loop(msg_id, event, click_count=0):
                 await asyncio.sleep(1)
 
             now = datetime.now(IST)
-            if now.hour < 6:
+            if now.hour < 8:
                 break
     
         await event.reply(
@@ -2391,7 +2391,7 @@ async def click_loop(msg_id, event, click_count=0):
             now = datetime.now(IST)
 
             # next day after midnight resets loop
-            if now.hour < 6:
+            if now.hour < 8:
                 break
 
             for _ in range(60):
