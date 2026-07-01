@@ -2266,7 +2266,6 @@ async def click_loop(msg_id, event, click_count=0):
     global last_daily_run
 
     while SYDFLAG:
-        await wait_until_6am()
         now = datetime.now(IST)
         today = now.date()
         if (
