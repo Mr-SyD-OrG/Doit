@@ -2218,7 +2218,7 @@ async def daily_profile_check(event):
 
                 if "Ежедневка" in btn.text:
 
-                    await latest.click(
+                    sy = await latest.click(
                         text=btn.text
                     )
 
@@ -2229,6 +2229,7 @@ async def daily_profile_check(event):
                 break
 
         if clicked:
+            if sy.message and "⭐" not in sy.message: await event.reply(f"Daily Check: {sy.message}")
 
             await event.reply(
                 "✅ Daily reward claimed"
@@ -2275,9 +2276,9 @@ async def click_loop(msg_id, event, click_count=0):
         ):
             await daily_profile_check(event)
             last_daily_run = today
-            
+
+        await wait_until_6am()
         ttl=30
-        click_count = 0
         first = True
 
         await event.reply("▶️ Starting today's clicking session")
