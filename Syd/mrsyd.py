@@ -2253,7 +2253,7 @@ async def daily_profile_check_loop(event):
                     try:
                         await mrsyd.send_message(
                             ADMIN_ID,
-                            f"✅ Daily reward claimed\n\n{text}"
+                            f"✅ Daily reward claimed"
                         )
                     except:
                         pass
@@ -2287,6 +2287,10 @@ async def daily_profile_check_loop(event):
                                     minutes * 60 +
                                     60
                                 )
+                                try:
+                                    await mrsyd.send_message(ADMIN_ID, f"✅ Daily reward claimed\nNext Press wait: {hours}, {minutes}")
+                                except:
+                                    pass
 
                         else:
                             textss = sy2.message if sy2 else "no popup"
