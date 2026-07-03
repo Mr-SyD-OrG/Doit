@@ -2294,6 +2294,7 @@ async def daily_profile_check_loop(event):
 
                         else:
                             textss = sy2.message if sy2 else "no popup"
+                            wait_seconds = 24*60*60
                             await mrsyd.send_message(ADMIN_ID, f"Daily Bonus: (Error: {textss}) (Check Acc)")
 
                     except:
@@ -2550,13 +2551,13 @@ async def click_loop(msg_id, event, click_count=0):
     while SYDFLAG:
         now = datetime.now(IST)
         today = now.date()
-        if (
-            now.hour >= 6 and
-            last_daily_run != today and
-            VSYD
-        ):
+      #  if (
+         #   now.hour >= 6 and
+         #   last_daily_run != today and
+         #   VSYD
+      #  ):
           #  await daily_profile_check(event)
-            last_daily_run = today
+         #   last_daily_run = today
 
         await wait_until_6am()
         ttl=30
