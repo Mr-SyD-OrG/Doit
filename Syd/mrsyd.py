@@ -2323,6 +2323,59 @@ async def daily_profile_check_loop(event):
                 await asyncio.sleep(5)
                 slept += 5
 
+
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystatus$",
+    from_users=ADMINS
+))
+async def daily_staatus(event):
+
+    await event.reply(
+        f"Daily Running: {DAILY_RUNNING}"
+    )
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystop$",
+    from_users=ADMINS
+))
+async def daily_stoop(event):
+
+    global DAILY_RUNNING
+    global DAILY_TASK
+
+    DAILY_RUNNING = False
+
+    if DAILY_TASK:
+        DAILY_TASK.cancel()
+        DAILY_TASK = None
+
+    await event.reply(
+        "🛑 Daily loop stopped"
+    )
+
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystart$",
+    from_users=ADMINS
+))
+async def daily_start(event):
+
+    global DAILY_RUNNING
+    global DAILY_TASK
+
+    if DAILY_RUNNING:
+        return await event.reply(
+            "⚠️ Daily loop already running"
+        )
+
+    DAILY_RUNNING = True
+
+    DAILY_TASK = asyncio.create_task(
+        daily_profile_check_loop(event)
+    )
+
+    await event.reply(
+        "✅ Daily loop started"
+    )
+
 async def sdaily_profile_check(event):
 
     try:
