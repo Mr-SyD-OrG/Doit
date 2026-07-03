@@ -3176,7 +3176,7 @@ async def solve_robot_check(event):
                     btn_text = (btn.text or "").strip()
 
                     # FIRST PRIORITY
-                    if "Подтвердить подписку" in btn_text:
+                    if "Подтвердить" in btn_text:
 
                         await btn.click()
 
