@@ -2102,7 +2102,228 @@ IST = pytz.timezone("Asia/Kolkata")
 last_daily_run = None
 
 
-async def daily_profile_check(event):
+import asyncio
+import re
+
+DAILY_RUNNING = False
+DAILY_TASK = None
+
+async def daily_profile_check_loop(event):
+
+    global DAILY_RUNNING
+
+    while DAILY_RUNNING:
+
+        try:
+
+            await mrsyd.send_message(
+                "patrickstarsrobot",
+                "/start"
+            )
+
+            await asyncio.sleep(10)
+
+            target_msg_id = None
+
+            messages = await mrsyd.get_messages(
+                "patrickstarsrobot",
+                limit=15
+            )
+
+            for m in messages:
+
+                if (
+                    m.text and
+                    re.search(
+                        r'Получи\s+свою\s+личную\s+ссылку',
+                        m.text
+                    )
+                ):
+                    target_msg_id = m.id
+                    break
+
+            if not target_msg_id:
+                await asyncio.sleep(300)
+                continue
+
+            msg = await mrsyd.get_messages(
+                "patrickstarsrobot",
+                ids=target_msg_id
+            )
+
+            if not msg.buttons:
+                await asyncio.sleep(300)
+                continue
+
+            clicked = False
+
+            for row in msg.buttons:
+                for btn in row:
+
+                    if "Профиль" in btn.text:
+
+                        await msg.click(
+                            text=btn.text
+                        )
+
+                        clicked = True
+                        break
+
+                if clicked:
+                    break
+
+            if not clicked:
+                await asyncio.sleep(300)
+                continue
+
+            await asyncio.sleep(5)
+
+            messages = await mrsyd.get_messages(
+                "patrickstarsrobot",
+                limit=5
+            )
+
+            latest = None
+
+            for m in messages:
+
+                clean_text = (
+                    m.text
+                    .replace("**", "")
+                    .replace("__", "")
+                    .strip()
+                ) if m.text else ""
+
+                if clean_text.startswith("✨ Профиль"):
+                    latest = m
+                    break
+
+            if not latest or not latest.buttons:
+                await mrsyd.send_message(ADMIN_ID, "No Profile message")
+                await asyncio.sleep(300)
+                continue
+
+            daily_btn = None
+
+            for row in latest.buttons:
+                for btn in row:
+
+                    if "Ежедневка" in btn.text:
+                        daily_btn = btn.text
+                        break
+
+                if daily_btn:
+                    break
+
+            if not daily_btn:
+                await asyncio.sleep(300)
+                continue
+
+            sy = await latest.click(
+                text=daily_btn
+            )
+
+            wait_seconds = 3600
+
+            if sy and sy.message:
+
+                text = sy.message
+
+                if "Осталось:" in text:
+
+                    m = re.search(
+                        r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
+                        text
+                    )
+
+                    if m:
+
+                        hours = int(m.group(1) or 0)
+                        minutes = int(m.group(2) or 0)
+
+                        wait_seconds = (
+                            hours * 3600 +
+                            minutes * 60 +
+                            60
+                        )
+                        await mrsyd.send_message(ADMIN_ID, f"Daily Bonus' wait: {hours}, {minutes}")
+
+                else:
+
+                    try:
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"✅ Daily reward claimed\n\n{text}"
+                        )
+                    except:
+                        pass
+
+                    await asyncio.sleep(13)
+
+                    try:
+
+                        sy2 = await latest.click(
+                            text=daily_btn
+                        )
+
+                        if (
+                            sy2
+                            and sy2.message
+                            and "Осталось:" in sy2.message
+                        ):
+
+                            m = re.search(
+                                r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
+                                sy2.message
+                            )
+
+                            if m:
+
+                                hours = int(m.group(1) or 0)
+                                minutes = int(m.group(2) or 0)
+
+                                wait_seconds = (
+                                    hours * 3600 +
+                                    minutes * 60 +
+                                    60
+                                )
+
+                    except:
+                        pass
+
+            slept = 0
+
+            while (
+                DAILY_RUNNING
+                and slept < wait_seconds
+            ):
+
+                chunk = min(
+                    300,
+                    wait_seconds - slept
+                )
+
+                await asyncio.sleep(chunk)
+
+                slept += chunk
+
+        except Exception as e:
+
+            try:
+                await mrsyd.send_message(
+                    ADMIN_ID,
+                    f"⚠️ Daily task error:\n{e}"
+                )
+            except:
+                pass
+
+            slept = 0
+
+            while DAILY_RUNNING and slept < 300:
+                await asyncio.sleep(5)
+                slept += 5
+
+async def sdaily_profile_check(event):
 
     try:
         await mrsyd.send_message(
@@ -2273,7 +2494,7 @@ async def click_loop(msg_id, event, click_count=0):
             last_daily_run != today and
             VSYD
         ):
-            await daily_profile_check(event)
+          #  await daily_profile_check(event)
             last_daily_run = today
 
         await wait_until_6am()
