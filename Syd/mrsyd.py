@@ -3177,8 +3177,14 @@ async def solve_robot_check(event):
 
                     # FIRST PRIORITY
                     if "Подтвердить" in btn_text:
-
-                        await btn.click()
+                        try:
+                            sy = await btn.click()
+                            if sy and getattr(sy, "message", "") and "❌" in sy.message:
+                                await asyncio.sleep(5)
+                                await btn.click()
+                        except Exception as e:
+                            await mrsyd.send_message(ADMIN_ID, f"Confirm button error: {e}")
+                            break
 
                         logging.info(
                             "Pressed confirm subscription button"
