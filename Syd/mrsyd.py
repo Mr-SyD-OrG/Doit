@@ -2225,6 +2225,7 @@ async def daily_profile_check_loop(event):
 
             wait_seconds = 3600
 
+            # COOLDOWN POPUP
             if sy and sy.message:
 
                 text = sy.message
@@ -2246,59 +2247,94 @@ async def daily_profile_check_loop(event):
                             minutes * 60 +
                             60
                         )
-                        await mrsyd.send_message(ADMIN_ID, f"Daily Bonus' wait: {hours}, {minutes}")
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"Daily Bonus wait: {hours}h {minutes}m"
+                        )
 
                 else:
 
-                    try:
-                        await mrsyd.send_message(
-                            ADMIN_ID,
-                            f"✅ Daily reward claimed"
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        f"Unexpected popup:\n{text}"
+                    )
+
+            # SUCCESSFUL CLAIM (NO POPUP)
+            else:
+
+                try:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        "✅ Daily reward claimed"
+                    )
+
+                except:
+                    pass
+
+                await asyncio.sleep(13)
+
+                try:
+
+                    sy2 = await latest.click(
+                        text=daily_btn
+                    )
+
+                    if (
+                        sy2
+                        and sy2.message
+                        and "Осталось:" in sy2.message
+                    ):
+
+                        m = re.search(
+                            r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
+                            sy2.message
                         )
-                    except:
-                        pass
 
-                    await asyncio.sleep(13)
+                        if m:
 
-                    try:
+                            hours = int(m.group(1) or 0)
+                            minutes = int(m.group(2) or 0)
 
-                        sy2 = await latest.click(
-                            text=daily_btn
-                        )
-
-                        if (
-                            sy2
-                            and sy2.message
-                            and "Осталось:" in sy2.message
-                        ):
-
-                            m = re.search(
-                                r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
-                                sy2.message
+                            wait_seconds = (
+                                hours * 3600 +
+                                minutes * 60 +
+                                60
                             )
 
-                            if m:
+                            try:
 
-                                hours = int(m.group(1) or 0)
-                                minutes = int(m.group(2) or 0)
-
-                                wait_seconds = (
-                                    hours * 3600 +
-                                    minutes * 60 +
-                                    60
+                                await mrsyd.send_message(
+                                    ADMIN_ID,
+                                    f"✅ Daily reward claimed\n"
+                                    f"Next Press wait: {hours}h {minutes}m"
                                 )
-                                try:
-                                    await mrsyd.send_message(ADMIN_ID, f"✅ Daily reward claimed\nNext Press wait: {hours}, {minutes}")
-                                except:
-                                    pass
 
-                        else:
-                            textss = sy2.message if sy2 else "no popup"
-                            wait_seconds = 24*60*60
-                            await mrsyd.send_message(ADMIN_ID, f"Daily Bonus: (Error: {textss}) (Check Acc)")
+                            except:
+                                pass
 
-                    except:
-                        pass
+                    else:
+
+                        textss = (
+                            sy2.message
+                            if sy2 and getattr(sy2, "message", None)
+                            else "no popup"
+                        )
+
+                        wait_seconds = 24 * 60 * 60
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"Daily Bonus: (Error: {textss}) (Check Acc)"
+                        )
+
+                except Exception as e:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        f"Error while checking next cooldown:\n{e}"
+                    )
 
             slept = 0
 
@@ -2319,19 +2355,23 @@ async def daily_profile_check_loop(event):
         except Exception as e:
 
             try:
+
                 await mrsyd.send_message(
                     ADMIN_ID,
                     f"⚠️ Daily task error:\n{e}"
                 )
+
             except:
                 pass
 
             slept = 0
 
             while DAILY_RUNNING and slept < 300:
-                await asyncio.sleep(5)
-                slept += 5
 
+                await asyncio.sleep(5)
+
+                slept += 5
+                    
 
 @mrsyd.on(events.NewMessage(
     pattern=r"^/dailystatus$",
