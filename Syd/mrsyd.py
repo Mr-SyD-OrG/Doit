@@ -2288,6 +2288,10 @@ async def daily_profile_check_loop(event):
                                     60
                                 )
 
+                        else:
+                            textss = sy2.message if sy2 else "no popup"
+                            await mrsyd.send_message(ADMIN_ID, f"Daily Bonus: (Error: {textss}) (Check Acc)")
+
                     except:
                         pass
 
