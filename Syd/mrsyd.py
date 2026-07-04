@@ -2603,7 +2603,7 @@ async def click_loop(msg_id, event, click_count=0):
         ttl=30
         first = True
 
-        await event.reply("▶️ Starting today's clicking session")
+        sydtext=await event.reply("▶️ Starting today's clicking session")
 
         # 30 clicks daily
         while SYDFLAG and click_count < ttl:
@@ -2700,7 +2700,8 @@ async def click_loop(msg_id, event, click_count=0):
             now = datetime.now(IST)
             if now.hour < 8:
                 break
-    
+
+        await sydtext.delete()
         await event.reply(
             f"✅ Finished today's {click_count} clicks"
         )
@@ -2749,7 +2750,7 @@ async def auto_runner(event, syd=None):
             if SYDFLAG: return await event.reply("a process already running")
             SYDFLAG = True
 
-            await event.reply(
+            ms=await event.reply(
                 "🔍 Searching process message..."
             )
 
@@ -2779,6 +2780,7 @@ async def auto_runner(event, syd=None):
             # not found
             if not target_msg_id:
                 SYDFLAG = False
+                await ms.delete()
                 return await event.reply(
                     "❌ Target process message not found in last 4 messages"
                 )
