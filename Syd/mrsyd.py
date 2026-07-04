@@ -2681,7 +2681,9 @@ async def click_loop(msg_id, event, click_count=0):
 
             # random wait
             now = datetime.now(IST)
-            if now.hour < 13:
+            if now.hour < 2:
+                wait_time = random.randint(370, 400)
+            elif now.hour < 13:
                 wait_time = random.randint(620, 1400)
             elif now.hour < 18:
                 wait_time = random.randint(420, 700)
