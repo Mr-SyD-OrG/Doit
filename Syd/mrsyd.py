@@ -2269,9 +2269,12 @@ async def daily_profile_check_loop(event):
                         ADMIN_ID,
                         "✅ Daily reward claimed"
                     )
+                    await mrsyd.send_message("MrStarPay_Bot", "/daily bonus")
+                    
+                    
+                except Exception as e:
+                    await event.reply(f"report fail: {e}")
 
-                except:
-                    pass
 
                 await asyncio.sleep(13)
 
@@ -2705,6 +2708,10 @@ async def click_loop(msg_id, event, click_count=0):
         await event.reply(
             f"✅ Finished today's {click_count} clicks"
         )
+        try:
+            await mrsyd.send_message("MrStarPay_Bot", "/daily 30")
+        except Exception as e:
+            await event.reply(f"report fail: {e}")
         click_count = 0
 
         # wait for next day
