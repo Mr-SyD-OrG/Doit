@@ -2629,6 +2629,7 @@ async def click_loop(msg_id, event, click_count=0):
                         f"No Message {last_msg_id}"
                     )
                     SYDFLAG = False
+                    await asyncio.sleep(3600)
                     return await auto_runner(event, click_count)
                     
 
