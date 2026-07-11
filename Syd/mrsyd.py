@@ -2658,7 +2658,7 @@ async def click_loop(msg_id, event, click_count=0):
                                     await event.reply(f"Approached Limit \n\n {psyd}\n 🌱: {click_count}")
                                     await asyncio.sleep(45*60)
 
-                                if psyd.message and "✅" not in psyd.message: 
+                                elif psyd.message and "✅" not in psyd.message: 
                                     await event.reply(f"Check Acc: \n\n {psyd}\n\n 🌱: {click_count}")
                             
                                 logging.info(
