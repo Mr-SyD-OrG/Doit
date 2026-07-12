@@ -2802,7 +2802,7 @@ async def auto_runner(event, syd=None):
                 asyncio.create_task(click_loop(target_msg_id, event, syd))
             else:
                 asyncio.create_task(click_loop(target_msg_id, event))
-            return
+            return await ms.delete()
 
         except Exception as e:
             SYDFLAG = False
