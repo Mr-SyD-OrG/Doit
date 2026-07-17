@@ -2143,7 +2143,7 @@ async def daily_profile_check_loop(event):
                     break
 
             if not target_msg_id:
-                await asyncio.sleep(300)
+                await asyncio.sleep(3000)
                 continue
 
             msg = await mrsyd.get_messages(
@@ -2160,7 +2160,7 @@ async def daily_profile_check_loop(event):
             for row in msg.buttons:
                 for btn in row:
 
-                    if "Профиль" in btn.text:
+                    if btn.text and any(x in btn.text for x in ["Профиль", "Ежедневка"]):
 
                         await msg.click(
                             text=btn.text
