@@ -2160,7 +2160,7 @@ async def daily_profile_check_loop(event):
             for row in msg.buttons:
                 for btn in row:
 
-                    if btn.text and any(x in btn.text for x in ["Профиль", "Ежедневка"]):
+                    if btn.text and any(x in btn.text for x in ["Профиль", "Ежедневка", "🎁"]):
 
                         await msg.click(
                             text=btn.text
@@ -2173,7 +2173,7 @@ async def daily_profile_check_loop(event):
                     break
 
             if not clicked:
-                await asyncio.sleep(300)
+                await asyncio.sleep(3600)
                 continue
 
             await asyncio.sleep(5)
