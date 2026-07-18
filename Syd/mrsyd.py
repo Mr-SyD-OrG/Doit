@@ -2770,6 +2770,8 @@ async def auto_runner(event, syd=None):
 
             # wait 20 sec
             await asyncio.sleep(20)
+            if not SYDFLAG: 
+                return await event.reply("Stopped")
 
             target_msg_id = None
 
@@ -2796,8 +2798,8 @@ async def auto_runner(event, syd=None):
             await event.reply(
                 f"✅ Found target message: {target_msg_id}"
             )
-
-            # start loop
+            if not SYDFLAG: 
+                return await event.reply("Stopped")
             if syd:
                 asyncio.create_task(click_loop(target_msg_id, event, syd))
             else:
