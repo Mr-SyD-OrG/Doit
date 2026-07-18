@@ -3297,7 +3297,6 @@ async def solve_robot_check(event):
             )
 
     except Exception as e:
-
         logging.info(
             f"solve_robot_check error: {e}"
         )
