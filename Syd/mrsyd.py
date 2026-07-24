@@ -2209,7 +2209,7 @@ async def daily_profile_check_loop(event):
             for row in latest.buttons:
                 for btn in row:
 
-                    if "Ежедневка" in btn.text:
+                    if btn.text and any(x in btn.text for x in ["Профиль", "Ежедневка", "🎁"]):
                         daily_btn = btn.text
                         break
 
