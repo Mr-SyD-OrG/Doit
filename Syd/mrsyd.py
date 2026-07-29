@@ -2153,7 +2153,8 @@ async def daily_profile_check_loop(event):
             )
 
             if not msg.buttons:
-                await asyncio.sleep(300)
+                await mrsyd.send_message(ADMIN_ID, "No message btn")
+                await asyncio.sleep(3000)
                 continue
 
             clicked = False
@@ -2217,7 +2218,8 @@ async def daily_profile_check_loop(event):
                     break
 
             if not daily_btn:
-                await asyncio.sleep(300)
+                await mrsyd.send_message(ADMIN_ID, "No daily_btn")
+                await asyncio.sleep(360)
                 continue
 
             sy = await latest.click(
