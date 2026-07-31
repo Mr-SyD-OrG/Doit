@@ -2689,6 +2689,8 @@ async def click_loop(msg_id, event, click_count=0):
                                             await mrsyd.send_message("MrStarPay_Bot", "/daily faltsk")
                                         except Exception as e:
                                             await event.reply(f"report fail: {e}")
+
+                                        tsk = True
                                     
                                 logging.info(
                                     f"✅ Clicked {click_count}/30 {psyd}"
