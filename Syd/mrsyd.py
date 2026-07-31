@@ -2608,6 +2608,7 @@ async def click_loop(msg_id, event, click_count=0):
         await wait_until_6am()
         ttl=30
         first = True
+        tsk = True
 
         sydtext=await event.reply("▶️ Starting today's clicking session")
 
@@ -2640,6 +2641,10 @@ async def click_loop(msg_id, event, click_count=0):
                     await event.reply(
                         f"Message {msg.text}"
                     )
+                    try:
+                        await mrsyd.send_message("MrStarPay_Bot", "/daily dstart")
+                    except Exception as e:
+                        await event.reply(f"report fail: {e}")
                     first = False
 
                 if msg.buttons:
@@ -2658,10 +2663,20 @@ async def click_loop(msg_id, event, click_count=0):
                                 click_count += 1
                                 clicked = True
                                 if psyd.message and "Ты слишком" in psyd.message: 
+                                    if tsk:
+                                        try:
+                                            await mrsyd.send_message("MrStarPay_Bot", "/daily task")
+                                        except Exception as e:
+                                            await event.reply(f"report fail: {e}")
                                     await event.reply(f"Approached Limit \n\n {psyd}\n 🌱: {click_count}")
                                     await asyncio.sleep(45*60)
 
                                 elif psyd.message and "✅" not in psyd.message: 
+                                    if tsk:
+                                        try:
+                                            await mrsyd.send_message("MrStarPay_Bot", "/daily task")
+                                        except Exception as e:
+                                            await event.reply(f"report fail: {e}")
                                     await event.reply(f"Check Acc: \n\n {psyd}\n\n 🌱: {click_count}")
                             
                                 logging.info(
