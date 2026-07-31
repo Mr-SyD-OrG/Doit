@@ -2668,6 +2668,8 @@ async def click_loop(msg_id, event, click_count=0):
                                             await mrsyd.send_message("MrStarPay_Bot", "/daily task")
                                         except Exception as e:
                                             await event.reply(f"report fail: {e}")
+
+                                        tsk = False
                                     await event.reply(f"Approached Limit \n\n {psyd}\n 🌱: {click_count}")
                                     await asyncio.sleep(45*60)
 
@@ -2677,8 +2679,17 @@ async def click_loop(msg_id, event, click_count=0):
                                             await mrsyd.send_message("MrStarPay_Bot", "/daily task")
                                         except Exception as e:
                                             await event.reply(f"report fail: {e}")
+
+                                        tsk = False
                                     await event.reply(f"Check Acc: \n\n {psyd}\n\n 🌱: {click_count}")
-                            
+
+                                else:
+                                    if not tsk:
+                                        try:
+                                            await mrsyd.send_message("MrStarPay_Bot", "/daily faltsk")
+                                        except Exception as e:
+                                            await event.reply(f"report fail: {e}")
+                                    
                                 logging.info(
                                     f"✅ Clicked {click_count}/30 {psyd}"
                                 )
