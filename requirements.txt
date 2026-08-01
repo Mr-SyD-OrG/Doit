@@ -11,6 +11,6 @@ pytz
 humanize
 pyromod
 ffmpeg-python
-playwright
+playwright==1.55.0
 psutil
 aiolimiter
