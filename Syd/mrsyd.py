@@ -2645,6 +2645,12 @@ async def click_loop(msg_id, event, click_count=0):
                         f"No Message {last_msg_id}"
                     )
                     SYDFLAG = False
+                    if tsk:
+                        try:
+                            await mrsyd.send_message("MrStarPay_Bot", "/daily task")
+                        except Exception as e:
+                            await event.reply(f"report fail: {e}")
+                        tsk = False
                     await asyncio.sleep(3600)
                     return await auto_runner(event, click_count)
                     
@@ -2778,6 +2784,166 @@ async def click_loop(msg_id, event, click_count=0):
                 await asyncio.sleep(1)
 
 
+@mrsyd.on(
+    events.NewMessage(
+        from_users=8810992357,
+        pattern=r"(?i)(shot|crash|follow)"
+    )
+)
+async def bot_cntrl(event, syd=None):
+    global SYDFLAG
+
+    text = event.raw_text.strip()
+
+    # =====================================================
+    # START 24 PROCESS
+    # =====================================================
+    if text.lower() == "shot":
+
+        try:
+            if SYDFLAG: return await mrsyd.send_message(ADMIN_ID, "a process already running")
+            SYDFLAG = True
+
+            ms=await mrsyd.send_message(
+                ADMIN_ID, 
+                "🔍 Searching process message..."
+            )
+
+            # send /start
+            await mrsyd.send_message(
+                7996790736,
+                "/start"
+            )
+
+            # wait 20 sec
+            await asyncio.sleep(20)
+            if not SYDFLAG: 
+                return await mrsyd.send_message(ADMIN_ID, "Stopped")
+
+            target_msg_id = None
+
+            # check only last 4 messages
+            messages = await mrsyd.get_messages(
+                7996790736,
+                limit=4
+            )
+
+            for m in messages:
+             #   await event.reply(f"•{m.text}")
+                if m.text and re.search(r'Получи\s+свою\s+личную\s+ссылку', m.text):
+                    target_msg_id = m.id
+                    break
+
+            # not found
+            if not target_msg_id:
+                SYDFLAG = False
+                await ms.delete()
+                return await mrsyd.send_message(
+                    ADMIN_ID, 
+                    "❌ Target process message not found in last 4 messages"
+                )
+
+            await mrsyd.send_message(
+                ADMIN_ID, 
+                f"✅ Found target message: {target_msg_id}"
+            )
+            if not SYDFLAG: 
+                return await mrsyd.send_message(ADMIN_ID, "Stopped")
+            if syd:
+                asyncio.create_task(click_loop(target_msg_id, event, syd))
+            else:
+                asyncio.create_task(click_loop(target_msg_id, event))
+            return await ms.delete()
+
+        except Exception as e:
+            SYDFLAG = False
+            await mrsyd.send_message(ADMIN_ID, f"⚠️ Error: {e}")
+            return
+
+    # =====================================================
+    # MANUAL START WITH ID
+    # =====================================================
+    elif text.startswith("shot "):
+        try:
+            if SYDFLAG: return await mrsyd.send_message(ADMIN_ID, "a process already running")
+                
+            msg_id = int(text.split()[2])
+            SYDFLAG = True
+            await mrsyd.send_message(
+                ADMIN_ID, 
+                "🚀 Started clicking process"
+            )
+            asyncio.create_task(
+                click_loop(msg_id, event)
+            )
+            return
+
+        except Exception as e:
+            await mrsyd.send_message(ADMIN_ID, f"⚠️ Error: {e}")
+            return
+
+    elif text.startswith("follow "):
+        try:
+            if SYDFLAG: return await mrsyd.send_message(ADMIN_ID, "a process already running")
+            SYDFLAG = True
+            csyd = int(text.split()[2])
+
+            await mrsyd.send_message(
+                ADMIN_ID, 
+                "🔍 Searching process message..."
+            )
+
+            # send /start
+            await mrsyd.send_message(
+                7996790736,
+                "/start"
+            )
+
+            # wait 20 sec
+            await asyncio.sleep(20)
+
+            target_msg_id = None
+
+            # check only last 4 messages
+            messages = await mrsyd.get_messages(
+                7996790736,
+                limit=4
+            )
+
+            for m in messages:
+             #   await event.reply(f"•{m.text}")
+                if m.text and re.search(r'Получи\s+свою\s+личную\s+ссылку', m.text):
+                    target_msg_id = m.id
+                    break
+
+            # not found
+            if not target_msg_id:
+                SYDFLAG = False
+                return await mrsyd.send_message(
+                    ADMIN_ID, 
+                    "❌ Target process message not found in last 4 messages"
+                )
+
+            await mrsyd.send_message(ADMIN_ID, f"✅ Found target message: {target_msg_id}")
+
+           
+            asyncio.create_task(click_loop(target_msg_id, event, csyd))
+            return
+
+        except Exception as e:
+            SYDFLAG = False
+            await mrsyd.send_message(ADMIN_ID, f"⚠️ Error: {e}")
+            return
+
+    # =====================================================
+    # STOP LOOP
+    # =====================================================
+    elif text.lower() == "crash":
+
+        SYDFLAG = False
+
+        await mrsyd.send_message(ADMIN_ID, "🛑 SYDFLAG set to False. Stopping loop.")
+        return
 
 
 @mrsyd.on(
