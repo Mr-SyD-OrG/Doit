@@ -2601,10 +2601,12 @@ async def wait_until_6am():
 
         await asyncio.sleep(30)
 
+last_dstart_date = None
 
 async def click_loop(msg_id, event, click_count=0):
     global SYDFLAG
     global last_daily_run
+    global last_dstart_date
 
     while SYDFLAG:
         now = datetime.now(IST)
@@ -2656,13 +2658,16 @@ async def click_loop(msg_id, event, click_count=0):
                     
 
                 if first:
-                    await event.reply(
-                        f"Message {msg.text}"
-                    )
-                    try:
-                        await mrsyd.send_message("MrStarPay_Bot", "/daily dstart")
-                    except Exception as e:
-                        await event.reply(f"report fail: {e}")
+                    today = datetime.now(IST).date()
+                    if last_dstart_date != today:
+                        await event.reply(
+                            f"Message {msg.text}"
+                        )
+                        try:
+                            await mrsyd.send_message("MrStarPay_Bot", "/daily dstart")
+                        except Exception as e:
+                            await event.reply(f"report fail: {e}")
+                        last_dstart_date = today
                     first = False
 
                 if msg.buttons:
@@ -2680,7 +2685,7 @@ async def click_loop(msg_id, event, click_count=0):
 
                                 click_count += 1
                                 clicked = True
-                                if psyd.message and "Ты слишком" in psyd.message: 
+                                if psyd and psyd.message and "Ты слишком" in psyd.message: 
                                     if tsk:
                                         try:
                                             await mrsyd.send_message("MrStarPay_Bot", "/daily limit")
@@ -2691,7 +2696,7 @@ async def click_loop(msg_id, event, click_count=0):
                                     await event.reply(f"Approached Limit \n\n {psyd}\n 🌱: {click_count}")
                                     await asyncio.sleep(45*60)
 
-                                elif psyd.message and "✅" not in psyd.message: 
+                                elif psyd and psyd.message and "✅" not in psyd.message: 
                                     if tsk:
                                         try:
                                             await mrsyd.send_message("MrStarPay_Bot", "/daily task")
