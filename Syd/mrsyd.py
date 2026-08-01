@@ -2665,7 +2665,7 @@ async def click_loop(msg_id, event, click_count=0):
                                 if psyd.message and "Ты слишком" in psyd.message: 
                                     if tsk:
                                         try:
-                                            await mrsyd.send_message("MrStarPay_Bot", "/daily task")
+                                            await mrsyd.send_message("MrStarPay_Bot", "/daily limit")
                                         except Exception as e:
                                             await event.reply(f"report fail: {e}")
 
