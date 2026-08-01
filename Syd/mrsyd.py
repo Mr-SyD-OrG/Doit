@@ -2122,7 +2122,7 @@ async def daily_profile_check_loop(event):
                 "/start"
             )
 
-            await asyncio.sleep(10)
+            if not await sleep_check(10): return
 
             target_msg_id = None
 
@@ -2144,7 +2144,7 @@ async def daily_profile_check_loop(event):
                     break
 
             if not target_msg_id:
-                await asyncio.sleep(3000)
+                if not await sleep_check(3000): return
                 continue
 
             msg = await mrsyd.get_messages(
@@ -2154,7 +2154,7 @@ async def daily_profile_check_loop(event):
 
             if not msg.buttons:
                 await mrsyd.send_message(ADMIN_ID, "No message btn")
-                await asyncio.sleep(3000)
+                if not await sleep_check(3000): return
                 continue
 
             clicked = False
@@ -2175,10 +2175,10 @@ async def daily_profile_check_loop(event):
                     break
 
             if not clicked:
-                await asyncio.sleep(3600)
+                if not await sleep_check(3600): return
                 continue
 
-            await asyncio.sleep(5)
+            if not await sleep_check(5): return
 
             messages = await mrsyd.get_messages(
                 "patrickstarsrobot",
@@ -2202,7 +2202,7 @@ async def daily_profile_check_loop(event):
 
             if not latest or not latest.buttons:
                 await mrsyd.send_message(ADMIN_ID, "No Profile message")
-                await asyncio.sleep(300)
+                if not await sleep_check(300): return
                 continue
 
             daily_btn = None
@@ -2219,7 +2219,7 @@ async def daily_profile_check_loop(event):
 
             if not daily_btn:
                 await mrsyd.send_message(ADMIN_ID, "No daily_btn")
-                await asyncio.sleep(360)
+                if not await sleep_check(360): return
                 continue
 
             sy = await latest.click(
@@ -2279,7 +2279,7 @@ async def daily_profile_check_loop(event):
                     await event.reply(f"report fail: {e}")
 
 
-                await asyncio.sleep(13)
+                if not await sleep_check(13): return
 
                 try:
 
@@ -2374,11 +2374,23 @@ async def daily_profile_check_loop(event):
 
             while DAILY_RUNNING and slept < 300:
 
-                await asyncio.sleep(5)
+                if not await sleep_check(5): return
 
                 slept += 5
                     
 
+async def sleep_check(wait_seconds):
+    global DAILY_RUNNING
+
+    slept = 0
+
+    while DAILY_RUNNING and slept < wait_seconds:
+        chunk = min(30, wait_seconds - slept)
+        await asyncio.sleep(chunk)
+        slept += chunk
+
+    return DAILY_RUNNING
+    
 @mrsyd.on(events.NewMessage(
     pattern=r"^/dailystatus$",
     from_users=ADMINS
