@@ -63,7 +63,7 @@ async def stop_forward(event):
     await event.reply("🛑 Stop request received.")
 
 
-@mrsyd.on(events.NewMessage(pattern=r"\.forward$", outgoing=True))
+@mrsyd.on(events.NewMessage(pattern=r"\.forward$"))
 async def forward_messages(event):
     await event.reply("test")
     global FORWARD_STOP
