@@ -65,6 +65,7 @@ async def stop_forward(event):
 
 @mrsyd.on(events.NewMessage(pattern=r"\.forward$", outgoing=True))
 async def forward_messages(event):
+    await event.reply("test")
     global FORWARD_STOP
     FORWARD_STOP = False
 
