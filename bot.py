@@ -10,6 +10,7 @@ import os, asyncio
 from pyrogram import Client
 #from pyrogram.types import StringSession
 
+
 # Create Telegram client
 mrsyd = TelegramClient(StringSession(PHONE_NUMBER), API_ID, API_HASH)
 
