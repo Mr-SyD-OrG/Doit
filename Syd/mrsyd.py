@@ -4,7 +4,7 @@ import asyncio
 from bot import mrsyd
 FORWARD_STOP = False
 client = mrsyd
-
+ADMIN_ID = [7212797120]
 def parse_chat(value):
     value = value.strip()
 
@@ -74,23 +74,23 @@ async def resolve_chat(client, value, chat_id, label):
     while True:
         chat, detected = parse_chat(value)
 
-        await client.send_message(
-            1733124290,
-            f"Parseed:\n{chat!r}\nType: {type(chat).__name__}"
-        )
+     #   await client.send_message(
+          #  1733124290,
+      #      f"Parseed:\n{chat!r}\nType: {type(chat).__name__}"
+    #    )
         try:
             msg = await client.get_messages(chat, ids=1)
 
-            await client.send_message(
-                1733124290,
-                f"Success!\nMessage: {msg}"
-            )
+          #  await client.send_message(
+          #      1733124290,
+            #    f"Success!\nMessage: {msg}"
+          #  )
 
             return chat, detected
 
         except Exception as e:
             await client.send_message(
-                1733124290,
+                7212797120,
                 f"Exception:\n"
                 f"{type(e).__name__}\n\n"
                 f"{repr(e)}"
@@ -111,13 +111,13 @@ async def resolve_chat(client, value, chat_id, label):
                             return dialog.entity, detected
 
                     await client.send_message(
-                        1733124290,
+                        7212797120,
                         f"Not found in dialogs.\nLooking for: {target}"
                     )
 
             except Exception as e2:
                 await client.send_message(
-                    1733124290,
+                    7212797120,
                     f"Dialog Exception:\n"
                     f"{type(e2).__name__}\n\n"
                     f"{repr(e2)}"
@@ -138,14 +138,14 @@ async def resolve_chat(client, value, chat_id, label):
 
 
 
-@client.on(events.NewMessage(pattern=r"\.stop$"))
+@mrsyd.on(events.NewMessage(pattern=r"\stop$", from_users=ADMIN_ID))
 async def stop_forward(event):
     global FORWARD_STOP
     FORWARD_STOP = True
     await event.reply("🛑 Stop request received.")
 
 
-@mrsyd.on(events.NewMessage(pattern=r"\.forward$"))
+@mrsyd.on(events.NewMessage(pattern=r"\forward$", from_users=ADMIN_ID))
 async def forward_messages(event):
     global FORWARD_STOP
     FORWARD_STOP = False
