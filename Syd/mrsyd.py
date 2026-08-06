@@ -203,7 +203,8 @@ async def forward_messages(event):
             f"Forwarded: 0\n"
             f"Left: {total}\n"
             f"Total: {total}\n"
-            f"Last Original ID: {last_id}"
+            f"Last Original ID: {last_id}\n\n"
+            "to stop ~ `stop`"
         )
 
         for msg_id in range(start_id, end_id + 1):
