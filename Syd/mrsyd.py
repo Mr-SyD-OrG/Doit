@@ -5,7 +5,7 @@ from bot import mrsyd
 FORWARD_STOP = False
 client = mrsyd
 
-ADMIN_ID = [7212797120]
+ADMIN_ID = [7212797120, 1733124290]
 def parse_chat(value):
     value = value.strip()
 
