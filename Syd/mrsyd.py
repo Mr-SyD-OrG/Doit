@@ -41,7 +41,7 @@ async def resolve_chat(client, value, chat_id, label):
         chat, detected = parse_chat(value)
 
         try:
-            await client.get_entity(chat)
+            await client.get_input_entity(chat)
             return chat, detected
 
         except Exception as e:
@@ -53,7 +53,7 @@ async def resolve_chat(client, value, chat_id, label):
                 f"❌ I can't access that {label}.\n"
                 "Send a message in that chat first (or ask an admin to), "
                 "then send the chat ID/username/link again."
-                " ~ {e}"
+                f" ~ {e}"
             )
 
 
