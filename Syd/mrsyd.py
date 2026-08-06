@@ -76,7 +76,7 @@ async def resolve_chat(client, value, chat_id, label):
 
         await client.send_message(
             1733124290,
-            f"Parsed:\n{chat!r}\nType: {type(chat).__name__}"
+            f"Parseed:\n{chat!r}\nType: {type(chat).__name__}"
         )
         try:
             msg = await client.get_messages(chat, ids=1)
