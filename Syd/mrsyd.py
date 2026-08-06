@@ -5,7 +5,6 @@ from bot import mrsyd
 FORWARD_STOP = False
 client = mrsyd
 
-
 def parse_chat(value):
     value = value.strip()
 
