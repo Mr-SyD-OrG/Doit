@@ -4,6 +4,7 @@ import asyncio
 from bot import mrsyd
 FORWARD_STOP = False
 client = mrsyd
+
 ADMIN_ID = [7212797120]
 def parse_chat(value):
     value = value.strip()
