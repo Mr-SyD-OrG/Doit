@@ -21,9 +21,11 @@ def parse_chat(value):
         if parts[0] == "c" and len(parts) >= 3:
             return int("-100" + parts[1]), int(parts[2])
 
+    if value.lstrip("-").isdigit():
+        return int(value), None
+
     return value, None
-
-
+    
 async def ask_or_cancel(event, text):
     async with event.client.conversation(event.chat_id) as conv:
         await conv.send_message(text + "\n\n(Type `cancel` to abort)")
