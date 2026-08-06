@@ -140,14 +140,14 @@ async def resolve_chat(client, value, chat_id, label):
 
 
 
-@mrsyd.on(events.NewMessage(pattern=r"\stop$", from_users=ADMIN_ID))
+@mrsyd.on(events.NewMessage(pattern=r"/stop$", from_users=ADMIN_ID))
 async def stop_forward(event):
     global FORWARD_STOP
     FORWARD_STOP = True
     await event.reply("🛑 Stop request received.")
 
 
-@mrsyd.on(events.NewMessage(pattern=r"\forward$", from_users=ADMIN_ID))
+@mrsyd.on(events.NewMessage(pattern=r"/forward$", from_users=ADMIN_ID))
 async def forward_messages(event):
     global FORWARD_STOP
     FORWARD_STOP = False
