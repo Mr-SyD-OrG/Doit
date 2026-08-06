@@ -27,6 +27,7 @@ def load_plugins():
 
 async def start_bot():
     await mrsyd.start()
+    await mrsyd.get_dialogs(limit=None)
   #  await app.start() # Userbot requires phone number login
     #print("Userbot is running...")
 
