@@ -41,7 +41,7 @@ async def resolve_chat(client, value, chat_id, label):
         chat, detected = parse_chat(value)
 
         try:
-            await client.get_input_entity(chat)
+            await client.get_messages(chat, ids=1)
             return chat, detected
 
         except Exception as e:
@@ -50,7 +50,7 @@ async def resolve_chat(client, value, chat_id, label):
                     "client": client,
                     "chat_id": chat_id
                 }),
-                f"❌ I can't access that {label}.\n"
+                f"🫠 I can't access that {label}.\n"
                 "Send a message in that chat first (or ask an admin to), "
                 "then send the chat ID/username/link again."
                 f" ~ {e}"
@@ -66,7 +66,6 @@ async def stop_forward(event):
 
 @mrsyd.on(events.NewMessage(pattern=r"\.forward$"))
 async def forward_messages(event):
-    await event.reply("test")
     global FORWARD_STOP
     FORWARD_STOP = False
 
