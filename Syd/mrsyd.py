@@ -44,7 +44,7 @@ async def resolve_chat(client, value, chat_id, label):
             await client.get_entity(chat)
             return chat, detected
 
-        except Exception:
+        except Exception as e:
             value = await ask_or_cancel(
                 type("obj", (), {
                     "client": client,
@@ -53,10 +53,11 @@ async def resolve_chat(client, value, chat_id, label):
                 f"❌ I can't access that {label}.\n"
                 "Send a message in that chat first (or ask an admin to), "
                 "then send the chat ID/username/link again."
+                " ~ {e}"
             )
 
 
-@client.on(events.NewMessage(pattern=r"\.stop$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"\.stop$"))
 async def stop_forward(event):
     global FORWARD_STOP
     FORWARD_STOP = True
