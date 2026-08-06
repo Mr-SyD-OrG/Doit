@@ -35,7 +35,7 @@ async def ask_or_cancel(event, text):
     return reply.raw_text.strip()
 
 
-async def resolve_chat(client, value, chat_id, label):
+async def resolbve_chat(client, value, chat_id, label):
     while True:
         chat, detected = parse_chat(value)
 
@@ -49,11 +49,52 @@ async def resolve_chat(client, value, chat_id, label):
                     "client": client,
                     "chat_id": chat_id
                 }),
-                f"🫠 I can't access that {label}.\n"
+                f"k I can't access that {label}.\n"
                 "Send a message in that chat first (or ask an admin to), "
                 "then send the chat ID/username/link again."
                 f" ~ {e}"
             )
+
+
+                       
+            
+            
+            
+            
+async def resolve_chat(client, value, chat_id, label):
+    while True:
+        chat, detected = parse_chat(value)
+
+        try:
+            await client.get_messages(chat, ids=1)
+            return chat, detected
+
+        except Exception:
+            # Try resolving numeric -100... IDs from dialogs
+            try:
+                if isinstance(chat, int) and str(chat).startswith("-100"):
+                    target = int(str(chat)[4:])  # remove -100 prefix
+
+                    async for dialog in client.iter_dialogs():
+                        if dialog.id == target:
+                            return dialog.entity, detected
+            except Exception:
+                pass
+
+            value = await ask_or_cancel(
+                type(
+                    "obj",
+                    (),
+                    {
+                        "client": client,
+                        "chat_id": chat_id,
+                    },
+                ),
+                f"🫠 I can't access that {label}.\n"
+                "Send a message in that chat first (or ask an admin to), "
+                "then send the chat ID/username/link again."
+            )
+
 
 
 @client.on(events.NewMessage(pattern=r"\.stop$"))
