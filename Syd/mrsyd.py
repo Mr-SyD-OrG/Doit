@@ -2,6 +2,7 @@ from telethon import events
 from telethon.errors import FloodWaitError
 import asyncio
 from bot import mrsyd
+
 FORWARD_STOP = False
 client = mrsyd
 
