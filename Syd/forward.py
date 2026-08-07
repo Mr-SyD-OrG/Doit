@@ -18,12 +18,14 @@ from pyrogram.types import Message
 semaphore = Semaphore(2)
 semapore = asyncio.Semaphore(1)
 #DESTINATION_CHAT = [-1002536001013, -1002523513653]
-DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002280144341, -1002429058090, -1002920265615]
-SOURCE_CHATS = [-1002295881345, 7885202047, -1002726550105, 7065204410, 7519971717, 7456653375, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1001862599580, -1002899768746, -1002077435396]
+#DESTINATION_CHATS = [-1002433450358, -1002464733363, -1002280144341, -1002429058090, -1002920265615]
+#SOURCE_CHATS = [-1002295881345, 7885202047, -1002726550105, 7065204410, 7519971717, 7456653375, 8128434604, 1983814301, 7755788244, 7193976370, -1001780243928, -1001862599580, -1002899768746, -1002077435396]
 BOT_IDS = {7872466736, 5804839092, 7274740598, 7017921723}
 TARGET_CHATS = [-1002332730533, -1002498086501, -1002305372915]  
 import asyncio
 
+SOURCE_CHATS = []
+DESTINATION_CHATS = [-1004485913563, -1004235033201, -1004489264718, -1003778649901, -1003769564318]
 # Global variables
 next_dest_index = 0
 DIRECT = False  
@@ -254,7 +256,7 @@ async def handle_invite(event):
 
 IST = pytz.timezone("Asia/Kolkata")  # Indian Standard Tim
 
-@mrsyd.on(events.NewMessage(from_users=6592320604))
+#@mrsyd.on(events.NewMessage(from_users=6592320604))
 async def forward_messs(event):
     async with semapore:  # Ensures only one message is handled at a time
         await asyncio.sleep(10 * 60)  # Wait 10 minutes
@@ -287,7 +289,7 @@ async def forward_messs(event):
 import re
 syd = asyncio.Semaphore(1)
 
-@mrsyd.on(events.NewMessage(chats=-1003230035868))
+#@mrsyd.on(events.NewMessage(chats=-1003230035868))
 async def forwd_mesages(event):
     async with syd:   # Limit concurrent execution
         try:
@@ -317,7 +319,7 @@ async def forwd_mesages(event):
 
 
 
-@mrsyd.on(events.NewMessage(from_users=8192265990))
+#@mrsyd.on(events.NewMessage(from_users=8192265990))
 async def forward_mesydsage(event):
     if not event.text:
         return
