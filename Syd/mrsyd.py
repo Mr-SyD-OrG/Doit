@@ -148,7 +148,7 @@ async def stop_forward(event):
 
 
 FORWARD_STOP = False
-
+ERROR_TIMES = []
 
 async def safe_edit(message, text):
     try:
@@ -159,7 +159,7 @@ async def safe_edit(message, text):
 
 @mrsyd.on(events.NewMessage(pattern=r"/forward$", from_users=ADMIN_ID))
 async def forward_messages(event):
-    global FORWARD_STOP
+    global FORWARD_STOP, ERROR_TIMES
     FORWARD_STOP = False
 
     client = event.client
@@ -258,22 +258,25 @@ async def forward_messages(event):
                     except FloodWaitError as e:
                         await asyncio.sleep(e.seconds)
 
-                    except Exception:
+                    except Exception as e:
                         invalid += 1
                         last_id = msg_id
-                        try:
-                            await event.reply(
-                                f"❌ Error forwarding message `{msg_id}`\n\n"
-                                f"`{type(e).__name__}: {e}`"
-                            )
-                        except Exception:
-                            pass
+
+                        now = asyncio.get_running_loop().time()
+                        ERROR_TIMES[:] = [t for t in ERROR_TIMES if now - t < 60]
+
+                        if len(ERROR_TIMES) < 2:
+                            ERROR_TIMES.append(now)
+                            try:
+                                await event.reply(
+                                    f"❌ Error forwarding message `{msg_id}`\n\n"
+                                    f"`{type(e).__name__}: {e}`"
+                                )
+                            except Exception:
+                                pass
                         break
 
-                if (
-                    (sent + invalid) % 100 == 0
-                    or msg_id == end_id
-                ):
+                if (sent + invalid) % 100 == 0 or msg_id == end_id:
                     await safe_edit(
                         progress,
                         f"🚀 Forwarding...\n\n"
@@ -287,18 +290,22 @@ async def forward_messages(event):
 
                 await asyncio.sleep(pause)
 
-            except Exception:
+            except Exception as e:
                 invalid += 1
                 last_id = msg_id
-                try:
-                    await event.reply(
-                        f"❌ Error forwarding message `{msg_id}`\n\n"
-                        f"`{type(e).__name__}: {e}`"
-                    )
-                except Exception:
-                    pass
-            
-    
+
+                now = asyncio.get_running_loop().time()
+                ERROR_TIMES[:] = [t for t in ERROR_TIMES if now - t < 60]
+
+                if len(ERROR_TIMES) < 2:
+                    ERROR_TIMES.append(now)
+                    try:
+                        await event.reply(
+                            f"❌ Error getting message `{msg_id}`\n\n"
+                            f"`{type(e).__name__}: {e}`"
+                        )
+                    except Exception:
+                        pass
 
         await safe_edit(
             progress,
