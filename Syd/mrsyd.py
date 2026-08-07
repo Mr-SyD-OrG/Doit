@@ -147,6 +147,16 @@ async def stop_forward(event):
     await event.reply("🛑 Stop request received.")
 
 
+FORWARD_STOP = False
+
+
+async def safe_edit(message, text):
+    try:
+        await message.edit(text)
+    except Exception:
+        pass
+
+
 @mrsyd.on(events.NewMessage(pattern=r"/forward$", from_users=ADMIN_ID))
 async def forward_messages(event):
     global FORWARD_STOP
@@ -174,10 +184,12 @@ async def forward_messages(event):
         start_id = int(await ask_or_cancel(event, "🔢 Send Start Message ID"))
 
         if detected_end is not None:
-            ans = (await ask_or_cancel(
-                event,
-                f"📌 Detected End Message ID: {detected_end}\nUse it? (yes/no)"
-            )).lower()
+            ans = (
+                await ask_or_cancel(
+                    event,
+                    f"📌 Detected End Message ID: {detected_end}\nUse it? (yes/no)"
+                )
+            ).lower()
 
             if ans in ("yes", "y"):
                 end_id = detected_end
@@ -193,6 +205,7 @@ async def forward_messages(event):
 
         total = end_id - start_id + 1
         sent = 0
+        invalid = 0
         last_id = start_id - 1
 
         progress = await event.reply(
@@ -200,22 +213,23 @@ async def forward_messages(event):
             f"From: {from_chat}\n"
             f"To: {to_chat}\n"
             f"Start ID: {start_id}\n"
-            f"Skipped: 0\n"
             f"Forwarded: 0\n"
+            f"Invalid: 0\n"
             f"Left: {total}\n"
             f"Total: {total}\n"
             f"Last Original ID: {last_id}\n\n"
-            "to stop ~ `stop`"
+            "To stop ~ /stop"
         )
 
         for msg_id in range(start_id, end_id + 1):
 
             if FORWARD_STOP:
-                await progress.edit(
+                await safe_edit(
+                    progress,
                     f"🛑 Stopped\n\n"
-                    f"Skipped: {max(0,last_id-start_id+1-sent)}\n"
                     f"Forwarded: {sent}\n"
-                    f"Left: {max(0,total-sent)}\n"
+                    f"Invalid: {invalid}\n"
+                    f"Left: {max(0, total - sent - invalid)}\n"
                     f"Total: {total}\n"
                     f"Last Original ID: {last_id}"
                 )
@@ -225,11 +239,13 @@ async def forward_messages(event):
                 msg = await client.get_messages(from_chat, ids=msg_id)
 
                 if not msg:
+                    invalid += 1
+                    last_id = msg_id
                     continue
 
                 while True:
                     try:
-                        await mrsyd.forward_messages(
+                        await client.forward_messages(
                             to_chat,
                             msg,
                             from_chat,
@@ -242,38 +258,57 @@ async def forward_messages(event):
                     except FloodWaitError as e:
                         await asyncio.sleep(e.seconds)
 
-                    except Exception as ex:
-                        print(ex)
+                    except Exception:
+                        invalid += 1
+                        last_id = msg_id
+                        try:
+                            await event.reply(
+                                f"❌ Error forwarding message `{msg_id}`\n\n"
+                                f"`{type(e).__name__}: {e}`"
+                            )
+                        except Exception:
+                            pass
                         break
 
-                if sent % 100 == 0 or msg_id == end_id:
-                    try:
-                        await progress.edit(
-                            f"🚀 Forwarding...\n\n"
-                            f"Skipped: {max(0,last_id-start_id+1-sent)}\n"
-                            f"Forwarded: {sent}\n"
-                            f"Left: {max(0,total-sent)}\n"
-                            f"Total: {total}\n"
-                            f"Last Original ID: {last_id}\n"
-                            f"~ .stop to end"
-                        )
-                    except Exception:
-                        pass
+                if (
+                    (sent + invalid) % 100 == 0
+                    or msg_id == end_id
+                ):
+                    await safe_edit(
+                        progress,
+                        f"🚀 Forwarding...\n\n"
+                        f"Forwarded: {sent}\n"
+                        f"Invalid: {invalid}\n"
+                        f"Left: {max(0, total - sent - invalid)}\n"
+                        f"Total: {total}\n"
+                        f"Last Original ID: {last_id}\n\n"
+                        "To stop ~ /stop"
+                    )
 
                 await asyncio.sleep(pause)
 
-            except Exception as ex:
-                print(ex)
+            except Exception:
+                invalid += 1
+                last_id = msg_id
+                try:
+                    await event.reply(
+                        f"❌ Error forwarding message `{msg_id}`\n\n"
+                        f"`{type(e).__name__}: {e}`"
+                    )
+                except Exception:
+                    pass
+            
+    
 
-        await progress.edit(
+        await safe_edit(
+            progress,
             f"✅ Completed\n\n"
-            f"Skipped: {max(0,last_id-start_id+1-sent)}\n"
             f"Forwarded: {sent}\n"
-            f"Left: {max(0,total-sent)}\n"
+            f"Invalid: {invalid}\n"
+            f"Left: {max(0, total - sent - invalid)}\n"
             f"Total: {total}\n"
             f"Last Original ID: {last_id}"
         )
 
     except Exception as e:
         await event.reply(f"❌ {e}")
-
