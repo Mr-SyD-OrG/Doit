@@ -2109,7 +2109,435 @@ import re
 DAILY_RUNNING = False
 DAILY_TASK = None
 
-async def daily_profile_check_loop(event):
+
+async def sleep_cheeck(wait_seconds):
+    try:
+        await asyncio.sleep(wait_seconds)
+        return True
+    except asyncio.CancelledError:
+        return False
+
+
+async def daily_profile_check_loop():
+
+    global DAILY_TASK
+
+    try:
+
+        while True:
+
+            try:
+
+                await mrsyd.send_message(
+                    "patrickstarsrobot",
+                    "/start"
+                )
+
+                if not await sleep_cheeck(10):
+                    return
+
+                target_msg_id = None
+
+                messages = await mrsyd.get_messages(
+                    "patrickstarsrobot",
+                    limit=15
+                )
+
+                for m in messages:
+
+                    if (
+                        m.text
+                        and re.search(
+                            r'Получи\s+свою\s+личную\s+ссылку',
+                            m.text
+                        )
+                    ):
+                        target_msg_id = m.id
+                        break
+
+                if not target_msg_id:
+
+                    if not await sleep_cheeck(300):
+                        return
+
+                    continue
+
+                msg = await mrsyd.get_messages(
+                    "patrickstarsrobot",
+                    ids=target_msg_id
+                )
+
+                if not msg.buttons:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        "No message btn"
+                    )
+
+                    if not await sleep_cheeck(300):
+                        return
+
+                    continue
+
+                clicked = False
+
+                for row in msg.buttons:
+
+                    for btn in row:
+
+                        if (
+                            btn.text
+                            and any(
+                                x in btn.text
+                                for x in [
+                                    "Профиль",
+                                    "Ежедневка",
+                                    "🎁"
+                                ]
+                            )
+                        ):
+
+                            await msg.click(
+                                text=btn.text
+                            )
+
+                            clicked = True
+                            break
+
+                    if clicked:
+                        break
+
+                if not clicked:
+
+                    if not await sleep_cheeck(3600):
+                        return
+
+                    continue
+
+                if not await sleep_cheeck(5):
+                    return
+
+                messages = await mrsyd.get_messages(
+                    "patrickstarsrobot",
+                    limit=5
+                )
+
+                latest = None
+
+                for m in messages:
+
+                    clean_text = (
+                        m.text
+                        .replace("**", "")
+                        .replace("__", "")
+                        .strip()
+                    ) if m.text else ""
+
+                    if clean_text.startswith("✨ Профиль"):
+                        latest = m
+                        break
+
+                if not latest or not latest.buttons:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        "No Profile message"
+                    )
+
+                    if not await sleep_check(300):
+                        return
+
+                    continue
+
+                daily_btn = None
+
+                for row in latest.buttons:
+
+                    for btn in row:
+
+                        if (
+                            btn.text
+                            and any(
+                                x in btn.text
+                                for x in [
+                                    "Профиль",
+                                    "Ежедневка",
+                                    "🎁"
+                                ]
+                            )
+                        ):
+                            daily_btn = btn.text
+                            break
+
+                    if daily_btn:
+                        break
+
+                if not daily_btn:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        "No daily_btn"
+                    )
+
+                    if not await sleep_check(360):
+                        return
+
+                    continue
+
+                # ==========================================
+                # PRESS DAILY
+                # ==========================================
+
+                sy = await latest.click(
+                    text=daily_btn
+                )
+
+                wait_seconds = 3600
+
+                # ==========================================
+                # COOLDOWN POPUP
+                # ==========================================
+
+                if sy and sy.message:
+
+                    text = sy.message
+
+                    if "Осталось:" in text:
+
+                        m = re.search(
+                            r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
+                            text
+                        )
+
+                        if m:
+
+                            hours = int(m.group(1) or 0)
+                            minutes = int(m.group(2) or 0)
+
+                            wait_seconds = (
+                                hours * 3600
+                                + minutes * 60
+                                + 60
+                            )
+
+                            await mrsyd.send_message(
+                                ADMIN_ID,
+                                f"Daily Bonus wait: "
+                                f"{hours}h {minutes}m"
+                            )
+
+                    else:
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"Unexpected popup:\n{text}"
+                        )
+
+                # ==========================================
+                # SUCCESSFUL CLAIM
+                # ==========================================
+
+                else:
+
+                    try:
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            "✅ Daily reward claimed"
+                        )
+
+                        await mrsyd.send_message(
+                            "MrStarPay_Bot",
+                            "/daily bonus"
+                        )
+
+                    except Exception as e:
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"Report fail: {e}"
+                        )
+
+                    if not await sleep_check(13):
+                        return
+
+                    # Check the next cooldown
+                    try:
+
+                        sy2 = await latest.click(
+                            text=daily_btn
+                        )
+
+                        if (
+                            sy2
+                            and sy2.message
+                            and "Осталось:" in sy2.message
+                        ):
+
+                            m = re.search(
+                                r"Осталось:\s*(?:(\d+)\s*ч)?\s*(?:(\d+)\s*мин)?",
+                                sy2.message
+                            )
+
+                            if m:
+
+                                hours = int(m.group(1) or 0)
+                                minutes = int(m.group(2) or 0)
+
+                                wait_seconds = (
+                                    hours * 3600
+                                    + minutes * 60
+                                    + 60
+                                )
+
+                                await mrsyd.send_message(
+                                    ADMIN_ID,
+                                    f"✅ Daily reward claimed\n"
+                                    f"Next Press wait: "
+                                    f"{hours}h {minutes}m"
+                                )
+
+                        else:
+
+                            textss = (
+                                sy2.message
+                                if sy2
+                                and getattr(
+                                    sy2,
+                                    "message",
+                                    None
+                                )
+                                else "no popup"
+                            )
+
+                            wait_seconds = 24 * 60 * 60
+
+                            await mrsyd.send_message(
+                                ADMIN_ID,
+                                f"Daily Bonus: "
+                                f"(Error: {textss}) "
+                                f"(Check Acc)"
+                            )
+
+                    except Exception as e:
+
+                        await mrsyd.send_message(
+                            ADMIN_ID,
+                            f"Error while checking "
+                            f"next cooldown:\n{e}"
+                        )
+
+                # ==========================================
+                # WAIT FOR NEXT PRESS
+                # ==========================================
+
+                # IMPORTANT:
+                # Sleep ONCE for the whole cooldown.
+                # No 5-minute loop.
+
+                if not await sleep_cheeck(wait_seconds):
+                    return
+
+            except asyncio.CancelledError:
+                raise
+
+            except Exception as e:
+
+                try:
+
+                    await mrsyd.send_message(
+                        ADMIN_ID,
+                        f"⚠️ Daily task error:\n{e}"
+                    )
+
+                except Exception:
+                    pass
+
+                # Retry after 5 minutes
+                if not await sleep_cheeck(300):
+                    return
+
+    finally:
+        if DAILY_TASK is asyncio.current_task():
+            DAILY_TASK = None
+
+
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystart$",
+    from_users=ADMINS
+))
+async def daily_start(event):
+
+    global DAILY_TASK
+
+    # Clean stale/finished task
+    if DAILY_TASK is not None and DAILY_TASK.done():
+        DAILY_TASK = None
+
+    if DAILY_TASK is not None:
+
+        return await event.reply(
+            "⚠️ Daily loop already running"
+        )
+
+    DAILY_TASK = asyncio.create_task(
+        daily_profile_check_loop()
+    )
+
+    await event.reply(
+        "✅ Daily loop started"
+    )
+
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystop$",
+    from_users=ADMINS
+))
+async def daily_stop(event):
+
+    global DAILY_TASK
+
+    task = DAILY_TASK
+
+    if task is None or task.done():
+
+        DAILY_TASK = None
+
+        return await event.reply(
+            "⚠️ Daily loop is not running"
+        )
+
+    task.cancel()
+
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+    except Exception:
+        pass
+
+    DAILY_TASK = None
+
+    await event.reply(
+        "🛑 Daily loop stopped"
+    )
+
+@mrsyd.on(events.NewMessage(
+    pattern=r"^/dailystatus$",
+    from_users=ADMINS
+))
+async def daily_status(event):
+
+    global DAILY_TASK
+
+    running = (
+        DAILY_TASK is not None
+        and not DAILY_TASK.done()
+    )
+
+    await event.reply(
+        f"Daily Running: {running}"
+    )
+async def daily_proofile_check_loop(event):
 
     global DAILY_RUNNING
 
@@ -2391,20 +2819,20 @@ async def sleep_check(wait_seconds):
 
     return DAILY_RUNNING
     
-@mrsyd.on(events.NewMessage(
-    pattern=r"^/dailystatus$",
-    from_users=ADMINS
-))
-async def daily_staatus(event):
+#@mrsyd.on(events.NewMessage(
+#    pattern=r"^/dailystatus$",
+ #   from_users=ADMINS
+#))
+async def daily_8staatus(event):
 
     await event.reply(
         f"Daily Running: {DAILY_RUNNING}"
     )
-@mrsyd.on(events.NewMessage(
-    pattern=r"^/dailystop$",
-    from_users=ADMINS
-))
-async def daily_stoop(event):
+#@mrsyd.on(events.NewMessage(
+#    pattern=r"^/dailystop$",
+  #  from_users=ADMINS
+#))
+async def dail8y_stoop(event):
 
     global DAILY_RUNNING
     global DAILY_TASK
@@ -2419,11 +2847,11 @@ async def daily_stoop(event):
         "🛑 Daily loop stopped"
     )
 
-@mrsyd.on(events.NewMessage(
-    pattern=r"^/dailystart$",
-    from_users=ADMINS
-))
-async def daily_start(event):
+#@mrsyd.on(events.NewMessage(
+ #   pattern=r"^/dailystart$",
+ #   from_users=ADMINS
+#))
+async def dai8ly_start(event):
 
     global DAILY_RUNNING
     global DAILY_TASK
