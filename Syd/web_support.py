@@ -8,7 +8,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "CHANGE_ME")
 connection_code = os.environ.get("CONNECTION_CODE", "482731")
 website_url = os.environ.get("WEBSITE_URL", "https://doit-u30d.onrender.com")
 
-.
+
 sessions = {}
 admin_tokens = set()
 
